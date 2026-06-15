@@ -114,7 +114,7 @@
             100% { right: 105%; transform: scaleX(-1) translateY(0); }
         }
 
-        /* 設計不同高度、速度、顏色的小魚 */
+        /* 设计不同高度、速度、颜色的小鱼 */
         .fish1 { bottom: 15%; background: #ff7675; animation: swim-right 14s linear infinite; }
         .fish1::before { border-right: 9px solid #ff7675; }
 
@@ -364,7 +364,10 @@
     <script>
         let totalSeconds = 0;
         let remainingSeconds = 0;
-        let accumulatedSeconds = 0; // 👑 用來儲存總累積專注時間的秒數
+        
+        // 👑 變更點 1：網頁開啟時，自動從小筆記本 (localStorage) 讀取舊紀錄，如果沒有就從 0 開始
+        let accumulatedSeconds = parseInt(localStorage.getItem('accumulatedSeconds')) || 0; 
+        
         let timerInterval = null;
         let alarmLoopInterval = null; 
         let isPaused = true;
@@ -442,7 +445,11 @@
                 timerInterval = setInterval(() => {
                     if (remainingSeconds > 0) {
                         remainingSeconds--;
-                        accumulatedSeconds++; // 👑 當計時器在跑時，每過一秒，累積時數就加一
+                        accumulatedSeconds++; // 當計時器在跑時，每過一秒，累積時數就加一
+                        
+                        // 👑 變更點 2：每過一秒，即時把最新累積秒數存進瀏覽器小筆記本中，避免關網頁時遺失
+                        localStorage.setItem('accumulatedSeconds', accumulatedSeconds); 
+                        
                         updateUI();
                     } else {
                         clearInterval(timerInterval);
@@ -574,6 +581,9 @@
         hoursInput.addEventListener('input', syncPreview);
         minutesInput.addEventListener('input', syncPreview);
         secondsInput.addEventListener('input', syncPreview);
+
+        // 👑 變更點 3：網頁剛載入時，立刻單獨刷新右上角「累積專注」的文字顯示，讀出歷史紀錄
+        accumulatedDisplay.innerText = `⏱️ 累積專注：${formatTime(accumulatedSeconds)}`;
     </script>
 </body>
 </html>
