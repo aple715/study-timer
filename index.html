@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-     <meta charset="UTF-8">
-    <title>專注讀書</title>
-    >     <link rel="icon" type="image/png" href="https://i.postimg.cc/SRMvMWMP/665.jpg">
-    <link rel="apple-touch-icon" href="https://i.postimg.cc/SRMvMWMP/665.jpg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>深呼吸！讀書專注計時器 (水族箱累積版)</title>
+    
+    <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/SRMvMWMP/665.jpg">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/SRMvMWMP/665.jpg">
+
     <style>
         * {
             box-sizing: border-box;
@@ -369,7 +369,6 @@
         let totalSeconds = 0;
         let remainingSeconds = 0;
         
-        // 👑 變更點 1：網頁開啟時，自動從小筆記本 (localStorage) 讀取舊紀錄，如果沒有就從 0 開始
         let accumulatedSeconds = parseInt(localStorage.getItem('accumulatedSeconds')) || 0; 
         
         let timerInterval = null;
@@ -388,7 +387,6 @@
         const startBtn = document.getElementById('start-btn');
         const pauseBtn = document.getElementById('pause-btn');
 
-        // 通用時間格式化函式 (秒數轉成 HH:MM:SS)
         function formatTime(totalSecs) {
             const hrs = Math.floor(totalSecs / 3600);
             const mins = Math.floor((totalSecs % 3600) / 60);
@@ -396,7 +394,6 @@
             return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // 更新介面狀態與水位高度
         function updateUI() {
             timeLeftDisplay.innerText = formatTime(remainingSeconds);
             accumulatedDisplay.innerText = `⏱️ 累積專注：${formatTime(accumulatedSeconds)}`;
@@ -410,7 +407,6 @@
             }
         }
 
-        // 即時同步變更設定時的預覽
         function syncPreview() {
             if (isPaused && timerInterval === null) {
                 const hrs = parseInt(hoursInput.value) || 0;
@@ -421,7 +417,6 @@
             }
         }
 
-        // 開始計時
         function startTimer() {
             if (isPaused) {
                 if (timerInterval === null && remainingSeconds === 0) {
@@ -449,9 +444,8 @@
                 timerInterval = setInterval(() => {
                     if (remainingSeconds > 0) {
                         remainingSeconds--;
-                        accumulatedSeconds++; // 當計時器在跑時，每過一秒，累積時數就加一
+                        accumulatedSeconds++;
                         
-                        // 👑 變更點 2：每過一秒，即時把最新累積秒數存進瀏覽器小筆記本中，避免關網頁時遺失
                         localStorage.setItem('accumulatedSeconds', accumulatedSeconds); 
                         
                         updateUI();
@@ -463,7 +457,6 @@
             }
         }
 
-        // 暫停計時
         function pauseTimer() {
             isPaused = true;
             clearInterval(timerInterval);
@@ -472,7 +465,6 @@
             startBtn.innerText = '繼續';
         }
 
-        // 重製計時
         function resetTimer() {
             clearInterval(timerInterval);
             timerInterval = null;
@@ -492,7 +484,6 @@
             syncPreview();
         }
 
-        // 鬧鐘轟炸與重複邏輯
         function triggerAlarm() {
             alarmModal.classList.add('active'); 
             const selectedSound = soundSelect.value;
@@ -508,7 +499,6 @@
             }, loopDelay);
         }
 
-        // 當使用者點擊彈窗的「確定」時呼叫
         function dismissAlarm() {
             if (alarmLoopInterval) {
                 clearInterval(alarmLoopInterval); 
@@ -518,7 +508,6 @@
             resetTimer(); 
         }
 
-        // 9 種音效合成核心
         function playAlarmSound(soundType) {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -561,7 +550,6 @@
                         break;
                     case 'retro':
                         beep(300, now, 0.05, 'square'); beep(450, now + 0.05, 0.05, 'square');
-                        beep(600, now + 0.1, 0.05, 'square'); beep(900, now + 0.15, 0.15, 'square');
                         break;
                     case 'morse':
                         const p = (t, d) => beep(900, now + t, d, 'sine', 0.2);
@@ -586,7 +574,6 @@
         minutesInput.addEventListener('input', syncPreview);
         secondsInput.addEventListener('input', syncPreview);
 
-        // 👑 變更點 3：網頁剛載入時，立刻單獨刷新右上角「累積專注」的文字顯示，讀出歷史紀錄
         accumulatedDisplay.innerText = `⏱️ 累積專注：${formatTime(accumulatedSeconds)}`;
     </script>
 </body>
