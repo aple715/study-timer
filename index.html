@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>深呼吸！讀書專注計時器 (水族箱累積版)</title>
     
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐟</text></svg>">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐟</text></svg>">
-
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐟</text></svg>">
+    <link class="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐟</text></svg>">
 
     <style>
         * {
@@ -56,7 +55,7 @@
             opacity: 0.8;
             transition: height 1s linear;
             z-index: 1;
-            overflow: hidden; /* 確保小魚只在水裡游，超出水面會被隱藏 */
+            overflow: hidden; /* 確保小魚只在水裡游 */
         }
 
         /* 水波紋效果 */
@@ -112,14 +111,13 @@
             50% { transform: translateY(-12px); }
             100% { left: 105%; transform: translateY(0); }
         }
-        /* 小魚游動動畫：從右到左 (需要水平翻轉 scaleX) */
+        /* 小魚游動動畫：從右到左 */
         @keyframes swim-left {
             0% { right: -50px; transform: scaleX(-1) translateY(0); }
             50% { transform: scaleX(-1) translateY(12px); }
             100% { right: 105%; transform: scaleX(-1) translateY(0); }
         }
 
-        /* 设计不同高度、速度、颜色的小鱼 */
         .fish1 { bottom: 15%; background: #ff7675; animation: swim-right 14s linear infinite; }
         .fish1::before { border-right: 9px solid #ff7675; }
 
@@ -135,8 +133,7 @@
         .fish5 { bottom: 85%; background: #10ac84; animation: swim-right 16s linear infinite; animation-delay: 3s; }
         .fish5::before { border-right: 9px solid #10ac84; }
 
-
-        /* 主介面卡片（毛玻璃效果） */
+        /* 主介面卡片 */
         .container {
             position: relative;
             z-index: 10;
@@ -252,7 +249,7 @@
             color: #7f8c8d;
         }
 
-        /* 自訂美化彈出視窗 */
+        /* 彈出視窗 */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -354,7 +351,7 @@
         <div class="btn-group">
             <button class="btn-start" id="start-btn" onclick="startTimer()">開始</button>
             <button class="btn-pause" id="pause-btn" onclick="pauseTimer()" disabled>暫停</button>
-            <button class="btn-reset" id="reset-btn" onclick="resetTimer()">重製</button>
+            <button class="btn-reset" id="reset-btn" onclick="resetTimer()">重置</button>
         </div>
     </div>
 
@@ -401,9 +398,10 @@
             timeLeftDisplay.innerText = formattedRemaining;
             accumulatedDisplay.innerText = `⏱️ 累積專注：${formatTime(accumulatedSeconds)}`;
 
-            // 🌟 讓分頁標題動態顯示剩餘時間
             if (!isPaused && remainingSeconds > 0) {
                 document.title = `(${formattedRemaining}) 讀書中...`;
+            } else if (isPaused && remainingSeconds > 0) {
+                document.title = `[已暫停] ${defaultTitle}`;
             } else {
                 document.title = defaultTitle;
             }
@@ -417,12 +415,17 @@
             }
         }
 
+        // 取得安全合法的輸入時間秒數
+        function getInputsInSeconds() {
+            let hrs = Math.max(0, parseInt(hoursInput.value) || 0);
+            let mins = Math.max(0, parseInt(minutesInput.value) || 0);
+            let secs = Math.max(0, parseInt(secondsInput.value) || 0);
+            return (hrs * 3600) + (mins * 60) + secs;
+        }
+
         function syncPreview() {
             if (isPaused && timerInterval === null) {
-                const hrs = parseInt(hoursInput.value) || 0;
-                const mins = parseInt(minutesInput.value) || 0;
-                const secs = parseInt(secondsInput.value) || 0;
-                const previewSeconds = (hrs * 3600) + (mins * 60) + secs;
+                const previewSeconds = getInputsInSeconds();
                 timeLeftDisplay.innerText = formatTime(previewSeconds);
             }
         }
@@ -430,11 +433,7 @@
         function startTimer() {
             if (isPaused) {
                 if (timerInterval === null && remainingSeconds === 0) {
-                    const hrs = parseInt(hoursInput.value) || 0;
-                    const mins = parseInt(minutesInput.value) || 0;
-                    const secs = parseInt(secondsInput.value) || 0;
-                    
-                    totalSeconds = (hrs * 3600) + (mins * 60) + secs;
+                    totalSeconds = getInputsInSeconds();
                     remainingSeconds = totalSeconds;
 
                     if (totalSeconds <= 0) {
@@ -447,11 +446,12 @@
                 startBtn.disabled = true;
                 pauseBtn.disabled = false;
                 
+                // 執行期間一律鎖定輸入框
                 hoursInput.disabled = true;
                 minutesInput.disabled = true;
                 secondsInput.disabled = true;
 
-                updateUI(); // 立即更新一次標題
+                updateUI();
 
                 timerInterval = setInterval(() => {
                     if (remainingSeconds > 0) {
@@ -459,10 +459,10 @@
                         accumulatedSeconds++;
                         
                         localStorage.setItem('accumulatedSeconds', accumulatedSeconds); 
-                        
                         updateUI();
                     } else {
                         clearInterval(timerInterval);
+                        timerInterval = null; // 確保清除狀態
                         triggerAlarm(); 
                     }
                 }, 1000);
@@ -472,10 +472,17 @@
         function pauseTimer() {
             isPaused = true;
             clearInterval(timerInterval);
+            timerInterval = null; // 暫停時釋放常駐，允許重置判斷
             startBtn.disabled = false;
             pauseBtn.disabled = true;
             startBtn.innerText = '繼續';
-            document.title = `[已暫停] ${defaultTitle}`;
+            
+            // 💡 修正點：暫停時不應該解鎖輸入框，避免剩餘秒數跟輸入框對不上有衝突
+            hoursInput.disabled = true;
+            minutesInput.disabled = true;
+            secondsInput.disabled = true;
+            
+            updateUI();
         }
 
         function resetTimer() {
@@ -589,6 +596,7 @@
         minutesInput.addEventListener('input', syncPreview);
         secondsInput.addEventListener('input', syncPreview);
 
+        // 初始化累積時數顯示
         accumulatedDisplay.innerText = `⏱️ 累積專注：${formatTime(accumulatedSeconds)}`;
     </script>
 </body>
