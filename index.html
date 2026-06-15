@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>深呼吸！讀書專注計時器 (水族箱累積版)</title>
     
-    <link rel="icon" type="image/jpeg" href="https://i.postimg.cc/SRMvMWMP/665.jpg">
-    <link rel="apple-touch-icon" href="https://i.postimg.cc/SRMvMWMP/665.jpg">
+    <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=32&h=32&fit=crop&auto=format">
+    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?w=180&h=180&fit=crop&auto=format">
 
     <style>
         * {
@@ -375,6 +375,7 @@
         let alarmLoopInterval = null; 
         let isPaused = true;
 
+        const defaultTitle = "深呼吸！讀書專注計時器 (水族箱累積版)";
         const hoursInput = document.getElementById('hours-input');
         const minutesInput = document.getElementById('minutes-input');
         const secondsInput = document.getElementById('seconds-input');
@@ -395,8 +396,16 @@
         }
 
         function updateUI() {
-            timeLeftDisplay.innerText = formatTime(remainingSeconds);
+            const formattedRemaining = formatTime(remainingSeconds);
+            timeLeftDisplay.innerText = formattedRemaining;
             accumulatedDisplay.innerText = `⏱️ 累積專注：${formatTime(accumulatedSeconds)}`;
+
+            // 🌟 讓分頁標題動態顯示剩餘時間
+            if (!isPaused && remainingSeconds > 0) {
+                document.title = `(${formattedRemaining}) 讀書中...`;
+            } else {
+                document.title = defaultTitle;
+            }
 
             if (totalSeconds > 0) {
                 const elapsedSeconds = totalSeconds - remainingSeconds;
@@ -441,6 +450,8 @@
                 minutesInput.disabled = true;
                 secondsInput.disabled = true;
 
+                updateUI(); // 立即更新一次標題
+
                 timerInterval = setInterval(() => {
                     if (remainingSeconds > 0) {
                         remainingSeconds--;
@@ -463,6 +474,7 @@
             startBtn.disabled = false;
             pauseBtn.disabled = true;
             startBtn.innerText = '繼續';
+            document.title = `[已暫停] ${defaultTitle}`;
         }
 
         function resetTimer() {
@@ -481,11 +493,13 @@
             pauseBtn.disabled = true;
             waterBg.style.height = '0%';
             
+            document.title = defaultTitle;
             syncPreview();
         }
 
         function triggerAlarm() {
             alarmModal.classList.add('active'); 
+            document.title = `🚨 時間到囉！！！`;
             const selectedSound = soundSelect.value;
             
             let loopDelay = 1200; 
