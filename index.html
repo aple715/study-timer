@@ -25,7 +25,7 @@
             align-items: center;
         }
 
-        /* 👑 右上方累積總時數顯示 */
+        /* 右上方累積總時數顯示 */
         .stats-display {
             position: absolute;
             top: 20px;
@@ -83,46 +83,21 @@
             100% { transform: translateX(-40px); }
         }
 
-        /* 🐟 動態生成的 CSS 游泳小魚設定 */
-        .fish {
+        /* 🐟 游泳小魚容器設定 */
+        .fish-container {
             position: absolute;
-            width: 34px;
-            height: 18px;
-            border-radius: 50%;
-            opacity: 0.85;
-            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.15);
-        }
-        .fish::before {
-            content: '';
-            position: absolute;
-            left: -8px;
-            top: 3px;
-            border-top: 6px solid transparent;
-            border-bottom: 6px solid transparent;
-        }
-        .fish::after {
-            content: '';
-            position: absolute;
-            right: 6px;
-            top: 5px;
-            width: 3px;
-            height: 3px;
-            background: #333;
-            border-radius: 50%;
-        }
-
-        /* 🦁 獅子魚特別樣式 */
-        .fish.lionfish {
-            background: repeating-linear-gradient(90deg, #d2143a, #d2143a 4px, #fff 4px, #fff 8px) !important;
+            width: 50px;
+            height: 35px;
+            opacity: 0.9;
         }
 
         @keyframes swim-right {
-            0% { left: -60px; transform: translateY(0); }
+            0% { left: -70px; transform: translateY(0); }
             50% { transform: translateY(-15px); }
             100% { left: 105%; transform: translateY(0); }
         }
         @keyframes swim-left {
-            0% { right: -60px; transform: scaleX(-1) translateY(0); }
+            0% { right: -70px; transform: scaleX(-1) translateY(0); }
             50% { transform: scaleX(-1) translateY(15px); }
             100% { right: 105%; transform: scaleX(-1) translateY(0); }
         }
@@ -330,7 +305,7 @@
                 <option value="retro">6. 復古電玩音 (紅白機感)</option>
                 <option value="morse">7. 摩斯密碼音 (SOS求救)</option>
                 <option value="sonar">8. 潛艇聲納探 (深海孤寂)</option>
-                <option value="digital">9. 電電子手錶音 (高頻雙響)</option>
+                <option value="digital">9. 電子手錶音 (高頻雙響)</option>
             </select>
         </div>
 
@@ -352,19 +327,34 @@
     </div>
 
     <script>
-        // 🐟 魚種解鎖資料庫 (這裡我把目標時間改短，方便你立刻看到所有魚！)
+        // 🐟 獨立向量 SVG 魚種庫，完美解決顏色重疊與不顯示的問題
         const FISH_DATABASE = [
-            { id: 'fish1', name: '基本金魚', target: 0, color: '#ff7675', speed: '14s', dir: 'swim-right', bottom: '15%', className: '' },
-            { id: 'fish2', name: '活力小丑魚', target: 10, color: '#ffa502', speed: '18s', dir: 'swim-left', bottom: '45%', className: '' }, // 累積 10 秒解鎖
-            { id: 'fish3', name: '黃金藍倒吊', target: 20, color: '#2e86de', speed: '15s', dir: 'swim-right', bottom: '65%', className: '' }, // 累積 20 秒解鎖
-            { id: 'fish4', name: '閃亮亮燈魚', target: 30, color: '#10ac84', speed: '12s', dir: 'swim-left', bottom: '30%', className: '' }, // 累積 30 秒解鎖
-            { id: 'fish5', name: '霸氣獅子魚', target: 40, color: '#d2143a', speed: '20s', dir: 'swim-right', bottom: '75%', className: 'lionfish' } // 累積 40 秒解鎖
+            { 
+                id: 'fish1', name: '基本金魚', target: 0, speed: '14s', dir: 'swim-right', bottom: '15%',
+                svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#ff7675"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#ff7675"/><circle cx="33" cy="12" r="2" fill="#fff"/><circle cx="33" cy="12" r="1" fill="#000"/></svg>`
+            },
+            { 
+                id: 'fish2', name: '活力小丑魚', target: 10, speed: '18s', dir: 'swim-left', bottom: '45%',
+                svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#ffa502"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#ffa502"/><path d="M20,6 Q23,15 20,24 L24,23 Q27,15 24,7 Z" fill="#fff"/><path d="M29,7 Q31,15 29,23 L32,22 Q34,15 32,8 Z" fill="#fff"/><circle cx="33" cy="12" r="1.5" fill="#000"/></svg>`
+            },
+            { 
+                id: 'fish3', name: '黃金藍倒吊', target: 20, speed: '15s', dir: 'swim-right', bottom: '65%',
+                svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#2e86de"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#f1c40f"/><path d="M15,10 Q25,7 32,15 Q22,17 15,10 Z" fill="#1a3a5f"/><circle cx="34" cy="12" r="1.5" fill="#000"/></svg>`
+            },
+            { 
+                id: 'fish4', name: '閃亮亮燈魚', target: 30, speed: '12s', dir: 'swim-left', bottom: '30%',
+                svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,5 40,15 Q25,25 10,15 Z" fill="#74b9ff"/><path d="M10,15 L3,9 L5,15 L3,21 Z" fill="#ff7675"/><path d="M12,15 Q25,12 38,15" stroke="#00f2fe" stroke-width="2" fill="none"/><circle cx="33" cy="13" r="1" fill="#000"/></svg>`
+            },
+            { 
+                id: 'fish5', name: '霸氣獅子魚', target: 40, speed: '21s', dir: 'swim-right', bottom: '75%',
+                svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#d2143a"/><path d="M10,15 L1,5 L5,15 L1,25 Z" fill="#d2143a"/><path d="M18,3 L15,12 M23,2 L21,11 M28,2 L27,11 M33,3 L31,12" stroke="#fff" stroke-width="1.5"/><path d="M18,27 L16,18 M23,28 L21,19 M27,28 L25,19" stroke="#fff" stroke-width="1.5"/><path d="M15,8 Q25,5 35,12" stroke="#fff" stroke-width="2" fill="none"/><path d="M15,22 Q25,25 35,18" stroke="#fff" stroke-width="2" fill="none"/><circle cx="33" cy="12" r="1.5" fill="#fff"/></svg>`
+            }
         ];
 
         let totalSeconds = 0;
         let remainingSeconds = 0;
         let accumulatedSeconds = parseInt(localStorage.getItem('accumulatedSeconds')) || 0; 
-        let currentUnlockedCount = -1; // 用來紀錄當前解鎖的魚隻數量，避免重複刷新
+        let currentUnlockedCount = -1; 
         
         let timerInterval = null;
         let alarmLoopInterval = null; 
@@ -391,34 +381,27 @@
             return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // 🌟 檢查並動態刷新魚群
+        // 🌟 核心修復：使用完整的內嵌 SVG，確保每隻魚獨立且互不干涉
         function checkAndRefreshFishTank() {
-            // 先計算目前時間應該解鎖幾隻魚
             let unlockedCount = 0;
             FISH_DATABASE.forEach(fish => {
                 if (accumulatedSeconds >= fish.target) unlockedCount++;
             });
 
-            // 💡 關鍵修正：只有當「解鎖的魚隻數量」改變時，才重新渲染 HTML
             if (unlockedCount !== currentUnlockedCount) {
                 currentUnlockedCount = unlockedCount;
-                waterBg.innerHTML = ''; // 清空水族箱重新放魚
+                waterBg.innerHTML = ''; 
 
                 FISH_DATABASE.forEach((fish) => {
                     if (accumulatedSeconds >= fish.target) {
-                        const fishEl = document.createElement('div');
-                        fishEl.className = `fish ${fish.className}`;
-                        fishEl.style.bottom = fish.bottom;
-                        fishEl.style.backgroundColor = fish.color;
-                        fishEl.style.animation = `${fish.dir} ${fish.speed} linear infinite`;
+                        const fishContainer = document.createElement('div');
+                        fishContainer.className = 'fish-container';
+                        fishContainer.style.bottom = fish.bottom;
+                        fishContainer.style.animation = `${fish.dir} ${fish.speed} linear infinite`;
                         
-                        // 動態注入尾巴顏色
-                        const style = document.createElement('style');
-                        style.innerHTML = `.${fish.id}-style::before { border-right-color: ${fish.color} !important; }`;
-                        document.head.appendChild(style);
-                        fishEl.classList.add(`${fish.id}-style`);
-
-                        waterBg.appendChild(fishEl);
+                        // 直接塞入專屬的 SVG 魚
+                        fishContainer.innerHTML = fish.svg;
+                        waterBg.appendChild(fishContainer);
                     }
                 });
 
@@ -491,7 +474,6 @@
                         
                         localStorage.setItem('accumulatedSeconds', accumulatedSeconds); 
                         
-                        // 檢查是否需要刷新小魚 (不會每秒打斷動畫)
                         checkAndRefreshFishTank();
                         updateUI();
                     } else {
