@@ -30,7 +30,7 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            z-index: 50; /* 提高層級防止被遮擋 */
+            z-index: 50; 
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
@@ -54,15 +54,14 @@
             margin-top: 2px;
         }
 
-        /* 📘 手工打造的自訂圖鑑選單容器 */
+        /* 📘 自訂圖鑑選單容器 */
         .custom-select-container {
             position: relative;
             margin-top: 8px;
             text-align: left;
-            width: 260px; /* 維持放大加寬版 */
+            width: 260px; 
         }
 
-        /* 選單按鈕頂層標題 */
         .custom-select-trigger {
             padding: 8px 12px;
             font-size: 14px;
@@ -79,7 +78,6 @@
             user-select: none;
         }
 
-        /* 下拉箭頭小圖示 */
         .custom-select-trigger::after {
             content: "";
             width: 0;
@@ -95,7 +93,6 @@
             transform: rotate(180deg);
         }
 
-        /* 下拉選項清單（核心：可以塞入 SVG） */
         .custom-options {
             position: absolute;
             top: 100%;
@@ -107,7 +104,7 @@
             border-radius: 0 0 8px 8px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
             display: none;
-            max-height: 300px;
+            max-height: 280px;
             overflow-y: auto;
             z-index: 60;
         }
@@ -116,7 +113,6 @@
             display: block;
         }
 
-        /* 單個選項的設計 */
         .custom-option {
             padding: 10px 12px;
             font-size: 14px;
@@ -125,7 +121,7 @@
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 12px; /* 圖示與文字間距 */
+            gap: 12px; 
             border-bottom: 1px solid #f1f5f9;
             transition: background 0.2s;
         }
@@ -139,7 +135,6 @@
             background-color: #f1f5f9;
         }
 
-        /* 選單內的小魚 SVG 縮圖規格（固定大小） */
         .select-fish-icon {
             width: 32px;
             height: 22px;
@@ -154,7 +149,7 @@
             height: 100%;
         }
 
-        /* 水位背景 */
+        /* 🌊 動態水面與海浪背景設定 */
         .water-bg {
             position: absolute;
             bottom: 0;
@@ -162,28 +157,46 @@
             width: 100%;
             height: 0%; 
             background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
-            opacity: 0.8;
+            opacity: 0.85;
             transition: height 1s linear;
             z-index: 1;
-            overflow: hidden;
         }
 
-        /* 水波紋效果 */
-        .water-bg::before {
-            content: "";
+        /* SVG 波浪容器放置在水體最上方 */
+        .waves-container {
             position: absolute;
-            top: -20px;
+            top: -28px; 
             left: 0;
-            width: 200%;
-            height: 40px;
-            background: radial-gradient(circle at 50% -10px, transparent 20px, #4facfe 21px);
-            background-size: 40px 40px;
-            animation: wave 2s infinite linear;
+            width: 100%;
+            height: 30px;
+            overflow: hidden;
+            pointer-events: none;
         }
 
-        @keyframes wave {
+        .wave-svg {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+        }
+
+        /* 前景浪：走得快，淺藍色 */
+        .wave-front {
+            fill: #4facfe;
+            opacity: 0.8;
+            animation: wave-move 4s linear infinite;
+        }
+
+        /* 背景浪：走得慢，深藍層次 */
+        .wave-back {
+            fill: #00c6ff;
+            opacity: 0.4;
+            animation: wave-move 7s linear infinite;
+            margin-top: 2px;
+        }
+
+        @keyframes wave-move {
             0% { transform: translateX(0); }
-            100% { transform: translateX(-40px); }
+            100% { transform: translateX(-50%); }
         }
 
         /* 🐟 游泳小魚容器設定 */
@@ -191,17 +204,28 @@
             position: absolute;
             width: 50px;
             height: 35px;
-            opacity: 0.9;
+            opacity: 0.95;
+            pointer-events: none;
+        }
+
+        /* 🐋 較大魚種的放大倍率 */
+        .fish-container.size-large {
+            width: 80px;   
+            height: 56px;
+        }
+        .fish-container.size-huge {
+            width: 95px;   
+            height: 66px;
         }
 
         @keyframes swim-right {
-            0% { left: -70px; transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+            0% { left: -110px; transform: translateY(0); }
+            50% { transform: translateY(-12px); }
             100% { left: 105%; transform: translateY(0); }
         }
         @keyframes swim-left {
-            0% { right: -70px; transform: scaleX(-1) translateY(0); }
-            50% { transform: scaleX(-1) translateY(15px); }
+            0% { right: -110px; transform: scaleX(-1) translateY(0); }
+            50% { transform: scaleX(-1) translateY(12px); }
             100% { right: 105%; transform: scaleX(-1) translateY(0); }
         }
 
@@ -371,16 +395,25 @@
 
     <div class="stats-display">
         <div id="accumulated-display">⏱️ 累積專注：00:00:00</div>
-        <div class="unlocked-count" id="fish-count-display">🐠 已解鎖魚種：1 / 5</div>
+        <div class="unlocked-count" id="fish-count-display">🐠 已解鎖魚種：1 / 8</div>
         
         <div class="custom-select-container" id="custom-fish-select">
             <div class="custom-select-trigger" onclick="toggleSelectMenu()">📜 查看魚種解鎖門檻</div>
-            <div class="custom-options" id="custom-options-box">
-                </div>
+            <div class="custom-options" id="custom-options-box"></div>
         </div>
     </div>
 
-    <div class="water-bg" id="water"></div>
+    <div class="water-bg" id="water">
+        <div class="waves-container">
+            <svg class="wave-svg wave-back" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M0,60 C150,90 350,30 500,60 C650,90 850,30 1000,60 C1150,90 1350,30 1500,60 L1500,120 L0,120 Z"></path>
+            </svg>
+            <svg class="wave-svg wave-front" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M0,50 C200,20 400,80 600,50 C800,20 1000,80 1200,50 L1200,120 L0,120 Z"></path>
+            </svg>
+        </div>
+        <div id="fish-tank-content" style="position: absolute; width:100%; height:100%; top:0; left:0;"></div>
+    </div>
 
     <div class="container">
         <h1>書海無涯，水快淹來啦！</h1>
@@ -389,7 +422,7 @@
             <label>設定專注時間</label>
             <div class="time-inputs-container">
                 <div class="time-field">
-                    <input type="number" id="hours-input" min="0" max="23" value="1">
+                    <input type="number" id="hours-input" min="0" max="23" value="0">
                     <span>時</span>
                 </div>
                 <div class="time-field">
@@ -397,7 +430,7 @@
                     <span>分</span>
                 </div>
                 <div class="time-field">
-                    <input type="number" id="seconds-input" min="0" max="59" value="0">
+                    <input type="number" id="seconds-input" min="0" max="59" value="15">
                     <span>秒</span>
                 </div>
             </div>
@@ -418,7 +451,7 @@
             </select>
         </div>
 
-        <div class="timer-display" id="time-left">01:00:00</div>
+        <div class="timer-display" id="time-left">00:00:15</div>
 
         <div class="btn-group">
             <button class="btn-start" id="start-btn" onclick="startTimer()">開始</button>
@@ -436,26 +469,37 @@
     </div>
 
     <script>
-        // 🐟 魚種解鎖資料庫 (完全保留你原本繪製的漂亮 SVG)
         const FISH_DATABASE = [
             { 
-                id: 'fish1', name: '基本金魚', target: 0, speed: '14s', dir: 'swim-right', bottom: '15%', label: '初始擁有',
+                id: 'fish1', name: '基本金魚', target: 0, sizeClass: '', label: '初始擁有',
                 svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#ff7675"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#ff7675"/><circle cx="33" cy="12" r="2" fill="#fff"/><circle cx="33" cy="12" r="1" fill="#000"/></svg>`
             },
             { 
-                id: 'fish2', name: '活力小丑魚', target: 300, speed: '18s', dir: 'swim-left', bottom: '45%', label: '累積 5 分鐘',
+                id: 'fish_puff', name: 'Ｑ彈綠河豚', target: 3, sizeClass: '', label: '測試 3 秒',
+                svg: `<svg viewBox="0 0 50 30"><circle cx="25" cy="15" r="12" fill="#badc58"/><path d="M13,15 L7,10 L9,15 L7,20 Z" fill="#6ab04c"/><path d="M22,18 Q25,21 28,18" stroke="#6ab04c" stroke-width="1.5" fill="none"/><circle cx="31" cy="12" r="2.5" fill="#fff"/><circle cx="32" cy="12" r="1" fill="#000"/><circle cx="18" cy="11" r="1" fill="#6ab04c"/><circle cx="24" cy="9" r="1" fill="#6ab04c"/><circle cx="20" cy="18" r="1" fill="#6ab04c"/></svg>`
+            },
+            { 
+                id: 'fish_sail', name: '極速大旗魚', target: 5, sizeClass: 'size-large', label: '測試 5 秒',
+                svg: `<svg viewBox="0 0 50 30"><path d="M5,15 Q22,4 42,14 Q22,24 5,15 Z" fill="#2c3e50"/><path d="M42,14 L49,14" stroke="#2c3e50" stroke-width="1.5"/><path d="M15,8 Q22,-2 32,7 Z" fill="#16a085"/><path d="M5,15 L0,9 L2,15 L0,21 Z" fill="#2c3e50"/><circle cx="36" cy="12" r="1.5" fill="#fff"/><circle cx="36" cy="12" r="0.8" fill="#000"/></svg>`
+            },
+            { 
+                id: 'fish_dolphin', name: '溫柔大海豚', target: 10, sizeClass: 'size-huge', label: '測試 10 秒',
+                svg: `<svg viewBox="0 0 50 30"><path d="M4,17 Q25,2 45,13 Q35,23 4,17 Z" fill="#74b9ff"/><path d="M38,10 Q43,6 45,13 Z" fill="#74b9ff"/><path d="M22,7 Q25,0 29,5 Z" fill="#4fa8ff"/><path d="M4,17 L-1,12 L1,17 L-1,22 Z" fill="#74b9ff"/><circle cx="38" cy="12" r="1.5" fill="#fff"/><circle cx="38" cy="12" r="0.8" fill="#000"/></svg>`
+            },
+            { 
+                id: 'fish2', name: '活力小丑魚', target: 300, sizeClass: '', label: '累積 5 分鐘',
                 svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#ffa502"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#ffa502"/><path d="M20,6 Q23,15 20,24 L24,23 Q27,15 24,7 Z" fill="#fff"/><path d="M29,7 Q31,15 29,23 L32,22 Q34,15 32,8 Z" fill="#fff"/><circle cx="33" cy="12" r="1.5" fill="#000"/></svg>`
             },
             { 
-                id: 'fish3', name: '黃金藍倒吊', target: 900, speed: '15s', dir: 'swim-right', bottom: '65%', label: '累積 15 分鐘',
+                id: 'fish3', name: '黃金藍倒吊', target: 900, sizeClass: '', label: '累積 15 分鐘',
                 svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#2e86de"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#f1c40f"/><path d="M15,10 Q25,7 32,15 Q22,17 15,10 Z" fill="#1a3a5f"/><circle cx="34" cy="12" r="1.5" fill="#000"/></svg>`
             },
             { 
-                id: 'fish4', name: '閃亮亮燈魚', target: 1800, speed: '12s', dir: 'swim-left', bottom: '30%', label: '累積 30 分鐘',
+                id: 'fish4', name: '閃亮亮燈魚', target: 1800, sizeClass: '', label: '累積 30 分鐘',
                 svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,5 40,15 Q25,25 10,15 Z" fill="#74b9ff"/><path d="M10,15 L3,9 L5,15 L3,21 Z" fill="#ff7675"/><path d="M12,15 Q25,12 38,15" stroke="#00f2fe" stroke-width="2" fill="none"/><circle cx="33" cy="13" r="1" fill="#000"/></svg>`
             },
             { 
-                id: 'fish5', name: '霸氣獅子魚', target: 3600, speed: '21s', dir: 'swim-right', bottom: '75%', label: '累積 1 小時',
+                id: 'fish5', name: '霸氣獅子魚', target: 3600, sizeClass: '', label: '累積 1 小時',
                 svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#d2143a"/><path d="M10,15 L1,5 L5,15 L1,25 Z" fill="#d2143a"/><path d="M18,3 L15,12 M23,2 L21,11 M28,2 L27,11 M33,3 L31,12" stroke="#fff" stroke-width="1.5"/><path d="M18,27 L16,18 M23,28 L21,19 M27,28 L25,19" stroke="#fff" stroke-width="1.5"/><path d="M15,8 Q25,5 35,12" stroke="#fff" stroke-width="2" fill="none"/><path d="M15,22 Q25,25 35,18" stroke="#fff" stroke-width="2" fill="none"/><circle cx="33" cy="12" r="1.5" fill="#fff"/></svg>`
             }
         ];
@@ -469,7 +513,7 @@
         let alarmLoopInterval = null; 
         let isPaused = true;
 
-        const defaultTitle = "深呼吸！讀書專注計時器 (水族箱進化版)";
+        const defaultTitle = "深呼吸！讀書專專計時器 (水族箱進化版)";
         const hoursInput = document.getElementById('hours-input');
         const minutesInput = document.getElementById('minutes-input');
         const secondsInput = document.getElementById('seconds-input');
@@ -480,6 +524,7 @@
         const customSelectContainer = document.getElementById('custom-fish-select');
         const customOptionsBox = document.getElementById('custom-options-box');
         const waterBg = document.getElementById('water');
+        const fishTankContent = document.getElementById('fish-tank-content');
         const alarmModal = document.getElementById('alarm-modal');
         
         const startBtn = document.getElementById('start-btn');
@@ -492,72 +537,73 @@
             return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // 開關自訂下拉選單
         function toggleSelectMenu() {
             customSelectContainer.classList.toggle('open');
         }
 
-        // 點擊選單外部時，自動收合選單
         window.addEventListener('click', function(e) {
             if (!customSelectContainer.contains(e.target)) {
                 customSelectContainer.classList.remove('open');
             }
         });
 
-        // 🌟 核心大修改：動態渲染帶有「真正小魚 SVG 程式碼」的精美圖鑑
         function updateFishGuideUI() {
             customOptionsBox.innerHTML = '';
             
             FISH_DATABASE.forEach(fish => {
                 const optionDiv = document.createElement('div');
                 optionDiv.className = 'custom-option';
-                
                 const isUnlocked = accumulatedSeconds >= fish.target;
                 
                 if (isUnlocked) {
-                    // 已解鎖：左邊放縮小版的小魚 SVG 圖示，右邊寫名字與條件
                     optionDiv.innerHTML = `
                         <div class="select-fish-icon">${fish.svg}</div>
                         <span>${fish.name} (${fish.label})</span>
                     `;
                 } else {
-                    // 未解鎖：維持安全鎖頭與神秘問號
                     optionDiv.innerHTML = `
                         <div class="select-fish-icon">🔒</div>
                         <span style="color: #94a3b8;">??? (${fish.label}解鎖)</span>
                     `;
                 }
-                
                 customOptionsBox.appendChild(optionDiv);
             });
         }
 
-        // 檢查並動態刷新魚群
-        function checkAndRefreshFishTank() {
+        // 🌟 核心修正：加入 forceRefresh 參數，確保網頁一開啟就強制渲染！
+        function checkAndRefreshFishTank(forceRefresh = false) {
             let unlockedCount = 0;
             FISH_DATABASE.forEach(fish => {
                 if (accumulatedSeconds >= fish.target) unlockedCount++;
             });
 
-            if (unlockedCount !== currentUnlockedCount) {
+            if (unlockedCount !== currentUnlockedCount || forceRefresh) {
                 currentUnlockedCount = unlockedCount;
-                waterBg.innerHTML = ''; 
+                fishTankContent.innerHTML = ''; 
 
                 FISH_DATABASE.forEach((fish) => {
                     if (accumulatedSeconds >= fish.target) {
-                        const fishContainer = document.createElement('div');
-                        fishContainer.className = 'fish-container';
-                        fishContainer.style.bottom = fish.bottom;
-                        fishContainer.style.animation = `${fish.dir} ${fish.speed} linear infinite`;
-                        
-                        fishContainer.innerHTML = fish.svg;
-                        waterBg.appendChild(fishContainer);
+                        const spawnCount = fish.id === 'fish1' ? 3 : 2; 
+
+                        for (let i = 0; i < spawnCount; i++) {
+                            const fishContainer = document.createElement('div');
+                            fishContainer.className = `fish-container ${fish.sizeClass}`;
+                            
+                            const randomBottom = Math.floor(Math.random() * 65) + 12; 
+                            const randomSpeed = (Math.random() * 8 + (fish.sizeClass ? 14 : 10)).toFixed(1); 
+                            const randomDelay = (Math.random() * -12).toFixed(1); 
+                            const randomDirection = Math.random() > 0.5 ? 'swim-right' : 'swim-left';
+
+                            fishContainer.style.bottom = `${randomBottom}%`;
+                            fishContainer.style.animation = `${randomDirection} ${randomSpeed}s linear ${randomDelay}s infinite`;
+                            
+                            fishContainer.innerHTML = fish.svg;
+                            fishTankContent.appendChild(fishContainer);
+                        }
                     }
                 });
 
                 fishCountDisplay.innerText = `🐠 已解鎖魚種：${unlockedCount} / ${FISH_DATABASE.length}`;
-                
-                // 完全同步刷新高擬真 SVG 下拉圖鑑
                 updateFishGuideUI();
             }
         }
@@ -752,9 +798,9 @@
         minutesInput.addEventListener('input', syncPreview);
         secondsInput.addEventListener('input', syncPreview);
 
-        // 初始化執行
-        updateFishGuideUI();
-        checkAndRefreshFishTank();
+        // 🌟 初始化執行：傳入 true 強制刷新
+        updateUI();
+        checkAndRefreshFishTank(true);
     </script>
 </body>
 </html>
