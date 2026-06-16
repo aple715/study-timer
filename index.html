@@ -111,11 +111,7 @@
             border-radius: 50%;
         }
 
-        /* 🦁 獅子魚特別樣式：多了延伸的胸鰭與背鰭線條效果 */
-        .fish.lionfish::shadow-fin, .fish.lionfish::before {
-            border-right-width: 14px !important;
-        }
-        /* 運用邊框做出獅子魚放射狀的斑紋感 */
+        /* 🦁 獅子魚特別樣式 */
         .fish.lionfish {
             background: repeating-linear-gradient(90deg, #d2143a, #d2143a 4px, #fff 4px, #fff 8px) !important;
         }
@@ -334,7 +330,7 @@
                 <option value="retro">6. 復古電玩音 (紅白機感)</option>
                 <option value="morse">7. 摩斯密碼音 (SOS求救)</option>
                 <option value="sonar">8. 潛艇聲納探 (深海孤寂)</option>
-                <option value="digital">9. 電子手錶音 (高頻雙響)</option>
+                <option value="digital">9. 電電子手錶音 (高頻雙響)</option>
             </select>
         </div>
 
@@ -356,18 +352,19 @@
     </div>
 
     <script>
-        // 🐟 魚種解鎖資料庫 (以秒為單位計算門檻)
+        // 🐟 魚種解鎖資料庫 (這裡我把目標時間改短，方便你立刻看到所有魚！)
         const FISH_DATABASE = [
             { id: 'fish1', name: '基本金魚', target: 0, color: '#ff7675', speed: '14s', dir: 'swim-right', bottom: '15%', className: '' },
-            { id: 'fish2', name: '活力小丑魚', target: 60, color: '#ffa502', speed: '18s', dir: 'swim-left', bottom: '45%', className: '' }, // 累積 1 分鐘解鎖 (方便測試)
-            { id: 'fish3', name: '黃金藍倒吊', target: 600, color: '#2e86de', speed: '15s', dir: 'swim-right', bottom: '65%', className: '' }, // 累積 10 分鐘解鎖
-            { id: 'fish4', name: '閃亮亮燈魚', target: 1800, color: '#10ac84', speed: '12s', dir: 'swim-left', bottom: '30%', className: '' }, // 累積 30 分鐘解鎖
-            { id: 'fish5', name: '霸氣獅子魚', target: 3600, color: '#d2143a', speed: '20s', dir: 'swim-right', bottom: '75%', className: 'lionfish' } // 累積 1 小時 (3600秒) 解鎖
+            { id: 'fish2', name: '活力小丑魚', target: 10, color: '#ffa502', speed: '18s', dir: 'swim-left', bottom: '45%', className: '' }, // 累積 10 秒解鎖
+            { id: 'fish3', name: '黃金藍倒吊', target: 20, color: '#2e86de', speed: '15s', dir: 'swim-right', bottom: '65%', className: '' }, // 累積 20 秒解鎖
+            { id: 'fish4', name: '閃亮亮燈魚', target: 30, color: '#10ac84', speed: '12s', dir: 'swim-left', bottom: '30%', className: '' }, // 累積 30 秒解鎖
+            { id: 'fish5', name: '霸氣獅子魚', target: 40, color: '#d2143a', speed: '20s', dir: 'swim-right', bottom: '75%', className: 'lionfish' } // 累積 40 秒解鎖
         ];
 
         let totalSeconds = 0;
         let remainingSeconds = 0;
         let accumulatedSeconds = parseInt(localStorage.getItem('accumulatedSeconds')) || 0; 
+        let currentUnlockedCount = -1; // 用來紀錄當前解鎖的魚隻數量，避免重複刷新
         
         let timerInterval = null;
         let alarmLoopInterval = null; 
@@ -394,39 +391,39 @@
             return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // 🌟 動態刷新魚群的函式
-        function refreshFishTank() {
-            waterBg.innerHTML = ''; // 清空水族箱
+        // 🌟 檢查並動態刷新魚群
+        function checkAndRefreshFishTank() {
+            // 先計算目前時間應該解鎖幾隻魚
             let unlockedCount = 0;
-
-            FISH_DATABASE.forEach((fish) => {
-                if (accumulatedSeconds >= fish.target) {
-                    unlockedCount++;
-                    
-                    // 建立小魚 DOM
-                    const fishEl = document.createElement('div');
-                    fishEl.className = `fish ${fish.className}`;
-                    fishEl.style.bottom = fish.bottom;
-                    fishEl.style.backgroundColor = fish.color;
-                    
-                    // 動態給予動畫速度與方向
-                    fishEl.style.animation = `${fish.dir} ${fish.speed} linear infinite`;
-                    
-                    // 注入尾巴顏色 (利用 CSS 變數或直接改 style)
-                    // 為了維持原本 ::before 邊框顏色，我們直接創建一個內部樣式或直接指定 border 顏色
-                    const style = document.createElement('style');
-                    style.innerHTML = `
-                        .${fish.id}-style::before { border-right-color: ${fish.color} !important; }
-                    `;
-                    document.head.appendChild(style);
-                    fishEl.classList.add(`${fish.id}-style`);
-
-                    waterBg.appendChild(fishEl);
-                }
+            FISH_DATABASE.forEach(fish => {
+                if (accumulatedSeconds >= fish.target) unlockedCount++;
             });
 
-            // 更新畫面上解鎖數量的文字
-            fishCountDisplay.innerText = `🐠 已解鎖魚種：${unlockedCount} / ${FISH_DATABASE.length}`;
+            // 💡 關鍵修正：只有當「解鎖的魚隻數量」改變時，才重新渲染 HTML
+            if (unlockedCount !== currentUnlockedCount) {
+                currentUnlockedCount = unlockedCount;
+                waterBg.innerHTML = ''; // 清空水族箱重新放魚
+
+                FISH_DATABASE.forEach((fish) => {
+                    if (accumulatedSeconds >= fish.target) {
+                        const fishEl = document.createElement('div');
+                        fishEl.className = `fish ${fish.className}`;
+                        fishEl.style.bottom = fish.bottom;
+                        fishEl.style.backgroundColor = fish.color;
+                        fishEl.style.animation = `${fish.dir} ${fish.speed} linear infinite`;
+                        
+                        // 動態注入尾巴顏色
+                        const style = document.createElement('style');
+                        style.innerHTML = `.${fish.id}-style::before { border-right-color: ${fish.color} !important; }`;
+                        document.head.appendChild(style);
+                        fishEl.classList.add(`${fish.id}-style`);
+
+                        waterBg.appendChild(fishEl);
+                    }
+                });
+
+                fishCountDisplay.innerText = `🐠 已解鎖魚種：${unlockedCount} / ${FISH_DATABASE.length}`;
+            }
         }
 
         function updateUI() {
@@ -494,8 +491,8 @@
                         
                         localStorage.setItem('accumulatedSeconds', accumulatedSeconds); 
                         
-                        // 💡 每秒檢查一次是否需要刷新水族箱魚隻（解鎖新魚）
-                        refreshFishTank();
+                        // 檢查是否需要刷新小魚 (不會每秒打斷動畫)
+                        checkAndRefreshFishTank();
                         updateUI();
                     } else {
                         clearInterval(timerInterval);
@@ -620,9 +617,8 @@
         minutesInput.addEventListener('input', syncPreview);
         secondsInput.addEventListener('input', syncPreview);
 
-        // 🚀 初始化執行
-        accumulatedDisplay.innerText = `⏱️ 累積專注：${formatTime(accumulatedSeconds)}`;
-        refreshFishTank(); // 初始化水族箱魚群
+        // 初始化執行
+        checkAndRefreshFishTank();
     </script>
 </body>
 </html>
