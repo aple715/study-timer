@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>深呼吸！讀書專注計時器 (水族箱進化版)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>深呼吸！讀書專注計時器 (手機相容極簡版)</title>
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐟</text></svg>">
     <link class="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐟</text></svg>">
@@ -14,6 +14,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body, html {
@@ -44,13 +45,35 @@
             user-select: none;
         }
 
-        /* 👑 右上方累積總時數與圖鑑顯示區域 */
-        .stats-display {
+        /* 📊 圖鑑與統計控制按鈕 (解決手機重疊關鍵) */
+        .stats-toggle-btn {
             position: absolute;
             top: 20px;
             right: 20px;
-            z-index: 50; 
-            background: rgba(255, 255, 255, 0.9);
+            z-index: 100;
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        .stats-toggle-btn:hover {
+            background: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        /* 👑 右上方累積總時數與圖鑑顯示區域 */
+        .stats-display {
+            position: absolute;
+            top: 65px;
+            right: 20px;
+            z-index: 90; 
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             padding: 15px 20px;
@@ -58,13 +81,19 @@
             font-size: 15px;
             font-weight: bold;
             color: #2c3e50;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
             border: 1px solid rgba(255,255,255,0.25);
             font-variant-numeric: tabular-nums;
             text-align: right;
-            display: flex;
+            display: none; /* 預設隱藏，由按鈕控制 */
             flex-direction: column;
             gap: 6px;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .unlocked-count {
@@ -78,12 +107,12 @@
             position: relative;
             margin-top: 8px;
             text-align: left;
-            width: 260px; 
+            width: 240px; 
         }
 
         .custom-select-trigger {
             padding: 8px 12px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             border: 2px solid #cbd5e1;
             border-radius: 8px;
@@ -101,9 +130,9 @@
             content: "";
             width: 0;
             height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 6px solid #2c3e50;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 5px solid #2c3e50;
             margin-left: 10px;
             transition: transform 0.2s;
         }
@@ -114,18 +143,17 @@
 
         .custom-options {
             position: absolute;
-            top: 100%;
+            bottom: 105%; /* 向上彈出防止手機版超出底線 */
             left: 0;
             right: 0;
             background: #ffffff;
             border: 2px solid #cbd5e1;
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            box-shadow: 0 -8px 20px rgba(0,0,0,0.15);
             display: none;
-            max-height: 280px;
+            max-height: 220px;
             overflow-y: auto;
-            z-index: 60;
+            z-index: 110;
         }
 
         .custom-select-container.open .custom-options {
@@ -134,7 +162,7 @@
 
         .custom-option {
             padding: 10px 12px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             color: #2c3e50;
             cursor: pointer;
@@ -142,21 +170,15 @@
             align-items: center;
             gap: 12px; 
             border-bottom: 1px solid #f1f5f9;
-            transition: background 0.2s;
         }
 
         .custom-option:last-child {
             border-bottom: none;
-            border-radius: 0 0 6px 6px;
-        }
-
-        .custom-option:hover {
-            background-color: #f1f5f9;
         }
 
         .select-fish-icon {
-            width: 32px;
-            height: 22px;
+            width: 28px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -181,7 +203,6 @@
             z-index: 1;
         }
 
-        /* SVG 波浪容器放置在水體最上方 */
         .waves-container {
             position: absolute;
             top: -42px; 
@@ -198,14 +219,12 @@
             height: 100%;
         }
 
-        /* 前景浪 */
         .wave-front {
             fill: #1fa2ff;
             opacity: 0.9;
             animation: wave-move-left 4s linear infinite;
         }
 
-        /* 背景浪 */
         .wave-back {
             fill: #00c6ff;
             opacity: 0.5;
@@ -222,7 +241,7 @@
             100% { transform: translateX(0); }
         }
 
-        /* 🐟 游泳小魚容器設定 */
+        /* 🐟 小魚容器與水面分佈修正 */
         .fish-container {
             position: absolute;
             width: 50px;
@@ -232,19 +251,12 @@
             left: -150px; 
         }
 
-        /* 🐋 較大魚種的放大倍率 */
         .fish-container.size-large { width: 80px; height: 56px; }
         .fish-container.size-huge { width: 95px; height: 66px; }
 
-        /* 啟動游泳動畫 */
-        .fish-container.active-swim-right {
-            animation: swim-right linear infinite backwards;
-        }
-        .fish-container.active-swim-left {
-            animation: swim-left linear infinite backwards;
-        }
+        .fish-container.active-swim-right { animation: swim-right linear infinite backwards; }
+        .fish-container.active-swim-left { animation: swim-left linear infinite backwards; }
 
-        /* 移動動畫 - 微幅上下波動漂浮感 */
         @keyframes swim-right {
             0% { left: -120px; opacity: 0; transform: translateY(0); }
             8% { opacity: 0.95; }
@@ -265,22 +277,44 @@
         .container {
             position: relative;
             z-index: 10;
-            background: rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.78);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            padding: 40px;
+            padding: 40px 30px;
             border-radius: 20px;
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
-            width: 95%;
+            width: 90%;
             max-width: 420px;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* ➖ 縮小按鈕樣式 */
+        .minimize-toggle-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: none;
+            border: none;
+            font-size: 13px;
+            font-weight: bold;
+            color: #7f8c8d;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.03);
+            transition: all 0.2s;
+        }
+        .minimize-toggle-btn:hover {
+            background: rgba(0,0,0,0.08);
+            color: #2c3e50;
         }
 
         h1 {
             color: #2c3e50;
             margin-bottom: 25px;
-            font-size: 24px;
+            font-size: 22px;
             letter-spacing: 1px;
         }
 
@@ -290,6 +324,7 @@
             color: #1a3a5f;
             margin: 20px 0;
             font-variant-numeric: tabular-nums;
+            transition: font-size 0.3s;
         }
 
         .setting-group {
@@ -309,13 +344,13 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 5px;
+            gap: 6px;
         }
 
         .time-field {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             flex: 1;
         }
 
@@ -328,7 +363,6 @@
             outline: none;
             background-color: white;
             text-align: center;
-            transition: border-color 0.2s;
         }
 
         input[type="number"]:focus, select:focus {
@@ -338,7 +372,6 @@
         .time-field span {
             font-size: 14px;
             color: #556;
-            white-space: nowrap;
         }
 
         .btn-group {
@@ -350,7 +383,7 @@
 
         button {
             flex: 1;
-            padding: 12px 20px;
+            padding: 12px 15px;
             font-size: 16px;
             font-weight: bold;
             border: none;
@@ -361,82 +394,110 @@
 
         .btn-start { background-color: #2ecc71; color: white; }
         .btn-start:hover { background-color: #27ae60; }
-
         .btn-pause { background-color: #f1c40f; color: #333; }
-        .btn-pause:hover { background-color: #f39c12; }
-
         .btn-reset { background-color: #e74c3c; color: white; }
-        .btn-reset:hover { background-color: #c0392b; }
+        button:disabled { background-color: #bdc3c7; cursor: not-allowed; color: #7f8c8d; }
 
-        button:disabled {
-            background-color: #bdc3c7;
-            cursor: not-allowed;
-            color: #7f8c8d;
+        /* 🔲 核心功能：極簡縮小狀態下的 CSS 改動 */
+        .container.minimized-mode {
+            max-width: 180px;
+            padding: 15px 10px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .container.minimized-mode h1,
+        .container.minimized-mode .setting-group,
+        .container.minimized-mode .btn-group {
+            display: none !important;
+        }
+        .container.minimized-mode .timer-display {
+            font-size: 26px !important;
+            margin: 0 !important;
+            padding-top: 12px;
+            color: #006699;
+        }
+        .container.minimized-mode .minimize-toggle-btn {
+            top: 4px;
+            right: 4px;
+            font-size: 11px;
+            padding: 2px 6px;
+        }
+
+        /* 📱 針對 RWD 手機版（如 2247.jpg 狀況）做極致調優 */
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px 15px;
+            }
+            h1 {
+                font-size: 19px;
+                margin-bottom: 15px;
+            }
+            .timer-display {
+                font-size: 46px;
+                margin: 10px 0;
+            }
+            button {
+                padding: 12px 10px;
+                font-size: 15px;
+            }
+            .version-tag {
+                top: 10px; left: 10px; padding: 4px 8px; font-size: 11px;
+            }
+            .stats-toggle-btn {
+                top: 10px; right: 10px; padding: 6px 12px; font-size: 12px;
+            }
+            .stats-display {
+                top: 50px; right: 10px; left: 10px;
+                width: auto;
+                text-align: center;
+                align-items: center;
+            }
+            .custom-select-container {
+                width: 100%;
+            }
         }
 
         /* 彈出視窗 */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
+            z-index: 200;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-box {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            max-width: 350px;
-            width: 90%;
-            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: white; padding: 30px; border-radius: 15px; text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-width: 320px; width: 90%;
         }
-
-        @keyframes popUp {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .modal-box h2 { color: #e74c3c; margin-bottom: 10px; font-size: 22px; }
-        .modal-box p { color: #555; margin-bottom: 20px; font-size: 16px; }
+        .modal-box h2 { color: #e74c3c; margin-bottom: 10px; font-size: 20px; }
         .modal-btn {
             background-color: #e74c3c; color: white; padding: 12px 30px; font-size: 16px;
             border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold;
-            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+            margin-top: 15px;
         }
-        .modal-btn:hover { background-color: #c0392b; }
     </style>
 </head>
 <body>
 
-    <div class="version-tag">v1.0.6</div>
+    <div class="version-tag">v1.0.7</div>
 
-    <div class="stats-display">
+    <!-- 📊 控制統計面板開關的按鈕 -->
+    <button class="stats-toggle-btn" id="stats-toggle-btn" onclick="toggleStatsCard()">📊 統計與圖鑑</button>
+
+    <div class="stats-display" id="stats-card">
         <div id="accumulated-display">⏱️ 累積專注：00:00:00</div>
         <div class="unlocked-count" id="fish-count-display">🐠 已解鎖魚種：1 / 8</div>
         
         <div class="custom-select-container" id="custom-fish-select">
-            <div class="custom-select-trigger" onclick="toggleSelectMenu()">📜 查看魚種解鎖門檻</div>
+            <div class="custom-select-trigger" onclick="toggleSelectMenu(event)">封印門檻與圖鑑</div>
             <div class="custom-options" id="custom-options-box"></div>
         </div>
     </div>
 
+    <!-- 水族箱背景 -->
     <div class="water-bg" id="water">
         <div class="waves-container">
             <svg class="wave-svg wave-back" viewBox="0 0 1200 120" preserveAspectRatio="none">
@@ -449,7 +510,11 @@
         <div id="fish-tank-content" style="position: absolute; width:100%; height:100%; top:0; left:0;"></div>
     </div>
 
-    <div class="container">
+    <!-- 主專注卡片 -->
+    <div class="container" id="main-container">
+        <!-- ➖ 縮小切換按鈕 -->
+        <button class="minimize-toggle-btn" id="minimize-btn" onclick="toggleMinimizeMode()" title="縮小計時器">縮小</button>
+
         <h1>書海無涯，水快淹來啦！</h1>
         
         <div class="setting-group">
@@ -497,59 +562,30 @@
     <div class="modal-overlay" id="alarm-modal">
         <div class="modal-box">
             <h2>🚨 時間到囉！</h2>
-            <p>辛苦了！水已經淹滿了，快起來動一動、喝口水休息吧！</p>
+            <p>辛苦了！水已經淹滿了，快起來動一動吧！</p>
             <button class="modal-btn" onclick="dismissAlarm()">確定 (關閉鬧鐘)</button>
         </div>
     </div>
 
     <script>
         const FISH_DATABASE = [
-            { 
-                id: 'fish1', name: '基本金魚', target: 0, sizeClass: '', label: '初始擁有',
-                svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#ff7675"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#ff7675"/><circle cx="33" cy="12" r="2" fill="#fff"/><circle cx="33" cy="12" r="1" fill="#000"/></svg>`
-            },
-            { 
-                id: 'fish2', name: '活力小丑魚', target: 60, sizeClass: '', label: '累積 1 分鐘',
-                svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#ffa502"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#ffa502"/><path d="M20,6 Q23,15 20,24 L24,23 Q27,15 24,7 Z" fill="#fff"/><path d="M29,7 Q31,15 29,23 L32,22 Q34,15 32,8 Z" fill="#fff"/><circle cx="33" cy="12" r="1.5" fill="#000"/></svg>`
-            },
-            { 
-                id: 'fish3', name: '黃金藍倒吊', target: 300, sizeClass: '', label: '累積 5 分鐘',
-                svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#2e86de"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#f1c40f"/><path d="M15,10 Q25,7 32,15 Q22,17 15,10 Z" fill="#1a3a5f"/><circle cx="34" cy="12" r="1.5" fill="#000"/></svg>`
-            },
-            { 
-                id: 'fish4', name: '閃亮亮燈魚', target: 600, sizeClass: '', label: '累積 10 分鐘',
-                svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,5 40,15 Q25,25 10,15 Z" fill="#74b9ff"/><path d="M10,15 L3,9 L5,15 L3,21 Z" fill="#ff7675"/><path d="M12,15 Q25,12 38,15" stroke="#00f2fe" stroke-width="2" fill="none"/><circle cx="33" cy="13" r="1" fill="#000"/></svg>`
-            },
-            { 
-                id: 'fish5', name: '霸氣獅子魚', target: 1800, sizeClass: '', label: '累積 30 分鐘',
-                svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#d2143a"/><path d="M10,15 L1,5 L5,15 L1,25 Z" fill="#d2143a"/><path d="M18,3 L15,12 M23,2 L21,11 M28,2 L27,11 M33,3 L31,12" stroke="#fff" stroke-width="1.5"/><path d="M18,27 L16,18 M23,28 L21,19 M27,28 L25,19" stroke="#fff" stroke-width="1.5"/><path d="M15,8 Q25,5 35,12" stroke="#fff" stroke-width="2" fill="none"/><path d="M15,22 Q25,25 35,18" stroke="#fff" stroke-width="2" fill="none"/><circle cx="33" cy="12" r="1.5" fill="#fff"/></svg>`
-            },
-            { 
-                id: 'fish_puff', name: 'Ｑ彈綠河豚', target: 3600, sizeClass: '', label: '累積 1 小時',
-                svg: `<svg viewBox="0 0 50 30"><circle cx="25" cy="15" r="12" fill="#badc58"/><path d="M13,15 L7,10 L9,15 L7,20 Z" fill="#6ab04c"/><path d="M22,18 Q25,21 28,18" stroke="#6ab04c" stroke-width="1.5" fill="none"/><circle cx="31" cy="12" r="2.5" fill="#fff"/><circle cx="32" cy="12" r="1" fill="#000"/><circle cx="18" cy="11" r="1" fill="#6ab04c"/><circle cx="24" cy="9" r="1" fill="#6ab04c"/><circle cx="20" cy="18" r="1" fill="#6ab04c"/></svg>`
-            },
-            { 
-                id: 'fish_sail', name: '極速大旗魚', target: 7200, sizeClass: 'size-large', label: '累積 2 小時',
-                svg: `<svg viewBox="0 0 50 30"><path d="M5,15 Q22,4 42,14 Q22,24 5,15 Z" fill="#2c3e50"/><path d="M42,14 L49,14" stroke="#2c3e50" stroke-width="1.5"/><path d="M15,8 Q22,-2 32,7 Z" fill="#16a085"/><path d="M5,15 L0,9 L2,15 L0,21 Z" fill="#2c3e50"/><circle cx="36" cy="12" r="1.5" fill="#fff"/><circle cx="36" cy="12" r="0.8" fill="#000"/></svg>`
-            },
-            { 
-                id: 'fish_dolphin', name: '溫柔大海豚', target: 10800, sizeClass: 'size-huge', label: '累積 3 小時',
-                svg: `<svg viewBox="0 0 50 30"><path d="M4,17 Q25,2 45,13 Q35,23 4,17 Z" fill="#74b9ff"/><path d="M38,10 Q43,6 45,13 Z" fill="#74b9ff"/><path d="M22,7 Q25,0 29,5 Z" fill="#4fa8ff"/><path d="M4,17 L-1,12 L1,17 L-1,22 Z" fill="#74b9ff"/><circle cx="38" cy="12" r="1.5" fill="#fff"/><circle cx="38" cy="12" r="0.8" fill="#000"/></svg>`
-            }
+            { id: 'fish1', name: '基本金魚', target: 0, sizeClass: '', label: '初始擁有', svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#ff7675"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#ff7675"/><circle cx="33" cy="12" r="2" fill="#fff"/><circle cx="33" cy="12" r="1" fill="#000"/></svg>` },
+            { id: 'fish2', name: '活力小丑魚', target: 60, sizeClass: '', label: '1 分鐘', svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#ffa502"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#ffa502"/><path d="M20,6 Q23,15 20,24 L24,23 Q27,15 24,7 Z" fill="#fff"/><path d="M29,7 Q31,15 29,23 L32,22 Q34,15 32,8 Z" fill="#fff"/><circle cx="33" cy="12" r="1.5" fill="#000"/></svg>` },
+            { id: 'fish3', name: '黃金藍倒吊', target: 300, sizeClass: '', label: '5 分鐘', svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#2e86de"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#f1c40f"/><path d="M15,10 Q25,7 32,15 Q22,17 15,10 Z" fill="#1a3a5f"/><circle cx="34" cy="12" r="1.5" fill="#000"/></svg>` },
+            { id: 'fish4', name: '閃亮亮燈魚', target: 600, sizeClass: '', label: '10 分鐘', svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,5 40,15 Q25,25 10,15 Z" fill="#74b9ff"/><path d="M10,15 L3,9 L5,15 L3,21 Z" fill="#ff7675"/><path d="M12,15 Q25,12 38,15" stroke="#00f2fe" stroke-width="2" fill="none"/><circle cx="33" cy="13" r="1" fill="#000"/></svg>` },
+            { id: 'fish5', name: '霸氣獅子魚', target: 1800, sizeClass: '', label: '30 分鐘', svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#d2143a"/><path d="M10,15 L1,5 L5,15 L1,25 Z" fill="#d2143a"/><path d="M18,3 L15,12 M23,2 L21,11 M28,2 L27,11 M33,3 L31,12" stroke="#fff" stroke-width="1.5"/><path d="M18,27 L16,18 M23,28 L21,19 M27,28 L25,19" stroke="#fff" stroke-width="1.5"/><path d="M15,8 Q25,5 35,12" stroke="#fff" stroke-width="2" fill="none"/><path d="M15,22 Q25,25 35,18" stroke="#fff" stroke-width="2" fill="none"/><circle cx="33" cy="12" r="1.5" fill="#fff"/></svg>` },
+            { id: 'fish_puff', name: 'Ｑ彈綠河豚', target: 3600, sizeClass: '', label: '1 小時', svg: `<svg viewBox="0 0 50 30"><circle cx="25" cy="15" r="12" fill="#badc58"/><path d="M13,15 L7,10 L9,15 L7,20 Z" fill="#6ab04c"/><path d="M22,18 Q25,21 28,18" stroke="#6ab04c" stroke-width="1.5" fill="none"/><circle cx="31" cy="12" r="2.5" fill="#fff"/><circle cx="32" cy="12" r="1" fill="#000"/><circle cx="18" cy="11" r="1" fill="#6ab04c"/></svg>` },
+            { id: 'fish_sail', name: '極速大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 50 30"><path d="M5,15 Q22,4 42,14 Q22,24 5,15 Z" fill="#2c3e50"/><path d="M42,14 L49,14" stroke="#2c3e50" stroke-width="1.5"/><path d="M15,8 Q22,-2 32,7 Z" fill="#16a085"/><circle cx="36" cy="12" r="1.5" fill="#fff"/></svg>` },
+            { id: 'fish_dolphin', name: '溫柔大海豚', target: 10800, sizeClass: 'size-huge', label: '3 小時', svg: `<svg viewBox="0 0 50 30"><path d="M4,17 Q25,2 45,13 Q35,23 4,17 Z" fill="#74b9ff"/><path d="M22,7 Q25,0 29,5 Z" fill="#4fa8ff"/><circle cx="38" cy="12" r="1.5" fill="#fff"/></svg>` }
         ];
 
-        let totalSeconds = 0;
-        let remainingSeconds = 0;
+        let totalSeconds = 0, remainingSeconds = 0;
         let accumulatedSeconds = parseInt(localStorage.getItem('accumulatedSeconds')) || 0; 
-        
-        let timerInterval = null;
-        let alarmLoopInterval = null; 
-        let isPaused = true;
-        let hasStartedCounting = false; 
-
+        let timerInterval = null, alarmLoopInterval = null; 
+        let isPaused = true, hasStartedCounting = false; 
         let instantiatedFishList = [];
 
-        const defaultTitle = "深呼吸！讀書專注計時器 (水族箱進化版)";
+        const defaultTitle = "深呼吸！讀書專注計時器";
         const hoursInput = document.getElementById('hours-input');
         const minutesInput = document.getElementById('minutes-input');
         const secondsInput = document.getElementById('seconds-input');
@@ -562,7 +598,10 @@
         const waterBg = document.getElementById('water');
         const fishTankContent = document.getElementById('fish-tank-content');
         const alarmModal = document.getElementById('alarm-modal');
-        
+        const mainContainer = document.getElementById('main-container');
+        const minimizeBtn = document.getElementById('minimize-btn');
+        const statsCard = document.getElementById('stats-card');
+        const statsToggleBtn = document.getElementById('stats-toggle-btn');
         const startBtn = document.getElementById('start-btn');
         const pauseBtn = document.getElementById('pause-btn');
 
@@ -573,7 +612,32 @@
             return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        function toggleSelectMenu() {
+        /* 📊 控制統計面板顯示邏輯 */
+        function toggleStatsCard() {
+            if (statsCard.style.display === 'none' || statsCard.style.display === '') {
+                statsCard.style.display = 'flex';
+                statsToggleBtn.innerText = '❌ 關閉選單';
+            } else {
+                statsCard.style.display = 'none';
+                statsToggleBtn.innerText = '📊 統計與圖鑑';
+                customSelectContainer.classList.remove('open');
+            }
+        }
+
+        /* 🔲 控制計時器縮小邏輯 */
+        function toggleMinimizeMode() {
+            mainContainer.classList.toggle('minimized-mode');
+            if (mainContainer.classList.contains('minimized-mode')) {
+                minimizeBtn.innerText = '展開';
+                minimizeBtn.title = '展開主面板';
+            } else {
+                minimizeBtn.innerText = '縮小';
+                minimizeBtn.title = '縮小計時器';
+            }
+        }
+
+        function toggleSelectMenu(e) {
+            e.stopPropagation();
             customSelectContainer.classList.toggle('open');
         }
 
@@ -588,76 +652,49 @@
             FISH_DATABASE.forEach(fish => {
                 const optionDiv = document.createElement('div');
                 optionDiv.className = 'custom-option';
-                const isUnlocked = accumulatedSeconds >= fish.target;
-                
-                if (isUnlocked) {
+                if (accumulatedSeconds >= fish.target) {
                     optionDiv.innerHTML = `<div class="select-fish-icon">${fish.svg}</div><span>${fish.name} (${fish.label})</span>`;
                 } else {
-                    optionDiv.innerHTML = `<div class="select-fish-icon">🔒</div><span style="color: #94a3b8;">??? (${fish.label}解鎖)</span>`;
+                    optionDiv.innerHTML = `<div class="select-fish-icon">🔒</div><span style="color: #94a3b8;">??? (達 ${fish.label}解鎖)</span>`;
                 }
                 customOptionsBox.appendChild(optionDiv);
             });
         }
 
-        // 💡 獲取當前水面的實際百分比高度
         function getCurrentWaterPercentage() {
             if (totalSeconds > 0 && hasStartedCounting) {
-                const elapsedSeconds = totalSeconds - remainingSeconds;
-                return 5 + ((elapsedSeconds / totalSeconds) * 95);
+                return 5 + (((totalSeconds - remainingSeconds) / totalSeconds) * 95);
             }
             return 5;
         }
 
-        // 💡 重新為某一條小魚隨機指定高度 (解放高度限制，讓魚能游到水面邊緣)
         function assignRandomHeightToFish(fish) {
             const currentWaterHeight = getCurrentWaterPercentage();
-            
-            // 💡 修正優化：大幅縮減過度寬鬆的 Buffer，給予背鰭貼近水面的空間！
-            let safetyBuffer = 2; // 基本魚只需要 2% 的安全邊距
-            if (fish.dom.classList.contains('size-large')) safetyBuffer = 5;  // 旗魚
-            if (fish.dom.classList.contains('size-huge')) safetyBuffer = 7;   // 海豚
+            let safetyBuffer = 2; // 縮减安全邊際，放寬游動極限高點
+            if (fish.dom.classList.contains('size-large')) safetyBuffer = 5;
+            if (fish.dom.classList.contains('size-huge')) safetyBuffer = 7;
 
             const maxSafeBottom = currentWaterHeight - safetyBuffer;
             const minSafeBottom = 2;
-
-            if (maxSafeBottom > minSafeBottom) {
-                fish.currentBottom = minSafeBottom + (Math.random() * (maxSafeBottom - minSafeBottom));
-            } else {
-                fish.currentBottom = minSafeBottom;
-            }
+            fish.currentBottom = maxSafeBottom > minSafeBottom ? minSafeBottom + (Math.random() * (maxSafeBottom - minSafeBottom)) : minSafeBottom;
             fish.dom.style.bottom = `${fish.currentBottom}%`;
         }
 
         function preInitializeFishTank() {
             fishTankContent.innerHTML = '';
             instantiatedFishList = [];
-
             FISH_DATABASE.forEach((fish) => {
                 const spawnCount = fish.id === 'fish1' ? 3 : 2; 
-
                 for (let i = 0; i < spawnCount; i++) {
                     const fishContainer = document.createElement('div');
                     fishContainer.className = `fish-container ${fish.sizeClass}`;
                     fishContainer.innerHTML = fish.svg;
-
                     const randomSpeed = (Math.random() * 5 + (fish.sizeClass ? 14 : 9)).toFixed(1); 
                     const randomDelay = (Math.random() * 8).toFixed(1); 
                     const direction = Math.random() > 0.5 ? 'right' : 'left';
 
-                    const fishData = {
-                        dom: fishContainer,
-                        targetThreshold: fish.target,
-                        direction: direction,
-                        speed: randomSpeed,
-                        delay: randomDelay,
-                        currentBottom: null
-                    };
-
-                    // 監聽 CSS 動態結束（小魚游過一次畫面），這時候立刻重抽一次高度！
-                    fishContainer.addEventListener('animationiteration', () => {
-                        assignRandomHeightToFish(fishData);
-                    });
-
+                    const fishData = { dom: fishContainer, targetThreshold: fish.target, direction: direction, speed: randomSpeed, delay: randomDelay, currentBottom: null };
+                    fishContainer.addEventListener('animationiteration', () => assignRandomHeightToFish(fishData));
                     fishTankContent.appendChild(fishContainer);
                     instantiatedFishList.push(fishData);
                 }
@@ -665,31 +702,19 @@
         }
 
         function checkAndRefreshFishTank() {
-            let unlockedCount = 0;
-            FISH_DATABASE.forEach(fish => {
-                if (accumulatedSeconds >= fish.target) unlockedCount++;
-            });
-
+            let unlockedCount = FISH_DATABASE.filter(f => accumulatedSeconds >= f.target).length;
             fishCountDisplay.innerText = `🐠 已解鎖魚種：${unlockedCount} / ${FISH_DATABASE.length}`;
             updateFishGuideUI();
-
             const currentWaterHeight = getCurrentWaterPercentage();
 
             instantiatedFishList.forEach(fish => {
-                const isUnlocked = accumulatedSeconds >= fish.targetThreshold;
-                
-                if (isUnlocked && hasStartedCounting) {
-                    let safetyBuffer = 2;
-                    if (fish.dom.classList.contains('size-large')) safetyBuffer = 5;
-                    if (fish.dom.classList.contains('size-huge')) safetyBuffer = 7;
-                    
-                    // 如果這條魚尚未給過高度，或者是因為突然降水位導致魚高於新水面，則進行重新整理
+                if (accumulatedSeconds >= fish.targetThreshold && hasStartedCounting) {
+                    let safetyBuffer = fish.dom.classList.contains('size-large') ? 5 : (fish.dom.classList.contains('size-huge') ? 7 : 2);
                     if (fish.currentBottom === null || fish.currentBottom > (currentWaterHeight - safetyBuffer)) {
                         assignRandomHeightToFish(fish);
                     } else {
                         fish.dom.style.bottom = `${fish.currentBottom}%`;
                     }
-                    
                     if (!fish.dom.classList.contains('active-swim-right') && !fish.dom.classList.contains('active-swim-left')) {
                         const animClass = fish.direction === 'right' ? 'active-swim-right' : 'active-swim-left';
                         fish.dom.classList.add(animClass);
@@ -707,31 +732,16 @@
             const formattedRemaining = formatTime(remainingSeconds);
             timeLeftDisplay.innerText = formattedRemaining;
             accumulatedDisplay.innerText = `⏱️ 累積專注：${formatTime(accumulatedSeconds)}`;
-
-            if (!isPaused && remainingSeconds > 0) {
-                document.title = `(${formattedRemaining}) 讀書中...`;
-            } else if (isPaused && remainingSeconds > 0) {
-                document.title = `[已暫停] ${defaultTitle}`;
-            } else {
-                document.title = defaultTitle;
-            }
-
-            const waterPercentage = getCurrentWaterPercentage();
-            waterBg.style.height = `${waterPercentage}%`;
+            document.title = (!isPaused && remainingSeconds > 0) ? `(${formattedRemaining}) 讀書中...` : defaultTitle;
+            waterBg.style.height = `${getCurrentWaterPercentage()}%`;
         }
 
         function getInputsInSeconds() {
-            let hrs = Math.max(0, parseInt(hoursInput.value) || 0);
-            let mins = Math.max(0, parseInt(minutesInput.value) || 0);
-            let secs = Math.max(0, parseInt(secondsInput.value) || 0);
-            return (hrs * 3600) + (mins * 60) + secs;
+            return (Math.max(0, parseInt(hoursInput.value) || 0) * 3600) + (Math.max(0, parseInt(minutesInput.value) || 0) * 60) + Math.max(0, parseInt(secondsInput.value) || 0);
         }
 
         function syncPreview() {
-            if (isPaused && timerInterval === null) {
-                const previewSeconds = getInputsInSeconds();
-                timeLeftDisplay.innerText = formatTime(previewSeconds);
-            }
+            if (isPaused && timerInterval === null) timeLeftDisplay.innerText = formatTime(getInputsInSeconds());
         }
 
         function startTimer() {
@@ -739,156 +749,78 @@
                 if (timerInterval === null && remainingSeconds === 0) {
                     totalSeconds = getInputsInSeconds();
                     remainingSeconds = totalSeconds;
-
-                    if (totalSeconds <= 0) {
-                        alert('請設定大於 0 秒的時間喔！');
-                        return;
-                    }
+                    if (totalSeconds <= 0) { alert('請設定大於 0 秒的時間喔！'); return; }
                 }
-
-                isPaused = false;
-                hasStartedCounting = true; 
-                startBtn.disabled = true;
-                pauseBtn.disabled = false;
-                
-                hoursInput.disabled = true;
-                minutesInput.disabled = true;
-                secondsInput.disabled = true;
-
-                updateUI();
-                checkAndRefreshFishTank();
+                isPaused = false; hasStartedCounting = true;
+                startBtn.disabled = true; pauseBtn.disabled = false;
+                ['hours-input', 'minutes-input', 'seconds-input'].forEach(id => document.getElementById(id).disabled = true);
+                updateUI(); checkAndRefreshFishTank();
 
                 timerInterval = setInterval(() => {
                     if (remainingSeconds > 0) {
-                        remainingSeconds--;
-                        accumulatedSeconds++;
-                        
+                        remainingSeconds--; accumulatedSeconds++;
                         localStorage.setItem('accumulatedSeconds', accumulatedSeconds); 
-                        
-                        updateUI();
-                        checkAndRefreshFishTank(); 
+                        updateUI(); checkAndRefreshFishTank(); 
                     } else {
-                        clearInterval(timerInterval);
-                        timerInterval = null;
-                        triggerAlarm(); 
+                        clearInterval(timerInterval); timerInterval = null; triggerAlarm(); 
                     }
                 }, 1000);
             }
         }
 
         function pauseTimer() {
-            isPaused = true;
-            clearInterval(timerInterval);
-            timerInterval = null;
-            startBtn.disabled = false;
-            pauseBtn.disabled = true;
-            startBtn.innerText = '繼續'; 
+            isPaused = true; clearInterval(timerInterval); timerInterval = null;
+            startBtn.disabled = false; pauseBtn.disabled = true; startBtn.innerText = '繼續'; 
             updateUI();
         }
 
         function resetTimer() {
-            clearInterval(timerInterval);
-            timerInterval = null;
-            isPaused = true;
-            hasStartedCounting = false; 
-            totalSeconds = 0;
-            remainingSeconds = 0;
-            
-            hoursInput.disabled = false;
-            minutesInput.disabled = false;
-            secondsInput.disabled = false;
-            
-            startBtn.disabled = false;
-            startBtn.innerText = '開始';
-            pauseBtn.disabled = true;
-            
-            updateUI();
-            checkAndRefreshFishTank(); 
-            syncPreview();
+            clearInterval(timerInterval); timerInterval = null;
+            isPaused = true; hasStartedCounting = false; totalSeconds = 0; remainingSeconds = 0;
+            ['hours-input', 'minutes-input', 'seconds-input'].forEach(id => document.getElementById(id).disabled = false);
+            startBtn.disabled = false; startBtn.innerText = '開始'; pauseBtn.disabled = true;
+            updateUI(); checkAndRefreshFishTank(); syncPreview();
         }
 
         function triggerAlarm() {
             alarmModal.classList.add('active'); 
-            document.title = `🚨 時間到囉！！！`;
             const selectedSound = soundSelect.value;
-            
-            let loopDelay = 1200; 
-            if (selectedSound === 'urgent' || selectedSound === 'digital') loopDelay = 700;
-            if (selectedSound === 'chime' || selectedSound === 'zen' || selectedSound === 'morse') loopDelay = 2500;
-            if (selectedSound === 'sonar') loopDelay = 2000;
-
+            let delay = (selectedSound === 'urgent' || selectedSound === 'digital') ? 700 : ((selectedSound === 'chime' || selectedSound === 'zen' || selectedSound === 'morse') ? 2500 : 1500);
             playAlarmSound(selectedSound);
-            alarmLoopInterval = setInterval(() => {
-                playAlarmSound(selectedSound);
-            }, loopDelay);
+            alarmLoopInterval = setInterval(() => playAlarmSound(selectedSound), delay);
         }
 
         function dismissAlarm() {
-            if (alarmLoopInterval) {
-                clearInterval(alarmLoopInterval); 
-                alarmLoopInterval = null;
-            }
-            alarmModal.classList.remove('active'); 
-            resetTimer(); 
+            if (alarmLoopInterval) { clearInterval(alarmLoopInterval); alarmLoopInterval = null; }
+            alarmModal.classList.remove('active'); resetTimer(); 
         }
 
         function playAlarmSound(soundType) {
             try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                const ctx = new AudioContext();
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const now = ctx.currentTime;
-
-                const beep = (freq, startTime, duration, type='sine', startGain=0.2) => {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = type;
-                    osc.frequency.setValueAtTime(freq, startTime);
-                    gain.gain.setValueAtTime(startGain, startTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-                    osc.connect(gain); gain.connect(ctx.destination);
-                    osc.start(startTime); osc.stop(startTime + duration);
+                const beep = (freq, start, dur, type='sine', g=0.2) => {
+                    const o = ctx.createOscillator(); const gain = ctx.createGain();
+                    o.type = type; o.frequency.setValueAtTime(freq, start);
+                    gain.gain.setValueAtTime(g, start); gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
+                    o.connect(gain); gain.connect(ctx.destination); o.start(start); o.stop(start + dur);
                 };
-
                 switch (soundType) {
                     case 'classic': beep(880, now, 0.15); beep(880, now + 0.2, 0.15); break;
-                    case 'urgent': for (let i = 0; i < 4; i++) beep(1200, now + i * 0.12, 0.06, 'square', 0.15); break;
-                    case 'chime': [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => beep(f, now + i * 0.08, 1.5, 'sine', 0.15)); break;
-                    case 'scifi':
-                        for (let i = 0; i < 3; i++) {
-                            const t = now + i * 0.3;
-                            const osc = ctx.createOscillator(); const gain = ctx.createGain();
-                            osc.type = 'triangle'; osc.frequency.setValueAtTime(400, t);
-                            osc.frequency.exponentialRampToValueAtTime(1500, t + 0.2);
-                            gain.gain.setValueAtTime(0.2, t); gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
-                            osc.connect(gain); gain.connect(ctx.destination); osc.start(t); osc.stop(t + 0.2);
-                        }
-                        break;
-                    case 'zen': beep(160, now, 2.2, 'sine', 0.3); beep(320, now, 1.8, 'sine', 0.1); break;
+                    case 'urgent': for(let i=0;i<4;i++) beep(1200, now + i*0.12, 0.06, 'square', 0.15); break;
+                    case 'chime': [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => beep(f, now + i*0.08, 1.5, 'sine', 0.15)); break;
+                    case 'scifi': for(let i=0;i<3;i++) { const t=now+i*0.3; const o=ctx.createOscillator(); const gain=ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(400,t); o.frequency.exponentialRampToValueAtTime(1500,t+0.2); gain.gain.setValueAtTime(0.2,t); gain.gain.exponentialRampToValueAtTime(0.001,t+0.2); o.connect(gain); gain.connect(ctx.destination); o.start(t); o.stop(t+0.2); } break;
+                    case 'zen': beep(160, now, 2.2, 'sine', 0.3); break;
                     case 'retro': beep(300, now, 0.05, 'square'); beep(450, now + 0.05, 0.05, 'square'); break;
-                    case 'morse':
-                        const p = (t, d) => beep(900, now + t, d, 'sine', 0.2);
-                        p(0, 0.06); p(0.12, 0.06); p(0.24, 0.06); p(0.42, 0.18); p(0.66, 0.18); p(0.90, 0.18); p(1.14, 0.06); p(1.26, 0.06); p(1.38, 0.06);
-                        break;
-                    case 'sonar':
-                        const sOsc = ctx.createOscillator(); const sGain = ctx.createGain();
-                        sOsc.type = 'sine'; sOsc.frequency.setValueAtTime(1400, now); sOsc.frequency.exponentialRampToValueAtTime(700, now + 0.6);
-                        sGain.gain.setValueAtTime(0.2, now); sGain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-                        sOsc.connect(sGain); sGain.connect(ctx.destination); sOsc.start(now); sOsc.stop(now + 1.2);
-                        break;
+                    case 'morse': const p = (t, d) => beep(900, now + t, d, 'sine', 0.2); p(0, 0.06); p(0.12, 0.06); p(0.24, 0.06); p(0.42, 0.18); break;
+                    case 'sonar': const sO = ctx.createOscillator(); const sG = ctx.createGain(); sO.type = 'sine'; sO.frequency.setValueAtTime(1400, now); sO.frequency.exponentialRampToValueAtTime(700, now + 0.6); sG.gain.setValueAtTime(0.2, now); sG.gain.exponentialRampToValueAtTime(0.001, now + 1.2); sO.connect(sG); sG.connect(ctx.destination); sO.start(now); sO.stop(now + 1.2); break;
                     case 'digital': beep(2800, now, 0.05, 'sine', 0.2); beep(2800, now + 0.08, 0.05, 'sine', 0.2); break;
                 }
-            } catch (error) {
-                console.error("播放音效失敗：", error);
-            }
+            } catch (e) { console.error(e); }
         }
 
-        hoursInput.addEventListener('input', syncPreview);
-        minutesInput.addEventListener('input', syncPreview);
-        secondsInput.addEventListener('input', syncPreview);
-
-        preInitializeFishTank();
-        updateUI();
-        checkAndRefreshFishTank();
+        [hoursInput, minutesInput, secondsInput].forEach(el => el.addEventListener('input', syncPreview));
+        preInitializeFishTank(); updateUI(); checkAndRefreshFishTank();
     </script>
 </body>
 </html>
