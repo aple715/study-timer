@@ -230,7 +230,7 @@
             opacity: 0; 
             pointer-events: none;
             left: -150px; 
-            transition: bottom 1s linear; 
+            transition: bottom 0.5s ease-in-out; /* 讓高度調整時更平滑 */
         }
 
         /* 🐋 較大魚種的放大倍率 */
@@ -426,7 +426,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.0.3</div>
+    <div class="version-tag">v1.0.4</div>
 
     <div class="stats-display">
         <div id="accumulated-display">⏱️ 累積專注：00:00:00</div>
@@ -504,7 +504,6 @@
     </div>
 
     <script>
-        // 🔄 按照 1.0.3 正確順序排列的 8 條魚數據
         const FISH_DATABASE = [
             { 
                 id: 'fish1', name: '基本金魚', target: 0, sizeClass: '', label: '初始擁有',
@@ -617,13 +616,13 @@
                     const randomDelay = (Math.random() * 8).toFixed(1); 
                     const direction = Math.random() > 0.5 ? 'right' : 'left';
 
+                    // 💡 關鍵修正：不再把隨機高度高度比綁死，改在每次重新整理或進出畫面時動態產生新位置
                     const fishData = {
                         dom: fishContainer,
                         targetThreshold: fish.target,
                         direction: direction,
                         speed: randomSpeed,
-                        delay: randomDelay,
-                        heightRatio: Math.random() 
+                        delay: randomDelay
                     };
 
                     fishTankContent.appendChild(fishContainer);
@@ -651,12 +650,22 @@
                 const isUnlocked = accumulatedSeconds >= fish.targetThreshold;
                 
                 if (isUnlocked && hasStartedCounting) {
-                    const maxSafeBottom = currentWaterHeight - 7; 
+                    // 💡 關鍵修正：扣除水面波浪的安全間距，大魚的安全扣分也要加多，避免游出水面
+                    let safetyBuffer = 6;
+                    if (fish.dom.classList.contains('size-large')) safetyBuffer = 10;
+                    if (fish.dom.classList.contains('size-huge')) safetyBuffer = 15;
+
+                    const maxSafeBottom = currentWaterHeight - safetyBuffer; 
                     const minSafeBottom = 2; 
                     
                     if (maxSafeBottom > minSafeBottom) {
-                        const calculatedBottom = minSafeBottom + (fish.heightRatio * (maxSafeBottom - minSafeBottom));
-                        fish.dom.style.bottom = `${calculatedBottom}%`;
+                        // 如果該魚尚未設定過 bottom 或者游出了當前可游的最高範圍
+                        // 就給牠一個完全隨希的分佈，如此一來不論水深水淺，整座深水區都能被填滿！
+                        if (!fish.currentBottom || fish.currentBottom > maxSafeBottom) {
+                            fish.currentBottom = minSafeBottom + (Math.random() * (maxSafeBottom - minSafeBottom));
+                        }
+                        
+                        fish.dom.style.bottom = `${fish.currentBottom}%`;
                         
                         if (!fish.dom.classList.contains('active-swim-right') && !fish.dom.classList.contains('active-swim-left')) {
                             const animClass = fish.direction === 'right' ? 'active-swim-right' : 'active-swim-left';
@@ -669,6 +678,7 @@
                 } else {
                     fish.dom.classList.remove('active-swim-right', 'active-swim-left');
                     fish.dom.style.animation = '';
+                    fish.currentBottom = null; // 重置高度紀錄
                 }
             });
         }
