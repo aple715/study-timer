@@ -244,11 +244,11 @@
             animation: swim-left linear infinite backwards;
         }
 
-        /* 移動動畫 - 加入微幅上下波動漂浮感 */
+        /* 移動動畫 - 微幅上下波動漂浮感 */
         @keyframes swim-right {
             0% { left: -120px; opacity: 0; transform: translateY(0); }
             8% { opacity: 0.95; }
-            50% { transform: translateY(-8px); }
+            50% { transform: translateY(-6px); }
             92% { opacity: 0.95; }
             100% { left: 105%; opacity: 0; transform: translateY(0); }
         }
@@ -256,7 +256,7 @@
         @keyframes swim-left {
             0% { left: 105%; opacity: 0; transform: scaleX(-1) translateY(0); }
             8% { opacity: 0.95; }
-            50% { transform: scaleX(-1) translateY(8px); }
+            50% { transform: scaleX(-1) translateY(6px); }
             92% { opacity: 0.95; }
             100% { left: -120px; opacity: 0; transform: scaleX(-1) translateY(0); }
         }
@@ -425,7 +425,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.0.5</div>
+    <div class="version-tag">v1.0.6</div>
 
     <div class="stats-display">
         <div id="accumulated-display">⏱️ 累積專注：00:00:00</div>
@@ -608,13 +608,14 @@
             return 5;
         }
 
-        // 💡 重新為某一條小魚隨機指定高度 (每次游出畫面或者初次解鎖時觸發)
+        // 💡 重新為某一條小魚隨機指定高度 (解放高度限制，讓魚能游到水面邊緣)
         function assignRandomHeightToFish(fish) {
             const currentWaterHeight = getCurrentWaterPercentage();
             
-            let safetyBuffer = 6;
-            if (fish.dom.classList.contains('size-large')) safetyBuffer = 10;
-            if (fish.dom.classList.contains('size-huge')) safetyBuffer = 15;
+            // 💡 修正優化：大幅縮減過度寬鬆的 Buffer，給予背鰭貼近水面的空間！
+            let safetyBuffer = 2; // 基本魚只需要 2% 的安全邊距
+            if (fish.dom.classList.contains('size-large')) safetyBuffer = 5;  // 旗魚
+            if (fish.dom.classList.contains('size-huge')) safetyBuffer = 7;   // 海豚
 
             const maxSafeBottom = currentWaterHeight - safetyBuffer;
             const minSafeBottom = 2;
@@ -652,7 +653,7 @@
                         currentBottom: null
                     };
 
-                    // 💡 監聽 CSS 動態結束（小魚游過一次畫面），這時候立刻重抽一次高度！
+                    // 監聽 CSS 動態結束（小魚游過一次畫面），這時候立刻重抽一次高度！
                     fishContainer.addEventListener('animationiteration', () => {
                         assignRandomHeightToFish(fishData);
                     });
@@ -678,15 +679,14 @@
                 const isUnlocked = accumulatedSeconds >= fish.targetThreshold;
                 
                 if (isUnlocked && hasStartedCounting) {
-                    // 如果這條魚尚未給過高度，或者是因為突然降水位導致魚高於水面，則進行重新整理
-                    let safetyBuffer = 6;
-                    if (fish.dom.classList.contains('size-large')) safetyBuffer = 10;
-                    if (fish.dom.classList.contains('size-huge')) safetyBuffer = 15;
+                    let safetyBuffer = 2;
+                    if (fish.dom.classList.contains('size-large')) safetyBuffer = 5;
+                    if (fish.dom.classList.contains('size-huge')) safetyBuffer = 7;
                     
+                    // 如果這條魚尚未給過高度，或者是因為突然降水位導致魚高於新水面，則進行重新整理
                     if (fish.currentBottom === null || fish.currentBottom > (currentWaterHeight - safetyBuffer)) {
                         assignRandomHeightToFish(fish);
                     } else {
-                        // 確保目前的高度被確實套用
                         fish.dom.style.bottom = `${fish.currentBottom}%`;
                     }
                     
@@ -782,7 +782,7 @@
             timerInterval = null;
             startBtn.disabled = false;
             pauseBtn.disabled = true;
-            startBtn.innerText = '繼續'; // 💡 確保恢復時顯示正確字樣
+            startBtn.innerText = '繼續'; 
             updateUI();
         }
 
