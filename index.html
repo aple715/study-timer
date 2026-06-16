@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>深呼吸！讀書專注計時器 (手機相容極簡版)</title>
+    <title>深呼吸！讀書專注計時器 (自適應拖曳版)</title>
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐟</text></svg>">
     <link class="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐟</text></svg>">
@@ -45,7 +45,7 @@
             user-select: none;
         }
 
-        /* 📊 圖鑑與統計控制按鈕 (解決手機重疊關鍵) */
+        /* 📊 圖鑑與統計控制按鈕 */
         .stats-toggle-btn {
             position: absolute;
             top: 20px;
@@ -85,7 +85,7 @@
             border: 1px solid rgba(255,255,255,0.25);
             font-variant-numeric: tabular-nums;
             text-align: right;
-            display: none; /* 預設隱藏，由按鈕控制 */
+            display: none; 
             flex-direction: column;
             gap: 6px;
             animation: fadeIn 0.2s ease-out;
@@ -141,15 +141,16 @@
             transform: rotate(180deg);
         }
 
+        /* 修正：由 bottom: 105% 改為 top: 105% 實現向下彈出 */
         .custom-options {
             position: absolute;
-            bottom: 105%; /* 向上彈出防止手機版超出底線 */
+            top: 105%; 
             left: 0;
             right: 0;
             background: #ffffff;
             border: 2px solid #cbd5e1;
             border-radius: 8px;
-            box-shadow: 0 -8px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
             display: none;
             max-height: 220px;
             overflow-y: auto;
@@ -185,10 +186,7 @@
             flex-shrink: 0;
         }
 
-        .select-fish-icon svg {
-            width: 100%;
-            height: 100%;
-        }
+        .select-fish-icon svg { width: 100%; height: 100%; }
 
         /* 🌊 動態水面與海浪背景設定 */
         .water-bg {
@@ -213,47 +211,17 @@
             pointer-events: none;
         }
 
-        .wave-svg {
-            position: absolute;
-            width: 200%;
-            height: 100%;
-        }
+        .wave-svg { position: absolute; width: 200%; height: 100%; }
+        .wave-front { fill: #1fa2ff; opacity: 0.9; animation: wave-move-left 4s linear infinite; }
+        .wave-back { fill: #00c6ff; opacity: 0.5; animation: wave-move-right 6s linear infinite; }
 
-        .wave-front {
-            fill: #1fa2ff;
-            opacity: 0.9;
-            animation: wave-move-left 4s linear infinite;
-        }
+        @keyframes wave-move-left { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        @keyframes wave-move-right { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
 
-        .wave-back {
-            fill: #00c6ff;
-            opacity: 0.5;
-            animation: wave-move-right 6s linear infinite;
-        }
-
-        @keyframes wave-move-left {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        @keyframes wave-move-right {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(0); }
-        }
-
-        /* 🐟 小魚容器與水面分佈修正 */
-        .fish-container {
-            position: absolute;
-            width: 50px;
-            height: 35px;
-            opacity: 0; 
-            pointer-events: none;
-            left: -150px; 
-        }
-
+        /* 🐟 小魚容器 */
+        .fish-container { position: absolute; width: 50px; height: 35px; opacity: 0; pointer-events: none; left: -150px; }
         .fish-container.size-large { width: 80px; height: 56px; }
         .fish-container.size-huge { width: 95px; height: 66px; }
-
         .fish-container.active-swim-right { animation: swim-right linear infinite backwards; }
         .fish-container.active-swim-left { animation: swim-left linear infinite backwards; }
 
@@ -264,7 +232,6 @@
             92% { opacity: 0.95; }
             100% { left: 105%; opacity: 0; transform: translateY(0); }
         }
-        
         @keyframes swim-left {
             0% { left: 105%; opacity: 0; transform: scaleX(-1) translateY(0); }
             8% { opacity: 0.95; }
@@ -287,7 +254,7 @@
             text-align: center;
             width: 90%;
             max-width: 420px;
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: padding 0.3s, max-width 0.3s, border-radius 0.3s;
         }
 
         /* ➖ 縮小按鈕樣式 */
@@ -305,186 +272,74 @@
             border-radius: 6px;
             background: rgba(0,0,0,0.03);
             transition: all 0.2s;
+            z-index: 15;
         }
-        .minimize-toggle-btn:hover {
-            background: rgba(0,0,0,0.08);
-            color: #2c3e50;
-        }
+        .minimize-toggle-btn:hover { background: rgba(0,0,0,0.08); color: #2c3e50; }
 
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 25px;
-            font-size: 22px;
-            letter-spacing: 1px;
-        }
-
-        .timer-display {
-            font-size: 56px;
-            font-weight: bold;
-            color: #1a3a5f;
-            margin: 20px 0;
-            font-variant-numeric: tabular-nums;
-            transition: font-size 0.3s;
-        }
-
-        .setting-group {
-            text-align: left;
-            margin-bottom: 15px;
-        }
-
-        .setting-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #556;
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        .time-inputs-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 6px;
-        }
-
-        .time-field {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex: 1;
-        }
+        h1 { color: #2c3e50; margin-bottom: 25px; font-size: 22px; letter-spacing: 1px; }
+        .timer-display { font-size: 56px; font-weight: bold; color: #1a3a5f; margin: 20px 0; font-variant-numeric: tabular-nums; }
+        .setting-group { text-align: left; margin-bottom: 15px; }
+        .setting-group label { display: block; margin-bottom: 8px; color: #556; font-size: 13px; font-weight: bold; }
+        .time-inputs-container { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+        .time-field { display: flex; align-items: center; gap: 4px; flex: 1; }
 
         input[type="number"], select {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid #cbd5e1;
-            border-radius: 8px;
-            outline: none;
-            background-color: white;
-            text-align: center;
+            width: 100%; padding: 10px; font-size: 16px; border: 2px solid #cbd5e1; border-radius: 8px; outline: none; text-align: center;
         }
+        input[type="number"]:focus, select:focus { border-color: #4facfe; }
+        .time-field span { font-size: 14px; color: #556; }
+        .btn-group { display: flex; justify-content: space-between; gap: 10px; margin-top: 25px; }
 
-        input[type="number"]:focus, select:focus {
-            border-color: #4facfe;
-        }
-
-        .time-field span {
-            font-size: 14px;
-            color: #556;
-        }
-
-        .btn-group {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-top: 25px;
-        }
-
-        button {
-            flex: 1;
-            padding: 12px 15px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
+        button { flex: 1; padding: 12px 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
         .btn-start { background-color: #2ecc71; color: white; }
         .btn-start:hover { background-color: #27ae60; }
         .btn-pause { background-color: #f1c40f; color: #333; }
         .btn-reset { background-color: #e74c3c; color: white; }
         button:disabled { background-color: #bdc3c7; cursor: not-allowed; color: #7f8c8d; }
 
-        /* 🔲 核心功能：極簡縮小狀態下的 CSS 改動 */
+        /* 🔲 核心修正：極簡縮小狀態下的樣式（開啟拖拉提示與防止文字選取） */
         .container.minimized-mode {
             max-width: 180px;
             padding: 15px 10px;
             border-radius: 15px;
             background: rgba(255, 255, 255, 0.9);
+            cursor: move; 
+            user-select: none; 
+            -webkit-user-select: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
         .container.minimized-mode h1,
         .container.minimized-mode .setting-group,
-        .container.minimized-mode .btn-group {
-            display: none !important;
-        }
-        .container.minimized-mode .timer-display {
-            font-size: 26px !important;
-            margin: 0 !important;
-            padding-top: 12px;
-            color: #006699;
-        }
-        .container.minimized-mode .minimize-toggle-btn {
-            top: 4px;
-            right: 4px;
-            font-size: 11px;
-            padding: 2px 6px;
-        }
+        .container.minimized-mode .btn-group { display: none !important; }
+        .container.minimized-mode .timer-display { font-size: 26px !important; margin: 0 !important; padding-top: 12px; color: #006699; }
+        .container.minimized-mode .minimize-toggle-btn { top: 4px; right: 4px; font-size: 11px; padding: 2px 6px; cursor: pointer; }
 
-        /* 📱 針對 RWD 手機版（如 2247.jpg 狀況）做極致調優 */
+        /* 📱 手機版 RWD 調優 */
         @media (max-width: 480px) {
-            .container {
-                padding: 25px 15px;
-            }
-            h1 {
-                font-size: 19px;
-                margin-bottom: 15px;
-            }
-            .timer-display {
-                font-size: 46px;
-                margin: 10px 0;
-            }
-            button {
-                padding: 12px 10px;
-                font-size: 15px;
-            }
-            .version-tag {
-                top: 10px; left: 10px; padding: 4px 8px; font-size: 11px;
-            }
-            .stats-toggle-btn {
-                top: 10px; right: 10px; padding: 6px 12px; font-size: 12px;
-            }
-            .stats-display {
-                top: 50px; right: 10px; left: 10px;
-                width: auto;
-                text-align: center;
-                align-items: center;
-            }
-            .custom-select-container {
-                width: 100%;
-            }
+            .container { padding: 25px 15px; }
+            h1 { font-size: 19px; margin-bottom: 15px; }
+            .timer-display { font-size: 46px; margin: 10px 0; }
+            button { padding: 12px 10px; font-size: 15px; }
+            .version-tag { top: 10px; left: 10px; padding: 4px 8px; font-size: 11px; }
+            .stats-toggle-btn { top: 10px; right: 10px; padding: 6px 12px; font-size: 12px; }
+            .stats-display { top: 50px; right: 10px; left: 10px; width: auto; text-align: center; align-items: center; }
+            .custom-select-container { width: 100%; }
         }
 
         /* 彈出視窗 */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            z-index: 200;
-            display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 200; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-box {
-            background: white; padding: 30px; border-radius: 15px; text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-width: 320px; width: 90%;
-        }
+        .modal-box { background: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-width: 320px; width: 90%; }
         .modal-box h2 { color: #e74c3c; margin-bottom: 10px; font-size: 20px; }
-        .modal-btn {
-            background-color: #e74c3c; color: white; padding: 12px 30px; font-size: 16px;
-            border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold;
-            margin-top: 15px;
-        }
+        .modal-btn { background-color: #e74c3c; color: white; padding: 12px 30px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <div class="version-tag">v1.0.7</div>
+    <div class="version-tag">v1.0.8</div>
 
-    <!-- 📊 控制統計面板開關的按鈕 -->
     <button class="stats-toggle-btn" id="stats-toggle-btn" onclick="toggleStatsCard()">📊 統計與圖鑑</button>
 
     <div class="stats-display" id="stats-card">
@@ -497,41 +352,24 @@
         </div>
     </div>
 
-    <!-- 水族箱背景 -->
     <div class="water-bg" id="water">
         <div class="waves-container">
-            <svg class="wave-svg wave-back" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                <path d="M0,50 Q150,110 300,50 T600,50 T900,50 T1200,50 L1200,120 L0,120 Z"></path>
-            </svg>
-            <svg class="wave-svg wave-front" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                <path d="M0,60 Q150,5 300,60 T600,60 T900,60 T1200,60 L1200,120 L0,120 Z"></path>
-            </svg>
+            <svg class="wave-svg wave-back" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,50 Q150,110 300,50 T600,50 T900,50 T1200,50 L1200,120 L0,120 Z"></path></svg>
+            <svg class="wave-svg wave-front" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,60 Q150,5 300,60 T600,60 T900,60 T1200,60 L1200,120 L0,120 Z"></path></svg>
         </div>
         <div id="fish-tank-content" style="position: absolute; width:100%; height:100%; top:0; left:0;"></div>
     </div>
 
-    <!-- 主專注卡片 -->
     <div class="container" id="main-container">
-        <!-- ➖ 縮小切換按鈕 -->
         <button class="minimize-toggle-btn" id="minimize-btn" onclick="toggleMinimizeMode()" title="縮小計時器">縮小</button>
-
         <h1>書海無涯，水快淹來啦！</h1>
         
         <div class="setting-group">
             <label>設定專注時間</label>
             <div class="time-inputs-container">
-                <div class="time-field">
-                    <input type="number" id="hours-input" min="0" max="23" value="0">
-                    <span>時</span>
-                </div>
-                <div class="time-field">
-                    <input type="number" id="minutes-input" min="0" max="59" value="0">
-                    <span>分</span>
-                </div>
-                <div class="time-field">
-                    <input type="number" id="seconds-input" min="0" max="59" value="15">
-                    <span>秒</span>
-                </div>
+                <div class="time-field"><input type="number" id="hours-input" min="0" max="23" value="0"><span>時</span></div>
+                <div class="time-field"><input type="number" id="minutes-input" min="0" max="59" value="0"><span>分</span></div>
+                <div class="time-field"><input type="number" id="seconds-input" min="0" max="59" value="15"><span>秒</span></div>
             </div>
         </div>
 
@@ -585,6 +423,9 @@
         let isPaused = true, hasStartedCounting = false; 
         let instantiatedFishList = [];
 
+        // 📝 拖曳專用變數
+        let dragX = 0, dragY = 0, isDragging = false, startX = 0, startY = 0;
+
         const defaultTitle = "深呼吸！讀書專注計時器";
         const hoursInput = document.getElementById('hours-input');
         const minutesInput = document.getElementById('minutes-input');
@@ -612,7 +453,6 @@
             return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        /* 📊 控制統計面板顯示邏輯 */
         function toggleStatsCard() {
             if (statsCard.style.display === 'none' || statsCard.style.display === '') {
                 statsCard.style.display = 'flex';
@@ -624,7 +464,7 @@
             }
         }
 
-        /* 🔲 控制計時器縮小邏輯 */
+        /* 🔲 控制計時器縮小邏輯（與重置拖曳位置） */
         function toggleMinimizeMode() {
             mainContainer.classList.toggle('minimized-mode');
             if (mainContainer.classList.contains('minimized-mode')) {
@@ -633,19 +473,56 @@
             } else {
                 minimizeBtn.innerText = '縮小';
                 minimizeBtn.title = '縮小計時器';
+                // 展開時一律歸位重置
+                dragX = 0; dragY = 0;
+                mainContainer.style.transform = '';
             }
         }
 
-        function toggleSelectMenu(e) {
-            e.stopPropagation();
-            customSelectContainer.classList.toggle('open');
+        /* 🖱️ 核心邏輯：極簡模式下的拖曳系統（滑鼠與觸控相容） */
+        mainContainer.addEventListener('mousedown', startDrag);
+        mainContainer.addEventListener('touchstart', startDrag, { passive: false });
+
+        function startDrag(e) {
+            if (!mainContainer.classList.contains('minimized-mode')) return;
+            if (e.target.id === 'minimize-btn') return; // 點擊展開按鈕不觸發拖曳
+
+            isDragging = true;
+            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+
+            startX = clientX - dragX;
+            startY = clientY - dragY;
+
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
         }
 
-        window.addEventListener('click', function(e) {
-            if (!customSelectContainer.contains(e.target)) {
-                customSelectContainer.classList.remove('open');
-            }
-        });
+        function drag(e) {
+            if (!isDragging) return;
+            if (e.type === 'touchmove') e.preventDefault(); // 阻擋手機網頁滾動
+
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+
+            dragX = clientX - startX;
+            dragY = clientY - startY;
+
+            mainContainer.style.transform = `translate(${dragX}px, ${dragY}px)`;
+        }
+
+        function endDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchend', endDrag);
+        }
+
+        function toggleSelectMenu(e) { e.stopPropagation(); customSelectContainer.classList.toggle('open'); }
+        window.addEventListener('click', function(e) { if (!customSelectContainer.contains(e.target)) customSelectContainer.classList.remove('open'); });
 
         function updateFishGuideUI() {
             customOptionsBox.innerHTML = '';
@@ -662,18 +539,13 @@
         }
 
         function getCurrentWaterPercentage() {
-            if (totalSeconds > 0 && hasStartedCounting) {
-                return 5 + (((totalSeconds - remainingSeconds) / totalSeconds) * 95);
-            }
+            if (totalSeconds > 0 && hasStartedCounting) return 5 + (((totalSeconds - remainingSeconds) / totalSeconds) * 95);
             return 5;
         }
 
         function assignRandomHeightToFish(fish) {
             const currentWaterHeight = getCurrentWaterPercentage();
-            let safetyBuffer = 2; // 縮减安全邊際，放寬游動極限高點
-            if (fish.dom.classList.contains('size-large')) safetyBuffer = 5;
-            if (fish.dom.classList.contains('size-huge')) safetyBuffer = 7;
-
+            let safetyBuffer = fish.dom.classList.contains('size-large') ? 5 : (fish.dom.classList.contains('size-huge') ? 7 : 2);
             const maxSafeBottom = currentWaterHeight - safetyBuffer;
             const minSafeBottom = 2;
             fish.currentBottom = maxSafeBottom > minSafeBottom ? minSafeBottom + (Math.random() * (maxSafeBottom - minSafeBottom)) : minSafeBottom;
@@ -681,8 +553,7 @@
         }
 
         function preInitializeFishTank() {
-            fishTankContent.innerHTML = '';
-            instantiatedFishList = [];
+            fishTankContent.innerHTML = ''; instantiatedFishList = [];
             FISH_DATABASE.forEach((fish) => {
                 const spawnCount = fish.id === 'fish1' ? 3 : 2; 
                 for (let i = 0; i < spawnCount; i++) {
@@ -722,8 +593,7 @@
                     }
                 } else {
                     fish.dom.classList.remove('active-swim-right', 'active-swim-left');
-                    fish.dom.style.animation = '';
-                    fish.currentBottom = null; 
+                    fish.dom.style.animation = ''; fish.currentBottom = null; 
                 }
             });
         }
@@ -740,15 +610,12 @@
             return (Math.max(0, parseInt(hoursInput.value) || 0) * 3600) + (Math.max(0, parseInt(minutesInput.value) || 0) * 60) + Math.max(0, parseInt(secondsInput.value) || 0);
         }
 
-        function syncPreview() {
-            if (isPaused && timerInterval === null) timeLeftDisplay.innerText = formatTime(getInputsInSeconds());
-        }
+        function syncPreview() { if (isPaused && timerInterval === null) timeLeftDisplay.innerText = formatTime(getInputsInSeconds()); }
 
         function startTimer() {
             if (isPaused) {
                 if (timerInterval === null && remainingSeconds === 0) {
-                    totalSeconds = getInputsInSeconds();
-                    remainingSeconds = totalSeconds;
+                    totalSeconds = getInputsInSeconds(); remainingSeconds = totalSeconds;
                     if (totalSeconds <= 0) { alert('請設定大於 0 秒的時間喔！'); return; }
                 }
                 isPaused = false; hasStartedCounting = true;
@@ -770,8 +637,7 @@
 
         function pauseTimer() {
             isPaused = true; clearInterval(timerInterval); timerInterval = null;
-            startBtn.disabled = false; pauseBtn.disabled = true; startBtn.innerText = '繼續'; 
-            updateUI();
+            startBtn.disabled = false; pauseBtn.disabled = true; startBtn.innerText = '繼續'; updateUI();
         }
 
         function resetTimer() {
@@ -783,25 +649,18 @@
         }
 
         function triggerAlarm() {
-            alarmModal.classList.add('active'); 
-            const selectedSound = soundSelect.value;
+            alarmModal.classList.add('active'); const selectedSound = soundSelect.value;
             let delay = (selectedSound === 'urgent' || selectedSound === 'digital') ? 700 : ((selectedSound === 'chime' || selectedSound === 'zen' || selectedSound === 'morse') ? 2500 : 1500);
-            playAlarmSound(selectedSound);
-            alarmLoopInterval = setInterval(() => playAlarmSound(selectedSound), delay);
+            playAlarmSound(selectedSound); alarmLoopInterval = setInterval(() => playAlarmSound(selectedSound), delay);
         }
 
-        function dismissAlarm() {
-            if (alarmLoopInterval) { clearInterval(alarmLoopInterval); alarmLoopInterval = null; }
-            alarmModal.classList.remove('active'); resetTimer(); 
-        }
+        function dismissAlarm() { if (alarmLoopInterval) { clearInterval(alarmLoopInterval); alarmLoopInterval = null; } alarmModal.classList.remove('active'); resetTimer(); }
 
         function playAlarmSound(soundType) {
             try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const now = ctx.currentTime;
+                const ctx = new (window.AudioContext || window.webkitAudioContext)(); const now = ctx.currentTime;
                 const beep = (freq, start, dur, type='sine', g=0.2) => {
-                    const o = ctx.createOscillator(); const gain = ctx.createGain();
-                    o.type = type; o.frequency.setValueAtTime(freq, start);
+                    const o = ctx.createOscillator(); const gain = ctx.createGain(); o.type = type; o.frequency.setValueAtTime(freq, start);
                     gain.gain.setValueAtTime(g, start); gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
                     o.connect(gain); gain.connect(ctx.destination); o.start(start); o.stop(start + dur);
                 };
