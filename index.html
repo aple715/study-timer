@@ -230,7 +230,6 @@
             opacity: 0; 
             pointer-events: none;
             left: -150px; 
-            transition: bottom 0.5s ease-in-out; /* 讓高度調整時更平滑 */
         }
 
         /* 🐋 較大魚種的放大倍率 */
@@ -245,11 +244,11 @@
             animation: swim-left linear infinite backwards;
         }
 
-        /* 移動動畫 */
+        /* 移動動畫 - 加入微幅上下波動漂浮感 */
         @keyframes swim-right {
             0% { left: -120px; opacity: 0; transform: translateY(0); }
             8% { opacity: 0.95; }
-            50% { transform: translateY(-12px); }
+            50% { transform: translateY(-8px); }
             92% { opacity: 0.95; }
             100% { left: 105%; opacity: 0; transform: translateY(0); }
         }
@@ -257,7 +256,7 @@
         @keyframes swim-left {
             0% { left: 105%; opacity: 0; transform: scaleX(-1) translateY(0); }
             8% { opacity: 0.95; }
-            50% { transform: scaleX(-1) translateY(12px); }
+            50% { transform: scaleX(-1) translateY(8px); }
             92% { opacity: 0.95; }
             100% { left: -120px; opacity: 0; transform: scaleX(-1) translateY(0); }
         }
@@ -426,7 +425,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.0.4</div>
+    <div class="version-tag">v1.0.5</div>
 
     <div class="stats-display">
         <div id="accumulated-display">⏱️ 累積專注：00:00:00</div>
@@ -600,6 +599,34 @@
             });
         }
 
+        // 💡 獲取當前水面的實際百分比高度
+        function getCurrentWaterPercentage() {
+            if (totalSeconds > 0 && hasStartedCounting) {
+                const elapsedSeconds = totalSeconds - remainingSeconds;
+                return 5 + ((elapsedSeconds / totalSeconds) * 95);
+            }
+            return 5;
+        }
+
+        // 💡 重新為某一條小魚隨機指定高度 (每次游出畫面或者初次解鎖時觸發)
+        function assignRandomHeightToFish(fish) {
+            const currentWaterHeight = getCurrentWaterPercentage();
+            
+            let safetyBuffer = 6;
+            if (fish.dom.classList.contains('size-large')) safetyBuffer = 10;
+            if (fish.dom.classList.contains('size-huge')) safetyBuffer = 15;
+
+            const maxSafeBottom = currentWaterHeight - safetyBuffer;
+            const minSafeBottom = 2;
+
+            if (maxSafeBottom > minSafeBottom) {
+                fish.currentBottom = minSafeBottom + (Math.random() * (maxSafeBottom - minSafeBottom));
+            } else {
+                fish.currentBottom = minSafeBottom;
+            }
+            fish.dom.style.bottom = `${fish.currentBottom}%`;
+        }
+
         function preInitializeFishTank() {
             fishTankContent.innerHTML = '';
             instantiatedFishList = [];
@@ -616,14 +643,19 @@
                     const randomDelay = (Math.random() * 8).toFixed(1); 
                     const direction = Math.random() > 0.5 ? 'right' : 'left';
 
-                    // 💡 關鍵修正：不再把隨機高度高度比綁死，改在每次重新整理或進出畫面時動態產生新位置
                     const fishData = {
                         dom: fishContainer,
                         targetThreshold: fish.target,
                         direction: direction,
                         speed: randomSpeed,
-                        delay: randomDelay
+                        delay: randomDelay,
+                        currentBottom: null
                     };
+
+                    // 💡 監聽 CSS 動態結束（小魚游過一次畫面），這時候立刻重抽一次高度！
+                    fishContainer.addEventListener('animationiteration', () => {
+                        assignRandomHeightToFish(fishData);
+                    });
 
                     fishTankContent.appendChild(fishContainer);
                     instantiatedFishList.push(fishData);
@@ -640,45 +672,33 @@
             fishCountDisplay.innerText = `🐠 已解鎖魚種：${unlockedCount} / ${FISH_DATABASE.length}`;
             updateFishGuideUI();
 
-            let currentWaterHeight = 5; 
-            if (totalSeconds > 0 && hasStartedCounting) {
-                const elapsedSeconds = totalSeconds - remainingSeconds;
-                currentWaterHeight = 5 + ((elapsedSeconds / totalSeconds) * 95);
-            }
+            const currentWaterHeight = getCurrentWaterPercentage();
 
             instantiatedFishList.forEach(fish => {
                 const isUnlocked = accumulatedSeconds >= fish.targetThreshold;
                 
                 if (isUnlocked && hasStartedCounting) {
-                    // 💡 關鍵修正：扣除水面波浪的安全間距，大魚的安全扣分也要加多，避免游出水面
+                    // 如果這條魚尚未給過高度，或者是因為突然降水位導致魚高於水面，則進行重新整理
                     let safetyBuffer = 6;
                     if (fish.dom.classList.contains('size-large')) safetyBuffer = 10;
                     if (fish.dom.classList.contains('size-huge')) safetyBuffer = 15;
-
-                    const maxSafeBottom = currentWaterHeight - safetyBuffer; 
-                    const minSafeBottom = 2; 
                     
-                    if (maxSafeBottom > minSafeBottom) {
-                        // 如果該魚尚未設定過 bottom 或者游出了當前可游的最高範圍
-                        // 就給牠一個完全隨希的分佈，如此一來不論水深水淺，整座深水區都能被填滿！
-                        if (!fish.currentBottom || fish.currentBottom > maxSafeBottom) {
-                            fish.currentBottom = minSafeBottom + (Math.random() * (maxSafeBottom - minSafeBottom));
-                        }
-                        
-                        fish.dom.style.bottom = `${fish.currentBottom}%`;
-                        
-                        if (!fish.dom.classList.contains('active-swim-right') && !fish.dom.classList.contains('active-swim-left')) {
-                            const animClass = fish.direction === 'right' ? 'active-swim-right' : 'active-swim-left';
-                            fish.dom.classList.add(animClass);
-                            fish.dom.style.animation = `${animClass === 'active-swim-right' ? 'swim-right' : 'swim-left'} ${fish.speed}s linear ${fish.delay}s infinite backwards`;
-                        }
+                    if (fish.currentBottom === null || fish.currentBottom > (currentWaterHeight - safetyBuffer)) {
+                        assignRandomHeightToFish(fish);
                     } else {
-                        fish.dom.style.bottom = `${minSafeBottom}%`;
+                        // 確保目前的高度被確實套用
+                        fish.dom.style.bottom = `${fish.currentBottom}%`;
+                    }
+                    
+                    if (!fish.dom.classList.contains('active-swim-right') && !fish.dom.classList.contains('active-swim-left')) {
+                        const animClass = fish.direction === 'right' ? 'active-swim-right' : 'active-swim-left';
+                        fish.dom.classList.add(animClass);
+                        fish.dom.style.animation = `${animClass === 'active-swim-right' ? 'swim-right' : 'swim-left'} ${fish.speed}s linear ${fish.delay}s infinite backwards`;
                     }
                 } else {
                     fish.dom.classList.remove('active-swim-right', 'active-swim-left');
                     fish.dom.style.animation = '';
-                    fish.currentBottom = null; // 重置高度紀錄
+                    fish.currentBottom = null; 
                 }
             });
         }
@@ -696,13 +716,8 @@
                 document.title = defaultTitle;
             }
 
-            if (totalSeconds > 0 && hasStartedCounting) {
-                const elapsedSeconds = totalSeconds - remainingSeconds;
-                const waterPercentage = 5 + ((elapsedSeconds / totalSeconds) * 95);
-                waterBg.style.height = `${waterPercentage}%`;
-            } else {
-                waterBg.style.height = '5%'; 
-            }
+            const waterPercentage = getCurrentWaterPercentage();
+            waterBg.style.height = `${waterPercentage}%`;
         }
 
         function getInputsInSeconds() {
@@ -767,7 +782,7 @@
             timerInterval = null;
             startBtn.disabled = false;
             pauseBtn.disabled = true;
-            startBtn.innerText = '繼續';
+            startBtn.innerText = '繼續'; // 💡 確保恢復時顯示正確字樣
             updateUI();
         }
 
