@@ -179,14 +179,14 @@
             height: 100%;
         }
 
-        /* 前景浪：向左滾動 */
+        /* 前景浪 */
         .wave-front {
             fill: #1fa2ff;
             opacity: 0.9;
             animation: wave-move-left 4s linear infinite;
         }
 
-        /* 背景浪：向右滾動形成強烈視覺交錯 */
+        /* 背景浪 */
         .wave-back {
             fill: #00c6ff;
             opacity: 0.5;
@@ -208,10 +208,9 @@
             position: absolute;
             width: 50px;
             height: 35px;
-            opacity: 0; /* 預設完全隱藏 */
+            opacity: 0; /* 🛠️ 預設起跑前絕對透明 */
             pointer-events: none;
             left: -150px; 
-            /* 🛠️ 拿掉原本會干擾 Animation 渲染的 transition */
             transition: bottom 1s linear; 
         }
 
@@ -219,28 +218,28 @@
         .fish-container.size-large { width: 80px; height: 56px; }
         .fish-container.size-huge { width: 95px; height: 66px; }
 
-        /* 啟動游泳動畫 */
+        /* 啟動游泳動畫：🛠️ 加入 backwards 確保正數延遲等待時，魚死死套用 0% 的透明與初始位置 */
         .fish-container.active-swim-right {
-            animation: swim-right linear infinite;
+            animation: swim-right linear infinite backwards;
         }
         .fish-container.active-swim-left {
-            animation: swim-left linear infinite;
+            animation: swim-left linear infinite backwards;
         }
 
-        /* 🛠️ 將淡入(opacity)整合進移動動畫的前 5%，確保在螢幕外完全透明，游進來才顯現 */
+        /* 🛠️ 重新定義移動動畫：從起跑點出發，一邊前進一邊在邊緣自然淡入 */
         @keyframes swim-right {
             0% { left: -120px; opacity: 0; transform: translateY(0); }
-            5% { opacity: 0.95; }
+            8% { opacity: 0.95; }
             50% { transform: translateY(-12px); }
-            95% { opacity: 0.95; }
+            92% { opacity: 0.95; }
             100% { left: 105%; opacity: 0; transform: translateY(0); }
         }
         
         @keyframes swim-left {
             0% { left: 105%; opacity: 0; transform: scaleX(-1) translateY(0); }
-            5% { opacity: 0.95; }
+            8% { opacity: 0.95; }
             50% { transform: scaleX(-1) translateY(12px); }
-            95% { opacity: 0.95; }
+            92% { opacity: 0.95; }
             100% { left: -120px; opacity: 0; transform: scaleX(-1) translateY(0); }
         }
 
@@ -592,8 +591,10 @@
                     fishContainer.className = `fish-container ${fish.sizeClass}`;
                     fishContainer.innerHTML = fish.svg;
 
-                    const randomSpeed = (Math.random() * 6 + (fish.sizeClass ? 14 : 9)).toFixed(1); 
-                    const randomDelay = (Math.random() * -15).toFixed(1); 
+                    const randomSpeed = (Math.random() * 5 + (fish.sizeClass ? 14 : 9)).toFixed(1); 
+                    
+                    // 🛠️ 核心修正：拋棄負數延遲！改用正數隨機延遲（0~8秒內隨機出發），確保絕對不快轉軌跡
+                    const randomDelay = (Math.random() * 8).toFixed(1); 
                     const direction = Math.random() > 0.5 ? 'right' : 'left';
 
                     const fishData = {
@@ -640,7 +641,8 @@
                         if (!fish.dom.classList.contains('active-swim-right') && !fish.dom.classList.contains('active-swim-left')) {
                             const animClass = fish.direction === 'right' ? 'active-swim-right' : 'active-swim-left';
                             fish.dom.classList.add(animClass);
-                            fish.dom.style.animation = `${animClass === 'active-swim-right' ? 'swim-right' : 'swim-left'} ${fish.speed}s linear ${fish.delay}s infinite`;
+                            // 🛠️ 套用不快轉的正數延遲時間
+                            fish.dom.style.animation = `${animClass === 'active-swim-right' ? 'swim-right' : 'swim-left'} ${fish.speed}s linear ${fish.delay}s infinite backwards`;
                         }
                     } else {
                         fish.dom.style.bottom = `${minSafeBottom}%`;
