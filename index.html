@@ -25,6 +25,25 @@
             align-items: center;
         }
 
+        /* 🏷️ 左上角版本號樣式 */
+        .version-tag {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #7f8c8d;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            user-select: none;
+        }
+
         /* 👑 右上方累積總時數與圖鑑顯示區域 */
         .stats-display {
             position: absolute;
@@ -208,7 +227,7 @@
             position: absolute;
             width: 50px;
             height: 35px;
-            opacity: 0; /* 🛠️ 預設起跑前絕對透明 */
+            opacity: 0; 
             pointer-events: none;
             left: -150px; 
             transition: bottom 1s linear; 
@@ -218,7 +237,7 @@
         .fish-container.size-large { width: 80px; height: 56px; }
         .fish-container.size-huge { width: 95px; height: 66px; }
 
-        /* 啟動游泳動畫：🛠️ 加入 backwards 確保正數延遲等待時，魚死死套用 0% 的透明與初始位置 */
+        /* 啟動游泳動畫 */
         .fish-container.active-swim-right {
             animation: swim-right linear infinite backwards;
         }
@@ -226,7 +245,7 @@
             animation: swim-left linear infinite backwards;
         }
 
-        /* 🛠️ 重新定義移動動畫：從起跑點出發，一邊前進一邊在邊緣自然淡入 */
+        /* 移動動畫 */
         @keyframes swim-right {
             0% { left: -120px; opacity: 0; transform: translateY(0); }
             8% { opacity: 0.95; }
@@ -407,6 +426,8 @@
 </head>
 <body>
 
+    <div class="version-tag">v1.0.0</div>
+
     <div class="stats-display">
         <div id="accumulated-display">⏱️ 累積專注：00:00:00</div>
         <div class="unlocked-count" id="fish-count-display">🐠 已解鎖魚種：1 / 8</div>
@@ -483,37 +504,38 @@
     </div>
 
     <script>
+        // 🛠️ 調整新解鎖魚種門檻秒數：2 小時(7200秒)、3 小時(10800秒)、5 小時(18000秒)
         const FISH_DATABASE = [
             { 
                 id: 'fish1', name: '基本金魚', target: 0, sizeClass: '', label: '初始擁有',
                 svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#ff7675"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#ff7675"/><circle cx="33" cy="12" r="2" fill="#fff"/><circle cx="33" cy="12" r="1" fill="#000"/></svg>`
             },
             { 
-                id: 'fish_puff', name: 'Ｑ彈綠河豚', target: 3, sizeClass: '', label: '測試 3 秒',
+                id: 'fish_puff', name: 'Ｑ彈綠河豚', target: 7200, sizeClass: '', label: '累積 2 小時',
                 svg: `<svg viewBox="0 0 50 30"><circle cx="25" cy="15" r="12" fill="#badc58"/><path d="M13,15 L7,10 L9,15 L7,20 Z" fill="#6ab04c"/><path d="M22,18 Q25,21 28,18" stroke="#6ab04c" stroke-width="1.5" fill="none"/><circle cx="31" cy="12" r="2.5" fill="#fff"/><circle cx="32" cy="12" r="1" fill="#000"/><circle cx="18" cy="11" r="1" fill="#6ab04c"/><circle cx="24" cy="9" r="1" fill="#6ab04c"/><circle cx="20" cy="18" r="1" fill="#6ab04c"/></svg>`
             },
             { 
-                id: 'fish_sail', name: '極速大旗魚', target: 5, sizeClass: 'size-large', label: '測試 5 秒',
+                id: 'fish_sail', name: '極速大旗魚', target: 10800, sizeClass: 'size-large', label: '累積 3 小時',
                 svg: `<svg viewBox="0 0 50 30"><path d="M5,15 Q22,4 42,14 Q22,24 5,15 Z" fill="#2c3e50"/><path d="M42,14 L49,14" stroke="#2c3e50" stroke-width="1.5"/><path d="M15,8 Q22,-2 32,7 Z" fill="#16a085"/><path d="M5,15 L0,9 L2,15 L0,21 Z" fill="#2c3e50"/><circle cx="36" cy="12" r="1.5" fill="#fff"/><circle cx="36" cy="12" r="0.8" fill="#000"/></svg>`
             },
             { 
-                id: 'fish_dolphin', name: '溫柔大海豚', target: 10, sizeClass: 'size-huge', label: '測試 10 秒',
+                id: 'fish_dolphin', name: '溫柔大海豚', target: 1800, sizeClass: 'size-huge', label: '測試 30 分鐘', // 仍維持原本的30分或視需求修改
                 svg: `<svg viewBox="0 0 50 30"><path d="M4,17 Q25,2 45,13 Q35,23 4,17 Z" fill="#74b9ff"/><path d="M38,10 Q43,6 45,13 Z" fill="#74b9ff"/><path d="M22,7 Q25,0 29,5 Z" fill="#4fa8ff"/><path d="M4,17 L-1,12 L1,17 L-1,22 Z" fill="#74b9ff"/><circle cx="38" cy="12" r="1.5" fill="#fff"/><circle cx="38" cy="12" r="0.8" fill="#000"/></svg>`
             },
             { 
-                id: 'fish2', name: '活力小丑魚', target: 300, sizeClass: '', label: '累積 5 分鐘',
+                id: 'fish2', name: '活力小丑魚', target: 18000, sizeClass: '', label: '累積 5 小時',
                 svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#ffa502"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#ffa502"/><path d="M20,6 Q23,15 20,24 L24,23 Q27,15 24,7 Z" fill="#fff"/><path d="M29,7 Q31,15 29,23 L32,22 Q34,15 32,8 Z" fill="#fff"/><circle cx="33" cy="12" r="1.5" fill="#000"/></svg>`
             },
             { 
-                id: 'fish3', name: '黃金藍倒吊', target: 900, sizeClass: '', label: '累積 15 分鐘',
+                id: 'fish3', name: '黃金藍倒吊', target: 36000, sizeClass: '', label: '累積 10 小時',
                 svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#2e86de"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#f1c40f"/><path d="M15,10 Q25,7 32,15 Q22,17 15,10 Z" fill="#1a3a5f"/><circle cx="34" cy="12" r="1.5" fill="#000"/></svg>`
             },
             { 
-                id: 'fish4', name: '閃亮亮燈魚', target: 1800, sizeClass: '', label: '累積 30 分鐘',
+                id: 'fish4', name: '閃亮亮燈魚', target: 54000, sizeClass: '', label: '累積 15 小時',
                 svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,5 40,15 Q25,25 10,15 Z" fill="#74b9ff"/><path d="M10,15 L3,9 L5,15 L3,21 Z" fill="#ff7675"/><path d="M12,15 Q25,12 38,15" stroke="#00f2fe" stroke-width="2" fill="none"/><circle cx="33" cy="13" r="1" fill="#000"/></svg>`
             },
             { 
-                id: 'fish5', name: '霸氣獅子魚', target: 3600, sizeClass: '', label: '累積 1 小時',
+                id: 'fish5', name: '霸氣獅子魚', target: 72000, sizeClass: '', label: '累積 20 小時',
                 svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#d2143a"/><path d="M10,15 L1,5 L5,15 L1,25 Z" fill="#d2143a"/><path d="M18,3 L15,12 M23,2 L21,11 M28,2 L27,11 M33,3 L31,12" stroke="#fff" stroke-width="1.5"/><path d="M18,27 L16,18 M23,28 L21,19 M27,28 L25,19" stroke="#fff" stroke-width="1.5"/><path d="M15,8 Q25,5 35,12" stroke="#fff" stroke-width="2" fill="none"/><path d="M15,22 Q25,25 35,18" stroke="#fff" stroke-width="2" fill="none"/><circle cx="33" cy="12" r="1.5" fill="#fff"/></svg>`
             }
         ];
@@ -592,8 +614,6 @@
                     fishContainer.innerHTML = fish.svg;
 
                     const randomSpeed = (Math.random() * 5 + (fish.sizeClass ? 14 : 9)).toFixed(1); 
-                    
-                    // 🛠️ 核心修正：拋棄負數延遲！改用正數隨機延遲（0~8秒內隨機出發），確保絕對不快轉軌跡
                     const randomDelay = (Math.random() * 8).toFixed(1); 
                     const direction = Math.random() > 0.5 ? 'right' : 'left';
 
@@ -641,7 +661,6 @@
                         if (!fish.dom.classList.contains('active-swim-right') && !fish.dom.classList.contains('active-swim-left')) {
                             const animClass = fish.direction === 'right' ? 'active-swim-right' : 'active-swim-left';
                             fish.dom.classList.add(animClass);
-                            // 🛠️ 套用不快轉的正數延遲時間
                             fish.dom.style.animation = `${animClass === 'active-swim-right' ? 'swim-right' : 'swim-left'} ${fish.speed}s linear ${fish.delay}s infinite backwards`;
                         }
                     } else {
