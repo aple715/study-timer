@@ -244,33 +244,35 @@
         /* 🐟 小魚容器 */
         .fish-container { 
             position: absolute; 
-            width: 50px; 
-            height: 35px; 
+            width: 55px; 
+            height: 38px; 
             opacity: 0; 
             pointer-events: none; 
             left: -150px; 
         }
         
-        .fish-container.size-large { width: 80px; height: 56px; }
-        .fish-container.size-huge { width: 95px; height: 66px; }
+        .fish-container.size-large { width: 85px; height: 60px; }
+        .fish-container.size-huge { width: 100px; height: 70px; }
+        /* 🐋 翻車魚專用體型：基礎巨大的 2 倍大 */
+        .fish-container.size-mola { width: 200px; height: 140px; }
         
         .fish-container.active-swim-right { animation: swim-right linear infinite backwards; }
         .fish-container.active-swim-left { animation: swim-left linear infinite backwards; }
 
         @keyframes swim-right {
-            0% { left: -120px; opacity: 0; transform: translateY(0); }
+            0% { left: -220px; opacity: 0; transform: translateY(0); }
             8% { opacity: 0.95; }
-            50% { transform: translateY(-6px); }
+            50% { transform: translateY(-8px); }
             92% { opacity: 0.95; }
-            100% { left: 105%; opacity: 0; transform: translateY(0); }
+            100% { left: 110%; opacity: 0; transform: translateY(0); }
         }
         
         @keyframes swim-left {
-            0% { left: 105%; opacity: 0; transform: scaleX(-1) translateY(0); }
+            0% { left: 110%; opacity: 0; transform: scaleX(-1) translateY(0); }
             8% { opacity: 0.95; }
-            50% { transform: scaleX(-1) translateY(6px); }
+            50% { transform: scaleX(-1) translateY(8px); }
             92% { opacity: 0.95; }
-            100% { left: -120px; opacity: 0; transform: scaleX(-1) translateY(0); }
+            100% { left: -220px; opacity: 0; transform: scaleX(-1) translateY(0); }
         }
 
         /* 主介面卡片 */
@@ -398,9 +400,8 @@
         .btn-reset { background-color: #e74c3c; color: white; }
         button:disabled { background-color: #bdc3c7; cursor: not-allowed; color: #7f8c8d; }
 
-        /* 🔲 【終極 Bug 修復】極簡縮小狀態下的樣式 */
+        /* 🔲 極簡縮小狀態下的樣式 */
         .container.minimized-mode {
-            /* 💡 核心改動：改為 fixed 定位並置中，完全打破 Flexbox 容器在中線對元件進行的渲染裁剪 */
             position: fixed !important;
             top: 50% !important;
             left: 50% !important;
@@ -464,13 +465,13 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.1.0</div>
+    <div class="version-tag">v1.1.1</div>
 
     <button class="stats-toggle-btn" id="stats-toggle-btn" onclick="toggleStatsCard()">📊 統計與圖鑑</button>
 
     <div class="stats-display" id="stats-card">
         <div id="accumulated-display">⏱️ 累積專注：00:00:00</div>
-        <div class="unlocked-count" id="fish-count-display">🐠 已解鎖魚種：1 / 8</div>
+        <div class="unlocked-count" id="fish-count-display">🐠 已解鎖魚種：1 / 10</div>
         
         <div class="custom-select-container" id="custom-fish-select">
             <div class="custom-select-trigger" onclick="toggleSelectMenu(event)">封印門檻與圖鑑</div>
@@ -493,9 +494,9 @@
         <div class="setting-group">
             <label>設定專注時間</label>
             <div class="time-inputs-container">
-                <div class="time-field"><input type="number" id="hours-input" min="0" max="23" value="0"><span>時</span></div>
+                <div class="time-field"><input type="number" id="hours-input" min="0" max="23" value="1"><span>時</span></div>
                 <div class="time-field"><input type="number" id="minutes-input" min="0" max="59" value="0"><span>分</span></div>
-                <div class="time-field"><input type="number" id="seconds-input" min="0" max="59" value="15"><span>秒</span></div>
+                <div class="time-field"><input type="number" id="seconds-input" min="0" max="59" value="0"><span>秒</span></div>
             </div>
         </div>
 
@@ -514,7 +515,7 @@
             </select>
         </div>
 
-        <div class="timer-display" id="time-left">00:00:15</div>
+        <div class="timer-display" id="time-left">01:00:00</div>
 
         <div class="btn-group">
             <button class="btn-start" id="start-btn" onclick="startTimer()">開始</button>
@@ -532,16 +533,20 @@
     </div>
 
     <script>
-        // 🐟 完整的魚類資料庫
+        // 🐟 精細美化版完整魚類資料庫 (多重拼色、動態細節結構)
         const FISH_DATABASE = [
-            { id: 'fish1', name: '基本金魚', target: 0, sizeClass: '', label: '初始擁有', svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#ff7675"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#ff7675"/><circle cx="33" cy="12" r="2" fill="#fff"/><circle cx="33" cy="12" r="1" fill="#000"/></svg>` },
-            { id: 'fish2', name: '活力小丑魚', target: 60, sizeClass: '', label: '1 分鐘', svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#ffa502"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#ffa502"/><path d="M20,6 Q23,15 20,24 L24,23 Q27,15 24,7 Z" fill="#fff"/><path d="M29,7 Q31,15 29,23 L32,22 Q34,15 32,8 Z" fill="#fff"/><circle cx="33" cy="12" r="1.5" fill="#000"/></svg>` },
-            { id: 'fish3', name: '黃金藍倒吊', target: 300, sizeClass: '', label: '5 分鐘', svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#2e86de"/><path d="M10,15 L2,8 L5,15 L2,22 Z" fill="#f1c40f"/><path d="M15,10 Q25,7 32,15 Q22,17 15,10 Z" fill="#1a3a5f"/><circle cx="34" cy="12" r="1.5" fill="#000"/></svg>` },
-            { id: 'fish4', name: '閃亮亮燈魚', target: 600, sizeClass: '', label: '10 分鐘', svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,5 40,15 Q25,25 10,15 Z" fill="#74b9ff"/><path d="M10,15 L3,9 L5,15 L3,21 Z" fill="#ff7675"/><path d="M12,15 Q25,12 38,15" stroke="#00f2fe" stroke-width="2" fill="none"/><circle cx="33" cy="13" r="1" fill="#000"/></svg>` },
-            { id: 'fish5', name: '霸氣獅子魚', target: 1800, sizeClass: '', label: '30 分鐘', svg: `<svg viewBox="0 0 50 30"><path d="M10,15 Q25,3 40,15 Q25,27 10,15 Z" fill="#d2143a"/><path d="M10,15 L1,5 L5,15 L1,25 Z" fill="#d2143a"/><path d="M18,3 L15,12 M23,2 L21,11 M28,2 L27,11 M33,3 L31,12" stroke="#fff" stroke-width="1.5"/><path d="M18,27 L16,18 M23,28 L21,19 M27,28 L25,19" stroke="#fff" stroke-width="1.5"/><path d="M15,8 Q25,5 35,12" stroke="#fff" stroke-width="2" fill="none"/><path d="M15,22 Q25,25 35,18" stroke="#fff" stroke-width="2" fill="none"/><circle cx="33" cy="12" r="1.5" fill="#fff"/></svg>` },
-            { id: 'fish_puff', name: 'Ｑ彈綠河豚', target: 3600, sizeClass: '', label: '1 小時', svg: `<svg viewBox="0 0 50 30"><circle cx="25" cy="15" r="12" fill="#badc58"/><path d="M13,15 L7,10 L9,15 L7,20 Z" fill="#6ab04c"/><path d="M22,18 Q25,21 28,18" stroke="#6ab04c" stroke-width="1.5" fill="none"/><circle cx="31" cy="12" r="2.5" fill="#fff"/><circle cx="32" cy="12" r="1" fill="#000"/><circle cx="18" cy="11" r="1" fill="#6ab04c"/></svg>` },
-            { id: 'fish_sail', name: '極速大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 50 30"><path d="M5,15 Q22,4 42,14 Q22,24 5,15 Z" fill="#2c3e50"/><path d="M42,14 L49,14" stroke="#2c3e50" stroke-width="1.5"/><path d="M15,8 Q22,-2 32,7 Z" fill="#16a085"/><circle cx="36" cy="12" r="1.5" fill="#fff"/></svg>` },
-            { id: 'fish_dolphin', name: '溫柔大海豚', target: 10800, sizeClass: 'size-huge', label: '3 小時', svg: `<svg viewBox="0 0 50 30"><path d="M4,17 Q25,2 45,13 Q35,23 4,17 Z" fill="#74b9ff"/><path d="M22,7 Q25,0 29,5 Z" fill="#4fa8ff"/><circle cx="38" cy="12" r="1.5" fill="#fff"/></svg>` }
+            { id: 'fish1', name: '紅紋琉璃金魚', target: 0, sizeClass: '', label: '初始擁有', svg: `<svg viewBox="0 0 60 40"><path d="M12,20 C22,8 42,10 46,20 C42,30 22,32 12,20 Z" fill="#ff4757"/><path d="M14,14 C22,6 34,8 36,13 Z" fill="#ffffff" opacity="0.3"/><path d="M12,20 C6,10 2,12 4,20 C2,28 6,30 12,20 Z" fill="#ff6b81"/><path d="M38,13 C38,8 43,5 45,8 Z" fill="#ff4757"/><circle cx="38" cy="15" r="3" fill="#ffffff"/><circle cx="39" cy="15" r="1.5" fill="#000000"/><path d="M22,27 C25,32 24,35 21,34 Z" fill="#ff6b81"/></svg>` },
+            { id: 'fish2', name: '活力條紋小丑魚', target: 60, sizeClass: '', label: '1 分鐘', svg: `<svg viewBox="0 0 60 40"><path d="M10,20 C20,6 42,8 48,20 C42,32 20,34 10,20 Z" fill="#ff9f43"/><path d="M12,20 L3,11 L6,20 L3,29 Z" fill="#ff9f43"/><path d="M22,9 C25,12 25,28 22,31 L26,30 C29,27 29,13 26,10 Z" fill="#ffffff"/><path d="M32,10 C35,13 35,27 32,30 L35,29 C38,26 38,14 35,11 Z" fill="#ffffff"/><path d="M19,9 C20,12 20,28 19,31" stroke="#2f3542" stroke-width="1.5" fill="none"/><path d="M29,10 C30,13 30,27 29,30" stroke="#2f3542" stroke-width="1.5" fill="none"/><circle cx="40" cy="16" r="2.5" fill="#ffffff"/><circle cx="40" cy="16" r="1.2" fill="#000000"/></svg>` },
+            { id: 'fish3', name: '極光霓虹藍倒吊', target: 300, sizeClass: '', label: '5 分鐘', svg: `<svg viewBox="0 0 60 40"><path d="M10,20 C18,6 40,8 48,20 C40,32 18,34 10,20 Z" fill="#1e90ff"/><path d="M12,20 L2,10 L5,20 L2,30 Z" fill="#ffa502"/><path d="M16,14 C26,10 38,18 42,20 C34,22 22,24 16,14 Z" fill="#2f3542"/><path d="M38,8 C43,8 46,12 44,14 Z" fill="#1e90ff"/><circle cx="40" cy="15" r="2" fill="#000000"/><circle cx="41" cy="14" r="0.6" fill="#ffffff"/></svg>` },
+            { id: 'fish4', name: '閃亮螢光綠燈魚', target: 600, sizeClass: '', label: '10 分鐘', svg: `<svg viewBox="0 0 60 40"><path d="M12,20 C22,10 42,12 46,20 C42,28 22,30 12,20 Z" fill="#2ed573"/><path d="M12,20 L4,12 L7,20 L4,28 Z" fill="#ff4757"/><path d="M14,20 C24,17 36,17 44,20" stroke="#00d2ff" stroke-width="2.5" fill="none" opacity="0.9"/><circle cx="38" cy="17" r="2" fill="#ffffff"/><circle cx="38.5" cy="17" r="1" fill="#000000"/></svg>` },
+            { id: 'fish5', name: '深海赤鱗獅子魚', target: 1800, sizeClass: '', label: '30 分鐘', svg: `<svg viewBox="0 0 60 40"><path d="M15,20 C23,8 40,10 45,20 C40,30 23,32 15,20 Z" fill="#ee5253"/><path d="M15,20 L4,10 L7,20 L4,30 Z" fill="#ff9f43"/><path d="M22,5 L20,13 M27,4 L25,12 M32,4 L31,12 M37,6 L35,14" stroke="#ffffff" stroke-width="2"/><path d="M22,35 L20,27 M27,36 L25,28 M32,36 L31,28" stroke="#ffffff" stroke-width="2"/><path d="M20,12 C26,9 35,14 40,18" stroke="#ffffff" stroke-width="1.5" fill="none"/><path d="M20,28 C26,31 35,26 40,22" stroke="#ffffff" stroke-width="1.5" fill="none"/><circle cx="37" cy="16" r="2" fill="#000000"/></svg>` },
+            { id: 'fish_puff', name: '斑點刺蝟綠河豚', target: 3600, sizeClass: '', label: '1 小時', svg: `<svg viewBox="0 0 50 40"><circle cx="25" cy="20" r="14" fill="#a8al4a"/><path d="M11,20 L4,14 L6,20 L4,26 Z" fill="#2ed573"/><circle cx="20" cy="14" r="1.5" fill="#218c74"/><circle cx="28" cy="26" r="1.5" fill="#218c74"/><circle cx="16" cy="24" r="2" fill="#218c74"/><path d="M23,24 Q26,27 29,24" stroke="#218c74" stroke-width="2" fill="none"/><circle cx="33" cy="16" r="3.5" fill="#ffffff"/><circle cx="34" cy="16" r="1.8" fill="#000000"/></svg>` },
+            { id: 'fish_sail', name: '夢幻破浪大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 80 50"><path d="M10,25 C30,12 65,20 72,25 C65,30 30,38 10,25 Z" fill="#57606f"/><path d="M72,25 L79,25" stroke="#2f3542" stroke-width="2"/><path d="M20,16 Q35,-4 55,12 Z" fill="#1e272e" opacity="0.85"/><path d="M25,3 Q35,-1 45,7 Z" fill="#ffa502"/><circle cx="62" cy="22" r="2" fill="#ffffff"/><circle cx="62.5" cy="22" r="1" fill="#000000"/></svg>` },
+            { id: 'fish_dolphin', name: '蔚藍守護大海豚', target: 10800, sizeClass: 'size-huge', label: '3 小時', svg: `<svg viewBox="0 0 90 50"><path d="M5,27 C30,6 70,16 85,25 C70,36 30,38 5,27 Z" fill="#70a1ff"/><path d="M35,14 Q40,2 46,9 Z" fill="#1e90ff"/><path d="M72,26 C62,28 52,28 45,26" stroke="#ffffff" stroke-width="1.5" fill="none" opacity="0.6"/><circle cx="75" cy="21" r="2" fill="#ffffff"/><circle cx="76" cy="21" r="1" fill="#000000"/></svg>` },
+            // 💡 新增 4 小時解鎖：漂浮小水母
+            { id: 'fish_jelly', name: '幽靈發光小水母', target: 14400, sizeClass: '', label: '4 小時', svg: `<svg viewBox="0 0 50 50"><path d="M10,22 C10,8 40,8 40,22 C40,24 10,24 10,22 Z" fill="#fbc531" opacity="0.85"/><path d="M15,23 C15,38 18,48 18,48" stroke="#fbc531" stroke-width="2" fill="none" opacity="0.7"/><path d="M25,23 C25,35 23,46 23,46" stroke="#e1b12c" stroke-width="2" fill="none" opacity="0.7"/><path d="M35,23 C35,38 32,48 32,48" stroke="#fbc531" stroke-width="2" fill="none" opacity="0.7"/><circle cx="20" cy="16" r="1.5" fill="#000"/><circle cx="30" cy="16" r="1.5" fill="#000"/></svg>` },
+            // 💡 新增 5 小時解鎖：巨型翻車魚 (採用 size-mola 放大 2 倍)
+            { id: 'fish_mola', name: '深海巨型翻車魚', target: 18000, sizeClass: 'size-mola', label: '5 小時', svg: `<svg viewBox="0 0 100 80"><path d="M30,40 C30,15 65,12 75,40 C65,68 30,65 30,40 Z" fill="#ced6e0"/><path d="M42,20 Q36,-2 48,10 Z" fill="#a4b0be"/><path d="M42,60 Q36,82 48,70 Z" fill="#a4b0be"/><path d="M28,35 C20,38 20,42 28,45 Z" fill="#747d8c"/><circle cx="66" cy="34" r="3.5" fill="#ffffff"/><circle cx="67" cy="34" r="1.8" fill="#000000"/><circle cx="69" cy="32" r="0.6" fill="#ffffff"/><path d="M54,42 Q58,45 62,42" stroke="#747d8c" stroke-width="2" fill="none"/></svg>` }
         ];
 
         let totalSeconds = 0;
@@ -553,7 +558,6 @@
         let hasStartedCounting = false; 
         let instantiatedFishList = [];
 
-        // 📝 拖曳系統專用變數
         let dragX = 0;
         let dragY = 0;
         let isDragging = false;
@@ -598,7 +602,6 @@
             }
         }
 
-        /* 🔄 縮小切換邏輯調優 */
         function toggleMinimizeMode() {
             mainContainer.classList.toggle('minimized-mode');
             if (mainContainer.classList.contains('minimized-mode')) {
@@ -606,7 +609,6 @@
                 minimizeBtn.title = '展開主面板';
                 dragX = 0;
                 dragY = 0;
-                // 💡 置中固定，並補上基準 -50% 的偏移
                 mainContainer.style.transform = `translate(-50%, -50%)`;
             } else {
                 minimizeBtn.innerText = '縮小';
@@ -617,7 +619,6 @@
             }
         }
 
-        /* 🖱️ 核心功能：精準無裁剪拖曳系統 */
         mainContainer.addEventListener('mousedown', startDrag);
         mainContainer.addEventListener('touchstart', startDrag, { passive: false });
 
@@ -648,7 +649,6 @@
             dragX = clientX - startX;
             dragY = clientY - startY;
 
-            // 💡 配合 fixed 佈局，使用 calc 疊加拖曳的像素，完美防裁切
             if (mainContainer.classList.contains('minimized-mode')) {
                 mainContainer.style.transform = `translate(calc(-50% + ${dragX}px), calc(-50% + ${dragY}px))`;
             } else {
@@ -698,7 +698,12 @@
 
         function assignRandomHeightToFish(fish) {
             const currentWaterHeight = getCurrentWaterPercentage();
-            let safetyBuffer = fish.dom.classList.contains('size-large') ? 5 : (fish.dom.classList.contains('size-huge') ? 7 : 2);
+            // 💡 針對不同尺寸計算安全水深邊緣緩衝區
+            let safetyBuffer = 2;
+            if (fish.dom.classList.contains('size-large')) safetyBuffer = 5;
+            else if (fish.dom.classList.contains('size-huge')) safetyBuffer = 7;
+            else if (fish.dom.classList.contains('size-mola')) safetyBuffer = 15; // 翻車魚需要更高水深
+            
             const maxSafeBottom = currentWaterHeight - safetyBuffer;
             const minSafeBottom = 2;
             
@@ -711,13 +716,20 @@
             instantiatedFishList = [];
             
             FISH_DATABASE.forEach((fish) => {
-                const spawnCount = fish.id === 'fish1' ? 3 : 2; 
+                // 翻車魚或旗魚這種巨物生成 1 隻即可，小魚生成 2-3 隻
+                const spawnCount = (fish.id === 'fish1') ? 3 : ((fish.sizeClass === 'size-mola' || fish.sizeClass === 'size-huge') ? 1 : 2); 
                 for (let i = 0; i < spawnCount; i++) {
                     const fishContainer = document.createElement('div');
                     fishContainer.className = `fish-container ${fish.sizeClass}`;
                     fishContainer.innerHTML = fish.svg;
                     
-                    const randomSpeed = (Math.random() * 5 + (fish.sizeClass ? 14 : 9)).toFixed(1); 
+                    // 巨型翻車魚游得比較慢（符合普物阻力感），小魚比較快
+                    let baseSpeed = 9;
+                    if (fish.sizeClass === 'size-large') baseSpeed = 14;
+                    else if (fish.sizeClass === 'size-huge') baseSpeed = 17;
+                    else if (fish.sizeClass === 'size-mola') baseSpeed = 22;
+
+                    const randomSpeed = (Math.random() * 5 + baseSpeed).toFixed(1); 
                     const randomDelay = (Math.random() * 8).toFixed(1); 
                     const direction = Math.random() > 0.5 ? 'right' : 'left';
 
@@ -745,7 +757,11 @@
 
             instantiatedFishList.forEach(fish => {
                 if (accumulatedSeconds >= fish.targetThreshold && hasStartedCounting) {
-                    let safetyBuffer = fish.dom.classList.contains('size-large') ? 5 : (fish.dom.classList.contains('size-huge') ? 7 : 2);
+                    let safetyBuffer = 2;
+                    if (fish.dom.classList.contains('size-large')) safetyBuffer = 5;
+                    else if (fish.dom.classList.contains('size-huge')) safetyBuffer = 7;
+                    else if (fish.dom.classList.contains('size-mola')) safetyBuffer = 15;
+
                     if (fish.currentBottom === null || fish.currentBottom > (currentWaterHeight - safetyBuffer)) {
                         assignRandomHeightToFish(fish);
                     } else {
