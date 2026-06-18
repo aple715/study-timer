@@ -240,6 +240,16 @@
             animation: wave-move-right 6s linear infinite; 
         }
 
+        @keyframes wave-move-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @keyframes wave-move-right {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+        }
+
         /* 🐟 小魚容器 */
         .fish-container { 
             position: absolute; 
@@ -391,6 +401,7 @@
             border-radius: 8px; 
             cursor: pointer; 
             transition: all 0.2s; 
+            touch-action: manipulation;
         }
         
         .btn-start { background-color: #2ecc71; color: white; }
@@ -450,6 +461,8 @@
             .stats-toggle-btn { top: 10px; right: 10px; padding: 6px 12px; font-size: 12px; }
             .stats-display { top: 50px; right: 10px; left: 10px; width: auto; text-align: center; align-items: center; }
             .custom-select-container { width: 100%; }
+            .time-inputs-container { gap: 4px; }
+            input[type="number"], select { font-size: 15px; padding: 9px 6px; }
         }
 
         /* 彈出視窗 */
@@ -682,7 +695,7 @@
                 if (accumulatedSeconds >= fish.target) {
                     optionDiv.innerHTML = `<div class="select-fish-icon">${fish.svg}</div><span>${fish.name} (${fish.label})</span>`;
                 } else {
-                    optionDiv.innerHTML = `<div class="select-fish-icon">🔒</div><span style="color: #94a3b8;">??? (達 ${fish.label}解鎖)</span>`;
+                    optionDiv.innerHTML = `<div class="select-fish-icon">🔒</div><span style="color: #94a3b8;">未解鎖（累積 ${fish.label}）</span>`;
                 }
                 customOptionsBox.appendChild(optionDiv);
             });
@@ -827,9 +840,21 @@
                         localStorage.setItem('accumulatedSeconds', accumulatedSeconds); 
                         updateUI(); 
                         checkAndRefreshFishTank(); 
+
+                        if (remainingSeconds === 0) {
+                            clearInterval(timerInterval); 
+                            timerInterval = null; 
+                            isPaused = true;
+                            startBtn.disabled = false;
+                            pauseBtn.disabled = true;
+                            triggerAlarm(); 
+                        }
                     } else {
                         clearInterval(timerInterval); 
                         timerInterval = null; 
+                        isPaused = true;
+                        startBtn.disabled = false;
+                        pauseBtn.disabled = true;
                         triggerAlarm(); 
                     }
                 }, 1000);
