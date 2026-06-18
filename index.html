@@ -928,6 +928,13 @@
         [hoursInput, minutesInput, secondsInput].forEach(el => {
             el.addEventListener('input', syncPreview);
         });
+
+        // 👁️ 偵測使用者是否切換分頁或離開此網頁，若是則自動暫停計時
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && !isPaused) {
+                pauseTimer();
+            }
+        });
         
         preInitializeFishTank(); 
         updateUI(); 
