@@ -36,7 +36,7 @@
             position: relative;
         }
 
-        /* 🏷️ 左上角版本號樣式 */
+        /* 左上角版本號樣式 */
         .version-tag {
             position: absolute;
             top: 20px;
@@ -55,7 +55,7 @@
             user-select: none;
         }
 
-        /* 📊 圖鑑與統計控制按鈕 */
+        /* 圖鑑與統計控制按鈕 */
         .stats-toggle-btn {
             position: absolute;
             top: 20px;
@@ -78,7 +78,7 @@
             transform: translateY(-1px);
         }
 
-        /* 👑 右上方累積總時數與圖鑑顯示區域 */
+        /* 右上方累積總時數與圖鑑顯示區域 */
         .stats-display {
             position: absolute;
             top: 65px;
@@ -113,7 +113,7 @@
             margin-top: 2px;
         }
 
-        /* 📘 自訂圖鑑選單容器 */
+        /* 自訂圖鑑選單容器 */
         .custom-select-container {
             position: relative;
             margin-top: 8px;
@@ -187,8 +187,8 @@
         }
 
         .select-fish-icon {
-            width: 28px;
-            height: 20px;
+            width: 32px;
+            height: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -204,10 +204,9 @@
             width: 100%;
             height: 100%;
             overflow: visible;
-            filter: drop-shadow(0 3px 5px rgba(0, 70, 110, 0.22));
         }
 
-        /* 🌊 動態水面與海浪背景設定 */
+        /* 動態水面與海浪背景設定 */
         .water-bg {
             position: absolute;
             bottom: 0;
@@ -215,7 +214,7 @@
             width: 100%;
             height: 5%; 
             background: linear-gradient(180deg, #1fa2ff 0%, #12d6df 50%, #006699 100%);
-            opacity: 0.88;
+            opacity: 0.85;
             transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 2;
         }
@@ -258,45 +257,45 @@
             100% { transform: translateX(0); }
         }
 
-        /* 🐟 小魚容器 */
+        /* 🐟 小魚容器與動畫 */
         .fish-container { 
             position: absolute; 
-            width: 55px; 
-            height: 38px; 
+            width: 75px; 
+            height: 45px; 
             opacity: 0; 
             pointer-events: none; 
-            left: -250px; 
+            left: -200px; 
             will-change: left, transform, bottom;
         }
         
-        .fish-container.size-large { width: 85px; height: 60px; }
-        .fish-container.size-huge { width: 100px; height: 70px; }
-        .fish-container.size-mola { width: 200px; height: 140px; }
+        .fish-container.size-large { width: 110px; height: 65px; }
+        .fish-container.size-huge { width: 140px; height: 85px; }
+        .fish-container.size-mola { width: 150px; height: 130px; }
         
         .fish-container.active-swim-right { animation: swim-right linear infinite backwards; }
         .fish-container.active-swim-left { animation: swim-left linear infinite backwards; }
 
         @keyframes swim-right {
-            0% { left: -250px; opacity: 0; transform: translateY(0); }
-            8% { opacity: 0.95; }
+            0% { left: -200px; opacity: 0; transform: translateY(0); }
+            8% { opacity: 1; }
             50% { transform: translateY(-8px); }
-            92% { opacity: 0.95; }
-            100% { left: 115%; opacity: 0; transform: translateY(0); }
+            92% { opacity: 1; }
+            100% { left: 110%; opacity: 0; transform: translateY(0); }
         }
         
         @keyframes swim-left {
-            0% { left: 115%; opacity: 0; transform: scaleX(-1) translateY(0); }
-            8% { opacity: 0.95; }
+            0% { left: 110%; opacity: 0; transform: scaleX(-1) translateY(0); }
+            8% { opacity: 1; }
             50% { transform: scaleX(-1) translateY(8px); }
-            92% { opacity: 0.95; }
-            100% { left: -250px; opacity: 0; transform: scaleX(-1) translateY(0); }
+            92% { opacity: 1; }
+            100% { left: -200px; opacity: 0; transform: scaleX(-1) translateY(0); }
         }
 
         /* 主介面卡片 */
         .container {
             position: relative;
-            z-index: 10;
-            background: rgba(255, 255, 255, 0.78);
+ z-index: 10;
+            background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             padding: 40px 30px;
@@ -425,7 +424,7 @@
         .btn-reset { background-color: #e74c3c; color: white; }
         button:disabled { background-color: #bdc3c7; cursor: not-allowed; color: #7f8c8d; }
 
-        /* 🔲 極簡縮小狀態下的樣式 */
+        /* 極簡縮小狀態下的樣式 */
         .container.minimized-mode {
             position: fixed !important;
             top: 50% !important;
@@ -464,7 +463,7 @@
             cursor: pointer; 
         }
 
-        /* 📱 手機版 RWD 調優 */
+        /* 手機版 RWD 調優 */
         @media (max-width: 480px) {
             .container { padding: 25px 15px; }
             h1 { font-size: 19px; margin-bottom: 15px; }
@@ -490,7 +489,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.2.0</div>
+    <div class="version-tag">v1.3.0</div>
 
     <button class="stats-toggle-btn" id="stats-toggle-btn" onclick="toggleStatsCard()">📊 統計與圖鑑</button>
 
@@ -558,17 +557,18 @@
     </div>
 
     <script>
+        // 🐟 原始魚群資料庫 (使用一開始正常的 SVG 結構)
         const FISH_DATABASE = [
-            { id: 'fish1', name: '紅紋琉璃金魚', target: 0, sizeClass: '', label: '初始擁有', svg: `<svg viewBox="0 0 64 42"><defs><linearGradient id="g-f1-body" x1="10" y1="8" x2="47" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#ff8a5c"/><stop offset="0.48" stop-color="#ff3f6f"/><stop offset="1" stop-color="#b8205f"/></linearGradient><linearGradient id="g-f1-fin" x1="2" y1="8" x2="23" y2="33" gradientUnits="userSpaceOnUse"><stop stop-color="#ffd166"/><stop offset="1" stop-color="#ff5576"/></linearGradient></defs><path d="M13,21 C5,10 2,13 5,21 C2,29 5,32 13,21 Z" fill="url(#g-f1-fin)"/><path d="M12,21 C21,8 43,8 51,20 C43,33 22,35 12,21 Z" fill="url(#g-f1-body)"/><path d="M17,15 C25,8 38,10 45,16 C35,14 25,15 17,15 Z" fill="#fff7d6" opacity="0.35"/><path d="M23,12 C27,16 27,26 23,31" stroke="#ffd6a5" stroke-width="1.4" stroke-linecap="round" opacity="0.55" fill="none"/><path d="M37,12 C40,7 48,6 52,11 C47,12 43,15 40,18 Z" fill="#ff6b8a"/><path d="M24,30 C28,35 27,39 20,37 C20,34 21,32 24,30 Z" fill="#ff7a8f"/><circle cx="42" cy="17" r="3.2" fill="#fff"/><circle cx="43" cy="17" r="1.55" fill="#111827"/><circle cx="44" cy="16" r="0.55" fill="#fff"/><path d="M44,23 Q47,25 50,22" stroke="#8f1d52" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>` },
-            { id: 'fish2', name: '活力條紋小丑魚', target: 60, sizeClass: '', label: '1 分鐘', svg: `<svg viewBox="0 0 64 42"><defs><linearGradient id="g-f2-body" x1="11" y1="7" x2="51" y2="33" gradientUnits="userSpaceOnUse"><stop stop-color="#ffcf60"/><stop offset="0.45" stop-color="#ff8a21"/><stop offset="1" stop-color="#ec5f13"/></linearGradient></defs><path d="M13,21 L3,11 L7,21 L3,31 Z" fill="#ff8a21"/><path d="M10,21 C20,6 44,7 53,20 C45,34 20,36 10,21 Z" fill="url(#g-f2-body)"/><path d="M20,9 C25,13 25,29 20,33 L27,31 C31,26 31,15 27,10 Z" fill="#fffaf0"/><path d="M35,9 C39,13 40,27 35,31 L41,29 C44,25 44,16 41,12 Z" fill="#fffaf0"/><path d="M18,9 C21,14 21,28 18,33" stroke="#22313f" stroke-width="1.7" stroke-linecap="round" fill="none"/><path d="M32,9 C35,14 35,27 32,31" stroke="#22313f" stroke-width="1.7" stroke-linecap="round" fill="none"/><path d="M14,15 C24,10 37,11 48,17" stroke="#fff7d6" stroke-width="1.3" stroke-linecap="round" opacity="0.5"/><path d="M31,31 C35,36 34,39 28,38 Z" fill="#ff7a21"/><circle cx="44" cy="17" r="3" fill="#fff"/><circle cx="44.7" cy="17" r="1.35" fill="#111827"/><circle cx="45.4" cy="16.2" r="0.45" fill="#fff"/></svg>` },
-            { id: 'fish3', name: '極光霓虹藍倒吊', target: 300, sizeClass: '', label: '5 分鐘', svg: `<svg viewBox="0 0 64 42"><defs><linearGradient id="g-f3-body" x1="10" y1="8" x2="52" y2="34" gradientUnits="userSpaceOnUse"><stop stop-color="#61e7ff"/><stop offset="0.48" stop-color="#1677ff"/><stop offset="1" stop-color="#2137a8"/></linearGradient><linearGradient id="g-f3-tail" x1="1" y1="10" x2="16" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#ffd166"/><stop offset="1" stop-color="#ff8a00"/></linearGradient></defs><path d="M13,21 L2,10 L6,21 L2,32 Z" fill="url(#g-f3-tail)"/><path d="M10,21 C19,5 43,8 53,20 C44,33 19,35 10,21 Z" fill="url(#g-f3-body)"/><path d="M16,14 C28,9 40,16 47,21 C37,23 25,24 16,14 Z" fill="#101a3d" opacity="0.88"/><path d="M17,14 C27,12 37,17 43,21" stroke="#65f4ff" stroke-width="1.4" stroke-linecap="round" opacity="0.7" fill="none"/><path d="M40,9 C46,7 51,11 51,16 C46,14 42,14 39,17 Z" fill="#1f8fff"/><path d="M25,30 C29,34 29,38 23,37 Z" fill="#2da8ff"/><circle cx="44" cy="16" r="2.8" fill="#fff"/><circle cx="44.7" cy="16" r="1.25" fill="#0b1020"/><circle cx="45.4" cy="15.2" r="0.5" fill="#fff"/></svg>` },
-            { id: 'fish4', name: '閃亮螢光綠燈魚', target: 600, sizeClass: '', label: '10 分鐘', svg: `<svg viewBox="0 0 64 42"><defs><linearGradient id="g-f4-body" x1="12" y1="10" x2="49" y2="31" gradientUnits="userSpaceOnUse"><stop stop-color="#b8ff7a"/><stop offset="0.55" stop-color="#28d17c"/><stop offset="1" stop-color="#0e8f6b"/></linearGradient></defs><path d="M13,21 L4,12 L7,21 L4,30 Z" fill="#ff5d73"/><path d="M11,21 C22,9 45,11 51,20 C44,30 23,32 11,21 Z" fill="url(#g-f4-body)"/><path d="M14,20 C25,16 39,16 49,20" stroke="#66f7ff" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.95"/><path d="M14,20 C25,18 39,18 49,20" stroke="#ecff8f" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.8"/><path d="M34,12 C39,8 46,10 49,15 C43,14 39,15 36,18 Z" fill="#34e89e"/><path d="M26,30 C30,35 29,38 24,37 Z" fill="#2ed573"/><circle cx="43" cy="17" r="2.7" fill="#fff"/><circle cx="43.7" cy="17" r="1.15" fill="#0f172a"/><circle cx="44.3" cy="16.2" r="0.45" fill="#fff"/></svg>` },
-            { id: 'fish5', name: '深海赤鱗獅子魚', target: 1800, sizeClass: '', label: '30 分鐘', svg: `<svg viewBox="0 0 64 42"><defs><linearGradient id="g-f5-body" x1="14" y1="8" x2="49" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#ffbd69"/><stop offset="0.42" stop-color="#f04452"/><stop offset="1" stop-color="#84223a"/></linearGradient></defs><path d="M16,21 L3,8 L8,21 L3,34 Z" fill="#ff9f43"/><path d="M15,21 C24,7 44,9 51,20 C44,32 24,34 15,21 Z" fill="url(#g-f5-body)"/><path d="M22,5 L20,14 M28,3 L26,13 M34,4 L32,13 M41,6 L38,15" stroke="#fff4d6" stroke-width="2.2" stroke-linecap="round"/><path d="M22,37 L20,28 M28,39 L26,29 M34,38 L32,29 M40,35 L37,27" stroke="#fff4d6" stroke-width="2.2" stroke-linecap="round"/><path d="M20,13 C28,9 39,13 47,19" stroke="#ffe6e6" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M20,29 C28,33 39,28 47,22" stroke="#ffe6e6" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M27,17 C34,15 42,17 48,20" stroke="#7a1f2f" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/><circle cx="42" cy="16" r="2.8" fill="#fff"/><circle cx="42.7" cy="16" r="1.25" fill="#111827"/><circle cx="43.4" cy="15.2" r="0.45" fill="#fff"/></svg>` },
-            { id: 'fish_puff', name: '斑點刺蝟綠河豚', target: 3600, sizeClass: '', label: '1 小時', svg: `<svg viewBox="0 0 54 42"><defs><radialGradient id="g-puff-body" cx="32%" cy="30%" r="62%"><stop stop-color="#f3ef8f"/><stop offset="0.55" stop-color="#a8c955"/><stop offset="1" stop-color="#578f47"/></radialGradient></defs><path d="M13,21 L4,14 L7,21 L4,28 Z" fill="#59c36a"/><circle cx="27" cy="21" r="15.5" fill="url(#g-puff-body)"/><path d="M14,15 L10,12 M13,21 L8,21 M15,27 L10,31 M25,6 L25,1 M35,11 L39,7 M39,25 L44,27 M27,37 L27,41" stroke="#7c9d3f" stroke-width="1.2" stroke-linecap="round"/><circle cx="22" cy="14" r="1.6" fill="#2f7d55"/><circle cx="31" cy="28" r="1.6" fill="#2f7d55"/><circle cx="18" cy="25" r="2" fill="#2f7d55"/><circle cx="29" cy="12" r="1.2" fill="#2f7d55"/><path d="M23,25 Q27,28 31,25" stroke="#2f7d55" stroke-width="1.8" stroke-linecap="round" fill="none"/><circle cx="36" cy="17" r="3.6" fill="#fff"/><circle cx="37" cy="17" r="1.65" fill="#111827"/><circle cx="38" cy="16" r="0.55" fill="#fff"/></svg>` },
-            { id: 'fish_sail', name: '夢幻破浪大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 84 54"><defs><linearGradient id="g-sail-body" x1="9" y1="15" x2="76" y2="35" gradientUnits="userSpaceOnUse"><stop stop-color="#89f7fe"/><stop offset="0.48" stop-color="#4f6fd8"/><stop offset="1" stop-color="#20315f"/></linearGradient><linearGradient id="g-sail-fin" x1="22" y1="2" x2="58" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#ffdc5e"/><stop offset="0.6" stop-color="#ff6b6b"/><stop offset="1" stop-color="#5f27cd"/></linearGradient></defs><path d="M10,27 C30,12 64,18 75,26 C64,35 30,41 10,27 Z" fill="url(#g-sail-body)"/><path d="M74,26 L83,24" stroke="#20315f" stroke-width="2.2" stroke-linecap="round"/><path d="M22,17 Q36,-5 62,15 C49,14 35,15 22,17 Z" fill="url(#g-sail-fin)" opacity="0.95"/><path d="M29,6 Q37,1 47,8" stroke="#fff7c2" stroke-width="1.3" stroke-linecap="round" opacity="0.8" fill="none"/><path d="M25,34 C32,43 31,48 21,44 Z" fill="#4f6fd8"/><path d="M20,23 C34,18 55,20 69,26" stroke="#dff9ff" stroke-width="1.5" stroke-linecap="round" opacity="0.6" fill="none"/><circle cx="65" cy="23" r="2.9" fill="#fff"/><circle cx="65.8" cy="23" r="1.25" fill="#0b1020"/><circle cx="66.5" cy="22.1" r="0.45" fill="#fff"/></svg>` },
-            { id: 'fish_dolphin', name: '蔚藍守護大海豚', target: 10800, sizeClass: 'size-huge', label: '3 小時', svg: `<svg viewBox="0 0 94 54"><defs><linearGradient id="g-dolphin-body" x1="7" y1="11" x2="87" y2="38" gradientUnits="userSpaceOnUse"><stop stop-color="#9be7ff"/><stop offset="0.5" stop-color="#4c9bff"/><stop offset="1" stop-color="#2d5aa7"/></linearGradient></defs><path d="M7,29 C30,6 72,13 89,26 C72,40 30,42 7,29 Z" fill="url(#g-dolphin-body)"/><path d="M39,14 Q44,1 52,10 C47,12 43,15 40,19 Z" fill="#2b76dd"/><path d="M25,35 C33,43 30,49 20,45 Z" fill="#3d86ef"/><path d="M72,27 C62,31 51,31 42,28" stroke="#e9fbff" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.65"/><path d="M17,25 C34,15 56,17 77,25" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity="0.45" fill="none"/><circle cx="78" cy="22" r="3" fill="#fff"/><circle cx="79" cy="22" r="1.25" fill="#0b1020"/><circle cx="79.7" cy="21.2" r="0.45" fill="#fff"/><path d="M82,29 Q79,31 76,29" stroke="#1d4f91" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>` },
-            { id: 'fish_jelly', name: '幽靈發光小水母', target: 14400, sizeClass: '', label: '4 小時', svg: `<svg viewBox="0 0 52 54"><defs><radialGradient id="g-jelly-bell" cx="35%" cy="25%" r="68%"><stop stop-color="#fff4a3"/><stop offset="0.55" stop-color="#ffc94d"/><stop offset="1" stop-color="#f08a5d"/></radialGradient></defs><path d="M10,24 C10,8 42,8 42,24 C42,28 10,28 10,24 Z" fill="url(#g-jelly-bell)" opacity="0.9"/><path d="M14,24 C18,28 24,28 26,24 C29,29 36,29 40,24" stroke="#fff8c7" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.75"/><path d="M16,27 C14,38 19,42 17,52" stroke="#ffd166" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.72"/><path d="M25,27 C24,37 28,43 24,51" stroke="#f7b731" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.72"/><path d="M35,27 C39,38 32,43 35,52" stroke="#ffd166" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.72"/><circle cx="20" cy="18" r="1.7" fill="#5f3b21"/><circle cx="32" cy="18" r="1.7" fill="#5f3b21"/><path d="M23,22 Q26,24 29,22" stroke="#8a4f25" stroke-width="1.1" stroke-linecap="round" fill="none"/></svg>` },
-            { id: 'fish_mola', name: '深海巨型翻車魚', target: 18000, sizeClass: 'size-mola', label: '5 小時', svg: `<svg viewBox="0 0 104 84"><defs><linearGradient id="g-mola-body" x1="29" y1="12" x2="78" y2="68" gradientUnits="userSpaceOnUse"><stop stop-color="#eef4f8"/><stop offset="0.52" stop-color="#b9c7d3"/><stop offset="1" stop-color="#6f8091"/></linearGradient></defs><path d="M31,42 C31,14 67,11 80,41 C67,72 31,68 31,42 Z" fill="url(#g-mola-body)"/><path d="M43,21 Q38,-3 52,11 C48,14 45,18 43,21 Z" fill="#91a0af"/><path d="M43,63 Q38,87 52,73 C48,70 45,66 43,63 Z" fill="#91a0af"/><path d="M29,36 C19,38 19,46 29,48 C27,44 27,40 29,36 Z" fill="#66778a"/><path d="M44,23 C54,17 67,25 75,40" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity="0.45" fill="none"/><path d="M43,55 C52,61 64,58 73,45" stroke="#6f8091" stroke-width="1.2" stroke-linecap="round" opacity="0.45" fill="none"/><circle cx="69" cy="35" r="4" fill="#fff"/><circle cx="70" cy="35" r="1.9" fill="#111827"/><circle cx="71.2" cy="33.7" r="0.65" fill="#fff"/><path d="M56,44 Q61,48 66,44" stroke="#59697a" stroke-width="2" stroke-linecap="round" fill="none"/></svg>` }
+            { id: 'fish1', name: '紅紋金魚', target: 0, sizeClass: '', label: '初始擁有', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="22" fill="#ff4d4d"/><path d="M15,35 Q-5,15 0,35 Q-5,55 15,35" fill="#ff4d4d"/><path d="M45,20 Q30,5 40,5 Q50,5 50,20" fill="#ffa64d"/><path d="M45,50 Q35,65 45,65 Q55,65 52,50" fill="#ffa64d"/><circle cx="70" cy="28" r="4" fill="black"/><circle cx="72" cy="26" r="1.5" fill="white"/><path d="M55,35 Q40,32 35,42" stroke="#ffa64d" stroke-width="2" fill="none"/></g></svg>` },
+            { id: 'fish2', name: '條紋小丑魚', target: 60, sizeClass: '', label: '1 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="20" fill="#ff7300"/><path d="M15,35 Q-5,15 -2,35 Q-5,55 15,35" fill="#ff7300"/><path d="M30,16 Q33,35 30,54 L38,53 Q41,35 38,17 Z" fill="white"/><path d="M50,15 Q53,35 50,55 L58,54 Q61,35 58,16 Z" fill="white"/><circle cx="72" cy="28" r="4" fill="black"/><circle cx="74" cy="26" r="1.5" fill="white"/></g></svg>` },
+            { id: 'fish3', name: '霓虹藍倒吊', target: 300, sizeClass: '', label: '5 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="22" fill="#1a75ff"/><path d="M15,35 Q-5,10 -2,35 Q-5,60 15,35" fill="#ffff33"/><path d="M30,25 Q50,15 65,30 Q45,45 30,25" fill="#000066"/><path d="M40,50 Q30,60 42,60 Z" fill="#ffff33"/><circle cx="70" cy="26" r="4" fill="black"/><circle cx="72" cy="24" r="1.5" fill="white"/></g></svg>` },
+            { id: 'fish4', name: '螢光綠燈魚', target: 600, sizeClass: '', label: '10 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="32" ry="16" fill="#00cc66"/><path d="M18,35 Q0,20 3,35 Q0,50 18,35" fill="#ff3333"/><path d="M25,35 Q50,28 75,35" stroke="#33ffff" stroke-width="3" fill="none"/><circle cx="68" cy="30" r="3.5" fill="black"/><circle cx="69.5" cy="28.5" r="1.2" fill="white"/></g></svg>` },
+            { id: 'fish5', name: '赤鱗獅子魚', target: 1800, sizeClass: '', label: '30 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><path d="M35,18 L20,-2 L40,3 Z M48,15 L40,-5 L53,2 Z M58,16 L60,-5 L65,5 Z M35,52 L20,72 L40,67 Z M48,55 L40,75 L53,68 Z M58,54 L60,75 L65,65 Z" fill="#ff4d4d"/><ellipse cx="50" cy="35" rx="33" ry="20" fill="#cc0000"/><path d="M17,35 Q-5,15 0,35 Q-5,55 17,35" fill="#ff4d4d"/><path d="M30,22 Q50,28 65,22 M30,48 Q50,42 65,48" stroke="white" stroke-width="1.5" fill="none"/><circle cx="68" cy="28" r="4" fill="black"/><circle cx="70" cy="26" r="1.5" fill="white"/></g></svg>` },
+            { id: 'fish_puff', name: '刺蝟綠河豚', target: 3600, sizeClass: '', label: '1 小時', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><circle cx="50" cy="35" r="24" fill="#ccff33"/><path d="M26,35 Q10,23 15,35 Q10,47 26,35" fill="#99cc00"/><path d="M32,20 L27,15 M42,15 L39,8 M55,14 L55,6 M67,17 L72,11 M30,48 L25,53 M40,54 L37,61 M54,56 L55,64 M68,52 L73,57" stroke="#668000" stroke-width="2"/><circle cx="62" cy="27" r="4.5" fill="black"/><circle cx="64" cy="25" r="1.5" fill="white"/><path d="M50,43 Q56,47 62,42" stroke="#668000" stroke-width="2" fill="none"/></g></svg>` },
+            { id: 'fish_sail', name: '破浪大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 160 100"><g transform="translate(10,10)"><path d="M45,25 Q70,-10 95,15 C75,10 60,15 45,25 Z" fill="#002266"/><path d="M20,40 Q-5,25 0,40 Q-5,55 20,40" fill="#3399ff"/><ellipse cx="65" cy="40" rx="50" ry="22" fill="#0055ff"/><path d="M115,38 L145,36" stroke="#002266" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="32" r="4.5" fill="black"/><circle cx="102" cy="30" r="1.5" fill="white"/></g></svg>` },
+            { id: 'fish_dolphin', name: '蔚藍大海豚', target: 10800, sizeClass: 'size-huge', label: '3 小時', svg: `<svg viewBox="0 0 200 120"><g transform="translate(10,10)"><path d="M20,55 C45,15 110,20 135,40 C115,65 50,70 20,55 Z" fill="#3399ff"/><path d="M75,32 Q90,5 105,22 Z" fill="#0066cc"/><path d="M50,62 C60,75 55,85 40,78 Z" fill="#3399ff"/><circle cx="116" cy="34" r="4.5" fill="black"/><circle cx="118" cy="32" r="1.5" fill="white"/></g></svg>` },
+            { id: 'fish_jelly', name: '發光小水母', target: 14400, sizeClass: '', label: '4 小時', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><path d="M35,35 Q20,42 30,52 Q20,62 35,67 Q25,74 42,76" stroke="#ff99ff" stroke-width="2.5" fill="none"/><path d="M55,35 C55,10 95,10 95,35 Z" fill="#ff66ff" opacity="0.8"/><circle cx="70" cy="24" r="3" fill="black"/><circle cx="82" cy="24" r="3" fill="black"/><path d="M73,29 Q76,32 79,29" stroke="black" stroke-width="1.5" fill="none"/></g></svg>` },
+            { id: 'fish_mola', name: '巨型翻車魚', target: 18000, sizeClass: 'size-mola', label: '5 小時', svg: `<svg viewBox="0 0 160 140"><g transform="translate(10,10)"><path d="M55,40 Q40,-5 65,15 Z M55,70 Q40,115 65,95 Z" fill="#999999"/><ellipse cx="55" cy="55" rx="35" ry="40" fill="#b3b3b3"/><ellipse cx="25" cy="55" rx="10" ry="12" fill="#999999"/><circle cx="72" cy="40" r="4.5" fill="black"/><circle cx="74" cy="38" r="1.5" fill="white"/></g></svg>` }
         ];
 
         let totalSeconds = 0;
@@ -727,10 +727,10 @@
 
         function assignRandomHeightToFish(fish) {
             const currentWaterHeight = getCurrentWaterPercentage();
-            let safetyBuffer = 2;
-            if (fish.dom.classList.contains('size-large')) safetyBuffer = 5;
-            else if (fish.dom.classList.contains('size-huge')) safetyBuffer = 7;
-            else if (fish.dom.classList.contains('size-mola')) safetyBuffer = 12; 
+            let safetyBuffer = 6;
+            if (fish.dom.classList.contains('size-large')) safetyBuffer = 10;
+            else if (fish.dom.classList.contains('size-huge')) safetyBuffer = 12;
+            else if (fish.dom.classList.contains('size-mola')) safetyBuffer = 18; 
             
             const maxSafeBottom = currentWaterHeight - safetyBuffer;
             const minSafeBottom = 2;
@@ -756,13 +756,13 @@
                         fishContainer.className = `fish-container ${fish.sizeClass}`;
                         fishContainer.innerHTML = fish.svg;
                         
-                        let baseSpeed = 9;
+                        let baseSpeed = 10;
                         if (fish.sizeClass === 'size-large') baseSpeed = 14;
                         else if (fish.sizeClass === 'size-huge') baseSpeed = 17;
                         else if (fish.sizeClass === 'size-mola') baseSpeed = 22;
 
                         const randomSpeed = (Math.random() * 5 + baseSpeed).toFixed(1); 
-                        const randomDelay = (Math.random() * 6).toFixed(1); 
+                        const randomDelay = (Math.random() * 5).toFixed(1); 
                         const direction = Math.random() > 0.5 ? 'right' : 'left';
 
                         const fishData = { 
@@ -784,10 +784,10 @@
 
                 existingFish.forEach(f => {
                     if (isUnlocked && hasStartedCounting) {
-                        let safetyBuffer = 2;
-                        if (f.dom.classList.contains('size-large')) safetyBuffer = 5;
-                        else if (f.dom.classList.contains('size-huge')) safetyBuffer = 7;
-                        else if (f.dom.classList.contains('size-mola')) safetyBuffer = 12;
+                        let safetyBuffer = 6;
+                        if (f.dom.classList.contains('size-large')) safetyBuffer = 10;
+                        else if (f.dom.classList.contains('size-huge')) safetyBuffer = 12;
+                        else if (f.dom.classList.contains('size-mola')) safetyBuffer = 18;
 
                         if (f.currentBottom === null || f.currentBottom > (currentWaterHeight - safetyBuffer)) {
                             assignRandomHeightToFish(f);
@@ -966,7 +966,6 @@
                     o.type = type; 
                     o.frequency.setValueAtTime(freq, start);
                     gain.gain.setValueAtTime(g, start); 
-                    // 💡 優化：使用 0.001 替代 0 防範電子爆音
                     gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
                     o.connect(gain); 
                     gain.connect(ctx.destination); 
