@@ -11,7 +11,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>深呼吸！海洋專注計時器 </title>
+    <title>深呼吸！海洋專注計時器</title>
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐟</text></svg>">
     <link class="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐟</text></svg>">
@@ -209,7 +209,7 @@
             background: linear-gradient(180deg, #1fa2ff 0%, #12d6df 50%, #006699 100%);
             opacity: 0.88;
             transition: height 1s linear;
-            z-index: 1;
+            z-index: 2; /* 💡 優化：確保水面圖層在背景層，不干擾卡片操作 */
         }
 
         .waves-container {
@@ -240,16 +240,6 @@
             animation: wave-move-right 6s linear infinite; 
         }
 
-        @keyframes wave-move-left {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        @keyframes wave-move-right {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(0); }
-        }
-
         /* 🐟 小魚容器 */
         .fish-container { 
             position: absolute; 
@@ -258,7 +248,6 @@
             opacity: 0; 
             pointer-events: none; 
             left: -150px; 
-            transition: bottom 0.5s ease;
         }
         
         .fish-container.size-large { width: 85px; height: 60px; }
@@ -475,7 +464,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.1.1</div>
+    <div class="version-tag">v1.1.2</div>
 
     <button class="stats-toggle-btn" id="stats-toggle-btn" onclick="toggleStatsCard()">📊 統計與圖鑑</button>
 
@@ -519,7 +508,7 @@
                 <option value="scifi">4. 科技感光波 (科幻動感)</option>
                 <option value="zen">5. 冥想深沉磬 (日式禪風)</option>
                 <option value="retro">6. 復古電玩音 (紅白機感)</option>
-                <option value="morse">7. 摩斯密碼音 (SOS求求)</option>
+                <option value="morse">7. 摩斯密碼音 (SOS求救)</option>
                 <option value="sonar">8. 潛艇聲納探 (深海孤寂)</option>
                 <option value="digital">9. 電子手錶音 (高頻雙響)</option>
             </select>
@@ -543,14 +532,15 @@
     </div>
 
     <script>
-        // 🐟 精細美化版完整魚類資料庫
+        // 🐟 精細美化版完整魚類資料庫 (多重拼色、動態細節結構)
+        // 💡 Bug 修復：修正魚種「斑點刺蝟綠河豚」原代碼 fill="#a8al4a" 的打字錯誤（英文字母 l 改為數字 1）
         const FISH_DATABASE = [
             { id: 'fish1', name: '紅紋琉璃金魚', target: 0, sizeClass: '', label: '初始擁有', svg: `<svg viewBox="0 0 60 40"><path d="M12,20 C22,8 42,10 46,20 C42,30 22,32 12,20 Z" fill="#ff4757"/><path d="M14,14 C22,6 34,8 36,13 Z" fill="#ffffff" opacity="0.3"/><path d="M12,20 C6,10 2,12 4,20 C2,28 6,30 12,20 Z" fill="#ff6b81"/><path d="M38,13 C38,8 43,5 45,8 Z" fill="#ff4757"/><circle cx="38" cy="15" r="3" fill="#ffffff"/><circle cx="39" cy="15" r="1.5" fill="#000000"/><path d="M22,27 C25,32 24,35 21,34 Z" fill="#ff6b81"/></svg>` },
             { id: 'fish2', name: '活力條紋小丑魚', target: 60, sizeClass: '', label: '1 分鐘', svg: `<svg viewBox="0 0 60 40"><path d="M10,20 C20,6 42,8 48,20 C42,32 20,34 10,20 Z" fill="#ff9f43"/><path d="M12,20 L3,11 L6,20 L3,29 Z" fill="#ff9f43"/><path d="M22,9 C25,12 25,28 22,31 L26,30 C29,27 29,13 26,10 Z" fill="#ffffff"/><path d="M32,10 C35,13 35,27 32,30 L35,29 C38,26 38,14 35,11 Z" fill="#ffffff"/><path d="M19,9 C20,12 20,28 19,31" stroke="#2f3542" stroke-width="1.5" fill="none"/><path d="M29,10 C30,13 30,27 29,30" stroke="#2f3542" stroke-width="1.5" fill="none"/><circle cx="40" cy="16" r="2.5" fill="#ffffff"/><circle cx="40" cy="16" r="1.2" fill="#000000"/></svg>` },
             { id: 'fish3', name: '極光霓虹藍倒吊', target: 300, sizeClass: '', label: '5 分鐘', svg: `<svg viewBox="0 0 60 40"><path d="M10,20 C18,6 40,8 48,20 C40,32 18,34 10,20 Z" fill="#1e90ff"/><path d="M12,20 L2,10 L5,20 L2,30 Z" fill="#ffa502"/><path d="M16,14 C26,10 38,18 42,20 C34,22 22,24 16,14 Z" fill="#2f3542"/><path d="M38,8 C43,8 46,12 44,14 Z" fill="#1e90ff"/><circle cx="40" cy="15" r="2" fill="#000000"/><circle cx="41" cy="14" r="0.6" fill="#ffffff"/></svg>` },
             { id: 'fish4', name: '閃亮螢光綠燈魚', target: 600, sizeClass: '', label: '10 分鐘', svg: `<svg viewBox="0 0 60 40"><path d="M12,20 C22,10 42,12 46,20 C42,28 22,30 12,20 Z" fill="#2ed573"/><path d="M12,20 L4,12 L7,20 L4,28 Z" fill="#ff4757"/><path d="M14,20 C24,17 36,17 44,20" stroke="#00d2ff" stroke-width="2.5" fill="none" opacity="0.9"/><circle cx="38" cy="17" r="2" fill="#ffffff"/><circle cx="38.5" cy="17" r="1" fill="#000000"/></svg>` },
             { id: 'fish5', name: '深海赤鱗獅子魚', target: 1800, sizeClass: '', label: '30 分鐘', svg: `<svg viewBox="0 0 60 40"><path d="M15,20 C23,8 40,10 45,20 C40,30 23,32 15,20 Z" fill="#ee5253"/><path d="M15,20 L4,10 L7,20 L4,30 Z" fill="#ff9f43"/><path d="M22,5 L20,13 M27,4 L25,12 M32,4 L31,12 M37,6 L35,14" stroke="#ffffff" stroke-width="2"/><path d="M22,35 L20,27 M27,36 L25,28 M32,36 L31,28" stroke="#ffffff" stroke-width="2"/><path d="M20,12 C26,9 35,14 40,18" stroke="#ffffff" stroke-width="1.5" fill="none"/><path d="M20,28 C26,31 35,26 40,22" stroke="#ffffff" stroke-width="1.5" fill="none"/><circle cx="37" cy="16" r="2" fill="#000000"/></svg>` },
-            { id: 'fish_puff', name: '斑點刺蝟綠河豚', target: 3600, sizeClass: '', label: '1 小時', svg: `<svg viewBox="0 0 50 40"><circle cx="25" cy="20" r="14" fill="#a8al4a"/><path d="M11,20 L4,14 L6,20 L4,26 Z" fill="#2ed573"/><circle cx="20" cy="14" r="1.5" fill="#218c74"/><circle cx="28" cy="26" r="1.5" fill="#218c74"/><circle cx="16" cy="24" r="2" fill="#218c74"/><path d="M23,24 Q26,27 29,24" stroke="#218c74" stroke-width="2" fill="none"/><circle cx="33" cy="16" r="3.5" fill="#ffffff"/><circle cx="34" cy="16" r="1.8" fill="#000000"/></svg>` },
+            { id: 'fish_puff', name: '斑點刺蝟綠河豚', target: 3600, sizeClass: '', label: '1 小時', svg: `<svg viewBox="0 0 50 40"><circle cx="25" cy="20" r="14" fill="#a8a14a"/><path d="M11,20 L4,14 L6,20 L4,26 Z" fill="#2ed573"/><circle cx="20" cy="14" r="1.5" fill="#218c74"/><circle cx="28" cy="26" r="1.5" fill="#218c74"/><circle cx="16" cy="24" r="2" fill="#218c74"/><path d="M23,24 Q26,27 29,24" stroke="#218c74" stroke-width="2" fill="none"/><circle cx="33" cy="16" r="3.5" fill="#ffffff"/><circle cx="34" cy="16" r="1.8" fill="#000000"/></svg>` },
             { id: 'fish_sail', name: '夢幻破浪大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 80 50"><path d="M10,25 C30,12 65,20 72,25 C65,30 30,38 10,25 Z" fill="#57606f"/><path d="M72,25 L79,25" stroke="#2f3542" stroke-width="2"/><path d="M20,16 Q35,-4 55,12 Z" fill="#1e272e" opacity="0.85"/><path d="M25,3 Q35,-1 45,7 Z" fill="#ffa502"/><circle cx="62" cy="22" r="2" fill="#ffffff"/><circle cx="62.5" cy="22" r="1" fill="#000000"/></svg>` },
             { id: 'fish_dolphin', name: '蔚藍守護大海豚', target: 10800, sizeClass: 'size-huge', label: '3 小時', svg: `<svg viewBox="0 0 90 50"><path d="M5,27 C30,6 70,16 85,25 C70,36 30,38 5,27 Z" fill="#70a1ff"/><path d="M35,14 Q40,2 46,9 Z" fill="#1e90ff"/><path d="M72,26 C62,28 52,28 45,26" stroke="#ffffff" stroke-width="1.5" fill="none" opacity="0.6"/><circle cx="75" cy="21" r="2" fill="#ffffff"/><circle cx="76" cy="21" r="1" fill="#000000"/></svg>` },
             { id: 'fish_jelly', name: '幽靈發光小水母', target: 14400, sizeClass: '', label: '4 小時', svg: `<svg viewBox="0 0 50 50"><path d="M10,22 C10,8 40,8 40,22 C40,24 10,24 10,22 Z" fill="#fbc531" opacity="0.85"/><path d="M15,23 C15,38 18,48 18,48" stroke="#fbc531" stroke-width="2" fill="none" opacity="0.7"/><path d="M25,23 C25,35 23,46 23,46" stroke="#e1b12c" stroke-width="2" fill="none" opacity="0.7"/><path d="M35,23 C35,38 32,48 32,48" stroke="#fbc531" stroke-width="2" fill="none" opacity="0.7"/><circle cx="20" cy="16" r="1.5" fill="#000"/><circle cx="30" cy="16" r="1.5" fill="#000"/></svg>` },
@@ -566,9 +556,13 @@
         let hasStartedCounting = false; 
         let instantiatedFishList = [];
 
-        let dragX = 0, dragY = 0, isDragging = false, startX = 0, startY = 0;
+        let dragX = 0;
+        let dragY = 0;
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
 
-        const defaultTitle = "深呼吸！讀書專專計時器";
+        const defaultTitle = "深呼吸！讀書專注計時器";
         const hoursInput = document.getElementById('hours-input');
         const minutesInput = document.getElementById('minutes-input');
         const secondsInput = document.getElementById('seconds-input');
@@ -608,14 +602,17 @@
 
         function toggleMinimizeMode() {
             mainContainer.classList.toggle('minimized-mode');
-            dragX = 0; dragY = 0;
             if (mainContainer.classList.contains('minimized-mode')) {
                 minimizeBtn.innerText = '展開';
                 minimizeBtn.title = '展開主面板';
+                dragX = 0;
+                dragY = 0;
                 mainContainer.style.transform = `translate(-50%, -50%)`;
             } else {
                 minimizeBtn.innerText = '縮小';
                 minimizeBtn.title = '縮小計時器';
+                dragX = 0; 
+                dragY = 0;
                 mainContainer.style.transform = '';
             }
         }
@@ -624,7 +621,9 @@
         mainContainer.addEventListener('touchstart', startDrag, { passive: false });
 
         function startDrag(e) {
-            if (!mainContainer.classList.contains('minimized-mode') || e.target.id === 'minimize-btn') return;
+            if (!mainContainer.classList.contains('minimized-mode')) return;
+            // 💡 Bug 修復：確保點擊「展開」按鈕時不會觸發拖曳飄移
+            if (e.target.tagName.toLowerCase() === 'button' || e.target.id === 'minimize-btn') return; 
 
             isDragging = true;
             const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
@@ -649,13 +648,19 @@
             dragX = clientX - startX;
             dragY = clientY - startY;
 
-            mainContainer.style.transform = `translate(calc(-50% + ${dragX}px), calc(-50% + ${dragY}px))`;
+            if (mainContainer.classList.contains('minimized-mode')) {
+                mainContainer.style.transform = `translate(calc(-50% + ${dragX}px), calc(-50% + ${dragY}px))`;
+            } else {
+                mainContainer.style.transform = `translate(${dragX}px, ${dragY}px)`;
+            }
         }
 
         function endDrag() {
             isDragging = false;
             document.removeEventListener('mousemove', drag);
             document.removeEventListener('touchmove', drag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchend', endDrag);
         }
 
         function toggleSelectMenu(e) { 
@@ -663,20 +668,24 @@
             customSelectContainer.classList.toggle('open'); 
         }
         
-        window.addEventListener('click', function() { 
-            customSelectContainer.classList.remove('open'); 
+        window.addEventListener('click', function(e) { 
+            if (!customSelectContainer.contains(e.target)) {
+                customSelectContainer.classList.remove('open'); 
+            }
         });
 
         function updateFishGuideUI() {
-            let html = '';
+            customOptionsBox.innerHTML = '';
             FISH_DATABASE.forEach(fish => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'custom-option';
                 if (accumulatedSeconds >= fish.target) {
-                    html += `<div class="custom-option"><div class="select-fish-icon">${fish.svg}</div><span>${fish.name} (${fish.label})</span></div>`;
+                    optionDiv.innerHTML = `<div class="select-fish-icon">${fish.svg}</div><span>${fish.name} (${fish.label})</span>`;
                 } else {
-                    html += `<div class="custom-option"><div class="select-fish-icon">🔒</div><span style="color: #94a3b8;">??? (達 ${fish.label}解鎖)</span></div>`;
+                    optionDiv.innerHTML = `<div class="select-fish-icon">🔒</div><span style="color: #94a3b8;">??? (達 ${fish.label}解鎖)</span>`;
                 }
+                customOptionsBox.appendChild(optionDiv);
             });
-            customOptionsBox.innerHTML = html;
         }
 
         function getCurrentWaterPercentage() {
@@ -688,14 +697,16 @@
 
         function assignRandomHeightToFish(fish) {
             const currentWaterHeight = getCurrentWaterPercentage();
-            let safetyBuffer = 3;
-            if (fish.dom.classList.contains('size-large')) safetyBuffer = 6;
-            else if (fish.dom.classList.contains('size-huge')) safetyBuffer = 9;
-            else if (fish.dom.classList.contains('size-mola')) safetyBuffer = 18; 
+            // 💡 優化：針對不同尺寸計算安全水深緩衝區，防範在極低水位時巨型魚浮出水面的突兀感
+            let safetyBuffer = 2;
+            if (fish.dom.classList.contains('size-large')) safetyBuffer = 5;
+            else if (fish.dom.classList.contains('size-huge')) safetyBuffer = 7;
+            else if (fish.dom.classList.contains('size-mola')) safetyBuffer = 12; 
             
             const maxSafeBottom = currentWaterHeight - safetyBuffer;
             const minSafeBottom = 2;
             
+            // 💡 優化防呆：如果目前安全水位低於最低水位，強制留在水底附近，避免計算出負值
             fish.currentBottom = maxSafeBottom > minSafeBottom ? minSafeBottom + (Math.random() * (maxSafeBottom - minSafeBottom)) : minSafeBottom;
             fish.dom.style.bottom = `${fish.currentBottom}%`;
         }
@@ -726,8 +737,7 @@
                         direction: direction, 
                         speed: randomSpeed, 
                         delay: randomDelay, 
-                        currentBottom: null,
-                        isCurrentlyActive: false
+                        currentBottom: null 
                     };
                     
                     fishContainer.addEventListener('animationiteration', () => assignRandomHeightToFish(fishData));
@@ -738,37 +748,32 @@
         }
 
         function checkAndRefreshFishTank() {
-            let unlockedCount = 0;
-            FISH_DATABASE.forEach(f => { if(accumulatedSeconds >= f.target) unlockedCount++; });
+            let unlockedCount = FISH_DATABASE.filter(f => accumulatedSeconds >= f.target).length;
             fishCountDisplay.innerText = `🐠 已解鎖魚種：${unlockedCount} / ${FISH_DATABASE.length}`;
             updateFishGuideUI();
             const currentWaterHeight = getCurrentWaterPercentage();
 
             instantiatedFishList.forEach(fish => {
-                // 時間推進即可解鎖游動，不被是否有在計時封死
-                if (accumulatedSeconds >= fish.targetThreshold) {
-                    let safetyBuffer = 3;
-                    if (fish.dom.classList.contains('size-large')) safetyBuffer = 6;
-                    if (fish.dom.classList.contains('size-huge')) safetyBuffer = 9;
-                    if (fish.dom.classList.contains('size-mola')) safetyBuffer = 18;
+                if (accumulatedSeconds >= fish.targetThreshold && hasStartedCounting) {
+                    let safetyBuffer = 2;
+                    if (fish.dom.classList.contains('size-large')) safetyBuffer = 5;
+                    else if (fish.dom.classList.contains('size-huge')) safetyBuffer = 7;
+                    else if (fish.dom.classList.contains('size-mola')) safetyBuffer = 12;
 
                     if (fish.currentBottom === null || fish.currentBottom > (currentWaterHeight - safetyBuffer)) {
                         assignRandomHeightToFish(fish);
+                    } else {
+                        fish.dom.style.bottom = `${fish.currentBottom}%`;
                     }
-
-                    if (!fish.isCurrentlyActive) {
-                        fish.isCurrentlyActive = true;
+                    if (!fish.dom.classList.contains('active-swim-right') && !fish.dom.classList.contains('active-swim-left')) {
                         const animClass = fish.direction === 'right' ? 'active-swim-right' : 'active-swim-left';
                         fish.dom.classList.add(animClass);
                         fish.dom.style.animation = `${animClass === 'active-swim-right' ? 'swim-right' : 'swim-left'} ${fish.speed}s linear ${fish.delay}s infinite backwards`;
                     }
                 } else {
-                    if (fish.isCurrentlyActive) {
-                        fish.isCurrentlyActive = false;
-                        fish.dom.classList.remove('active-swim-right', 'active-swim-left');
-                        fish.dom.style.animation = ''; 
-                        fish.currentBottom = null; 
-                    }
+                    fish.dom.classList.remove('active-swim-right', 'active-swim-left');
+                    fish.dom.style.animation = ''; 
+                    fish.currentBottom = null; 
                 }
             });
         }
@@ -794,42 +799,41 @@
         }
 
         function startTimer() {
-            if (!isPaused) return;
-            
-            if (timerInterval === null && remainingSeconds === 0) {
-                totalSeconds = getInputsInSeconds(); 
-                remainingSeconds = totalSeconds;
-                if (totalSeconds <= 0) { 
-                    alert('請設定大於 0 秒的時間喔！'); 
-                    return; 
+            if (isPaused) {
+                if (timerInterval === null && remainingSeconds === 0) {
+                    totalSeconds = getInputsInSeconds(); 
+                    remainingSeconds = totalSeconds;
+                    if (totalSeconds <= 0) { 
+                        alert('請設定大於 0 秒的時間喔！'); 
+                        return; 
+                    }
                 }
-            }
-            
-            isPaused = false; 
-            hasStartedCounting = true;
-            startBtn.disabled = true; 
-            pauseBtn.disabled = false;
-            
-            ['hours-input', 'minutes-input', 'seconds-input'].forEach(id => {
-                document.getElementById(id).disabled = true;
-            });
-            
-            updateUI(); 
-            checkAndRefreshFishTank();
+                isPaused = false; 
+                hasStartedCounting = true;
+                startBtn.disabled = true; 
+                pauseBtn.disabled = false;
+                
+                ['hours-input', 'minutes-input', 'seconds-input'].forEach(id => {
+                    document.getElementById(id).disabled = true;
+                });
+                
+                updateUI(); 
+                checkAndRefreshFishTank();
 
-            timerInterval = setInterval(() => {
-                if (remainingSeconds > 0) {
-                    remainingSeconds--; 
-                    accumulatedSeconds++;
-                    localStorage.setItem('accumulatedSeconds', accumulatedSeconds); 
-                    updateUI(); 
-                    checkAndRefreshFishTank(); 
-                } else {
-                    clearInterval(timerInterval); 
-                    timerInterval = null; 
-                    triggerAlarm(); 
-                }
-            }, 1000);
+                timerInterval = setInterval(() => {
+                    if (remainingSeconds > 0) {
+                        remainingSeconds--; 
+                        accumulatedSeconds++;
+                        localStorage.setItem('accumulatedSeconds', accumulatedSeconds); 
+                        updateUI(); 
+                        checkAndRefreshFishTank(); 
+                    } else {
+                        clearInterval(timerInterval); 
+                        timerInterval = null; 
+                        triggerAlarm(); 
+                    }
+                }, 1000);
+            }
         }
 
         function pauseTimer() {
@@ -843,10 +847,15 @@
         }
 
         function resetTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
+            // 💡 優化：加入防呆彈窗機制，防止計時進行中誤觸重置導致數據歸零
+            if (!isPaused) {
+                if (!confirm('專注計時器正在運行中，確定要重置並放棄本次進度嗎？')) {
+                    return; 
+                }
             }
+
+            clearInterval(timerInterval); 
+            timerInterval = null;
             isPaused = true; 
             hasStartedCounting = false; 
             totalSeconds = 0; 
@@ -870,8 +879,11 @@
             const selectedSound = soundSelect.value;
             
             let delay = 1500;
-            if (selectedSound === 'urgent' || selectedSound === 'digital') delay = 700;
-            else if (selectedSound === 'chime' || selectedSound === 'zen' || selectedSound === 'morse') delay = 2500;
+            if (selectedSound === 'urgent' || selectedSound === 'digital') {
+                delay = 700;
+            } else if (selectedSound === 'chime' || selectedSound === 'zen' || selectedSound === 'morse') {
+                delay = 2500;
+            }
             
             playAlarmSound(selectedSound); 
             alarmLoopInterval = setInterval(() => playAlarmSound(selectedSound), delay);
