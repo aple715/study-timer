@@ -294,7 +294,7 @@
         /* 主介面卡片 */
         .container {
             position: relative;
- z-index: 10;
+            z-index: 10;
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -424,7 +424,7 @@
         .btn-reset { background-color: #e74c3c; color: white; }
         button:disabled { background-color: #bdc3c7; cursor: not-allowed; color: #7f8c8d; }
 
-        /* 極簡縮小狀態下的樣式 */
+        /* 極簡縮小狀態下的樣式 - 優化行動端拖曳流暢度 */
         .container.minimized-mode {
             position: fixed !important;
             top: 50% !important;
@@ -440,6 +440,7 @@
             background: #ffffff !important; 
             backdrop-filter: none !important; 
             -webkit-backdrop-filter: none !important;
+            touch-action: none; /* 防止手機拖曳時畫面一起滾動 */
         }
         
         .container.minimized-mode h1,
@@ -489,7 +490,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.3.0</div>
+    <div class="version-tag">v1.3.1</div>
 
     <button class="stats-toggle-btn" id="stats-toggle-btn" onclick="toggleStatsCard()">📊 統計與圖鑑</button>
 
@@ -557,7 +558,7 @@
     </div>
 
     <script>
-        // 🐟 原始魚群資料庫 (使用一開始正常的 SVG 結構)
+        // 🐟 原始魚群資料庫
         const FISH_DATABASE = [
             { id: 'fish1', name: '紅紋金魚', target: 0, sizeClass: '', label: '初始擁有', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="22" fill="#ff4d4d"/><path d="M15,35 Q-5,15 0,35 Q-5,55 15,35" fill="#ff4d4d"/><path d="M45,20 Q30,5 40,5 Q50,5 50,20" fill="#ffa64d"/><path d="M45,50 Q35,65 45,65 Q55,65 52,50" fill="#ffa64d"/><circle cx="70" cy="28" r="4" fill="black"/><circle cx="72" cy="26" r="1.5" fill="white"/><path d="M55,35 Q40,32 35,42" stroke="#ffa64d" stroke-width="2" fill="none"/></g></svg>` },
             { id: 'fish2', name: '條紋小丑魚', target: 60, sizeClass: '', label: '1 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="20" fill="#ff7300"/><path d="M15,35 Q-5,15 -2,35 Q-5,55 15,35" fill="#ff7300"/><path d="M30,16 Q33,35 30,54 L38,53 Q41,35 38,17 Z" fill="white"/><path d="M50,15 Q53,35 50,55 L58,54 Q61,35 58,16 Z" fill="white"/><circle cx="72" cy="28" r="4" fill="black"/><circle cx="74" cy="26" r="1.5" fill="white"/></g></svg>` },
@@ -571,21 +572,25 @@
             { id: 'fish_mola', name: '巨型翻車魚', target: 18000, sizeClass: 'size-mola', label: '5 小時', svg: `<svg viewBox="0 0 160 140"><g transform="translate(10,10)"><path d="M55,40 Q40,-5 65,15 Z M55,70 Q40,115 65,95 Z" fill="#999999"/><ellipse cx="55" cy="55" rx="35" ry="40" fill="#b3b3b3"/><ellipse cx="25" cy="55" rx="10" ry="12" fill="#999999"/><circle cx="72" cy="40" r="4.5" fill="black"/><circle cx="74" cy="38" r="1.5" fill="white"/></g></svg>` }
         ];
 
+        // 全域變數
         let totalSeconds = 0;
         let remainingSeconds = 0;
         let accumulatedSeconds = parseInt(localStorage.getItem('accumulatedSeconds')) || 0; 
         
         let timerTimeout = null;
         let expectedTime = 0;
-        
         let alarmLoopInterval = null; 
         let isPaused = true;
         let hasStartedCounting = false; 
         let instantiatedFishList = [];
 
+        // 拖曳狀態變數
         let dragX = 0, dragY = 0;
         let isDragging = false;
         let startX = 0, startY = 0;
+
+        // 全域音訊上下文 (防禦性預解鎖機制)
+        let audioCtx = null;
 
         const defaultTitle = "深呼吸！海洋專注計時器";
         const hoursInput = document.getElementById('hours-input');
@@ -606,6 +611,23 @@
         const statsToggleBtn = document.getElementById('stats-toggle-btn');
         const startBtn = document.getElementById('start-btn');
         const pauseBtn = document.getElementById('pause-btn');
+
+        // 初始化音訊與事件監聽
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                // 播放一個極短的靜音來騙過瀏覽器的安全機制
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.01);
+            } else if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
 
         function formatTime(totalSecs) {
             const hrs = Math.floor(totalSecs / 3600);
@@ -646,6 +668,7 @@
             }
         }
 
+        // --- 📥 拖曳邊界防禦與限制機制 ---
         mainContainer.addEventListener('mousedown', startDrag);
         mainContainer.addEventListener('touchstart', startDrag, { passive: false });
 
@@ -675,8 +698,17 @@
             const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
             const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
 
-            dragX = clientX - startX;
-            dragY = clientY - startY;
+            let tentativeX = clientX - startX;
+            let tentativeY = clientY - startY;
+
+            // 邊界防禦：限制小卡片絕對不會飛出可視螢幕之外
+            const halfWidth = 90;  // 縮小模式寬度 180px 的一半
+            const halfHeight = 35; // 縮小模式估計高度 70px 的一半
+            const screenW = window.innerWidth / 2;
+            const screenH = window.innerHeight / 2;
+
+            dragX = Math.max(-screenW + halfWidth, Math.min(screenW - halfWidth, tentativeX));
+            dragY = Math.max(-screenH + halfHeight, Math.min(screenH - halfHeight, tentativeY));
 
             if (mainContainer.classList.contains('minimized-mode')) {
                 mainContainer.style.transform = `translate(calc(-50% + ${dragX}px), calc(-50% + ${dragY}px))`;
@@ -834,6 +866,9 @@
         }
 
         function startTimer() {
+            // 在使用者點擊交互的第一時間，解鎖並啟用音訊上下文
+            initAudioContext();
+
             if (isPaused) {
                 if (timerTimeout === null && remainingSeconds === 0) {
                     totalSeconds = getInputsInSeconds(); 
@@ -955,9 +990,11 @@
             resetTimer(); 
         }
 
+        // --- 🎵 音訊產生器模組 ---
         function playAlarmSound(soundType) {
             try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)(); 
+                initAudioContext();
+                const ctx = audioCtx;
                 const now = ctx.currentTime;
                 
                 const beep = (freq, start, dur, type='sine', g=0.2) => {
