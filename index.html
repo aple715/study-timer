@@ -212,7 +212,7 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 5%; 
+            height: 12%; 
             background: linear-gradient(180deg, #1fa2ff 0%, #12d6df 50%, #006699 100%);
             opacity: 0.85;
             z-index: 2;
@@ -257,6 +257,60 @@
             100% { transform: translateX(0); }
         }
 
+
+
+        /* 🌿 海草背景：使用純 CSS，低負擔飄動 */
+        .seaweed-layer {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .seaweed {
+            position: absolute;
+            bottom: -2px;
+            width: 18px;
+            height: var(--h, 120px);
+            transform-origin: 50% 100%;
+            opacity: 0.75;
+            animation: seaweed-sway var(--d, 5s) ease-in-out infinite alternate;
+            animation-delay: var(--delay, 0s);
+            will-change: transform;
+        }
+
+        .seaweed::before,
+        .seaweed::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 12px;
+            height: 100%;
+            border-radius: 100% 0 100% 0;
+            background: linear-gradient(180deg, rgba(75, 222, 128, 0.45), rgba(22, 163, 74, 0.85));
+            transform-origin: 50% 100%;
+        }
+
+        .seaweed::before {
+            transform: translateX(-55%) rotate(-7deg);
+        }
+
+        .seaweed::after {
+            height: 75%;
+            transform: translateX(-10%) rotate(18deg);
+            background: linear-gradient(180deg, rgba(134, 239, 172, 0.35), rgba(21, 128, 61, 0.75));
+        }
+
+        @keyframes seaweed-sway {
+            from { transform: rotate(-4deg) translateX(-2px); }
+            to { transform: rotate(5deg) translateX(3px); }
+        }
+
         /* 🐟 魚群容器尺寸 */
         .fish-container { 
             position: absolute; 
@@ -275,6 +329,47 @@
         
         .fish-container.active-swim-right { animation: swim-right linear infinite backwards; }
         .fish-container.active-swim-left { animation: swim-left linear infinite backwards; }
+
+
+        .bubble-trail {
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            width: 34px;
+            height: 38px;
+            transform: translateY(-50%);
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        .active-swim-left .bubble-trail {
+            left: auto;
+            right: 8px;
+        }
+
+        .bubble-trail span {
+            position: absolute;
+            bottom: 4px;
+            width: var(--size, 7px);
+            height: var(--size, 7px);
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.28);
+            box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.55);
+            opacity: 0;
+            animation: bubble-rise var(--bubble-speed, 1.8s) ease-out infinite;
+            animation-delay: var(--bubble-delay, 0s);
+        }
+
+        .bubble-trail span:nth-child(1) { left: 3px; --size: 5px; --bubble-delay: 0s; }
+        .bubble-trail span:nth-child(2) { left: 14px; --size: 7px; --bubble-delay: 0.45s; }
+        .bubble-trail span:nth-child(3) { left: 24px; --size: 4px; --bubble-delay: 0.9s; }
+
+        @keyframes bubble-rise {
+            0% { opacity: 0; transform: translate(0, 8px) scale(0.6); }
+            18% { opacity: 0.85; }
+            100% { opacity: 0; transform: translate(8px, -34px) scale(1.25); }
+        }
 
         @keyframes swim-right {
             0% { left: -250px; opacity: 0; transform: translateY(0); }
@@ -398,6 +493,33 @@
             color: #556; 
             user-select: none;
         }
+
+
+        .quick-time-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .quick-time-btn {
+            padding: 8px 6px;
+            font-size: 13px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.92);
+            color: #1a3a5f;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+        }
+
+        .quick-time-btn:hover:not(:disabled) {
+            background: #e0f2fe;
+            transform: translateY(-1px);
+        }
+
+        .quick-time-btn:disabled {
+            opacity: 0.55;
+        }
         
         .btn-group { 
             display: flex; 
@@ -492,7 +614,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.3.8</div>
+    <div class="version-tag">v1.4.0</div>
 
     <svg class="global-svg-defs">
         <defs>
@@ -554,7 +676,16 @@
             <svg class="wave-svg wave-back" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,50 Q150,110 300,50 T600,50 T900,50 T1200,50 L1200,120 L0,120 Z"></path></svg>
             <svg class="wave-svg wave-front" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,60 Q150,5 300,60 T600,60 T900,60 T1200,60 L1200,120 L0,120 Z"></path></svg>
         </div>
-        <div id="fish-tank-content" style="position: absolute; width:100%; height:100%; top:0; left:0;"></div>
+        <div class="seaweed-layer" aria-hidden="true">
+            <span class="seaweed" style="left: 4%; --h: 90px; --d: 4.7s; --delay: -0.5s;"></span>
+            <span class="seaweed" style="left: 13%; --h: 140px; --d: 5.8s; --delay: -1.2s;"></span>
+            <span class="seaweed" style="left: 25%; --h: 105px; --d: 4.9s; --delay: -2.1s;"></span>
+            <span class="seaweed" style="left: 39%; --h: 155px; --d: 6.2s; --delay: -0.8s;"></span>
+            <span class="seaweed" style="left: 58%; --h: 120px; --d: 5.2s; --delay: -1.7s;"></span>
+            <span class="seaweed" style="left: 73%; --h: 165px; --d: 6.5s; --delay: -2.5s;"></span>
+            <span class="seaweed" style="left: 88%; --h: 110px; --d: 4.8s; --delay: -1.1s;"></span>
+        </div>
+        <div id="fish-tank-content" style="position: absolute; width:100%; height:100%; top:0; left:0; z-index:2; overflow:hidden;"></div>
     </div>
 
     <div class="container" id="main-container">
@@ -568,20 +699,21 @@
                 <div class="time-field"><input type="number" id="minutes-input" min="0" max="59" value="0" onblur="validateInput(this, 0, 59)"><span>分</span></div>
                 <div class="time-field"><input type="number" id="seconds-input" min="0" max="59" value="0" onblur="validateInput(this, 0, 59)"><span>秒</span></div>
             </div>
+            <div class="quick-time-buttons" aria-label="常用時間快捷鍵">
+                <button type="button" class="quick-time-btn" onclick="setQuickTime(0, 10, 0)">10 分鐘</button>
+                <button type="button" class="quick-time-btn" onclick="setQuickTime(0, 30, 0)">30 分鐘</button>
+                <button type="button" class="quick-time-btn" onclick="setQuickTime(2, 0, 0)">2 小時</button>
+            </div>
         </div>
 
         <div class="setting-group">
             <label for="sound-select">結束鈴聲</label>
             <select id="sound-select">
-                <option value="classic">1. 經典嗶嗶聲 (傳統鬧鐘)</option>
-                <option value="urgent">2. 快奏警報音 (極度催促)</option>
-                <option value="chime">3. 風弦和弦音 (舒服和緩)</option>
-                <option value="scifi">4. 科技感光波 (科幻動感)</option>
-                <option value="zen">5. 冥想深沉磬 (日式禪風)</option>
-                <option value="retro">6. 復古電玩音 (紅白機感)</option>
-                <option value="morse">7. 摩斯密碼音 (SOS求救)</option>
-                <option value="sonar">8. 潛艇聲納探 (深海孤寂)</option>
-                <option value="digital">9. 電子手錶音 (高頻雙響)</option>
+                <option value="ocean_lullaby">1. 海洋搖籃曲（柔和鋼片琴）</option>
+                <option value="morning_chime">2. 晨光和弦（清亮木琴）</option>
+                <option value="coral_music">3. 珊瑚小調（溫暖輕快）</option>
+                <option value="deep_sea">4. 深海冥想（低頻舒緩）</option>
+                <option value="star_wave">5. 星空海浪（夢幻收尾）</option>
             </select>
         </div>
 
@@ -664,7 +796,7 @@
             { id: 'fish5', name: '赤鱗獅子魚', target: 1800, sizeClass: '', label: '30 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><path d="M35,18 L20,-2 L40,3 Z M48,15 L40,-5 L53,2 Z M58,16 L60,-5 L65,5 Z M35,52 L20,72 L40,67 Z M48,55 L40,75 L53,68 Z M58,54 L60,75 L65,65 Z" fill="#ff4d4d"/><ellipse cx="50" cy="35" rx="33" ry="20" fill="#cc0000"/><path d="M17,35 Q-5,15 0,35 Q-5,55 17,35" fill="#ff4d4d"/><path d="M30,22 Q50,28 65,22 M30,48 Q50,42 65,48" stroke="white" stroke-width="1.5" fill="none"/><circle cx="68" cy="28" r="4" fill="black"/><circle cx="70" cy="26" r="1.5" fill="white"/></g></svg>` },
             { id: 'fish_puff', name: '刺蝟綠河豚', target: 3600, sizeClass: '', label: '1 小時', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><circle cx="50" cy="35" r="24" fill="#ccff33"/><path d="M26,35 Q10,23 15,35 Q10,47 26,35" fill="#99cc00"/><path d="M32,20 L27,15 M42,15 L39,8 M55,14 L55,6 M67,17 L72,11 M30,48 L25,53 M40,54 L37,61 M54,56 L55,64 M68,52 L73,57" stroke="#668000" stroke-width="2"/><circle cx="62" cy="27" r="4.5" fill="black"/><circle cx="64" cy="25" r="1.5" fill="white"/><path d="M50,43 Q56,47 62,42" stroke="#668000" stroke-width="2" fill="none"/></g></svg>` },
             { id: 'fish_sail', name: '破浪大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 160 100"><g transform="translate(10,10)"><path d="M45,25 Q70,-10 95,15 C75,10 60,15 45,25 Z" fill="#002266"/><path d="M20,40 Q-5,25 0,40 Q-5,55 20,40" fill="#3399ff"/><ellipse cx="65" cy="40" rx="50" ry="22" fill="#0055ff"/><path d="M115,38 L145,36" stroke="#002266" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="32" r="4.5" fill="black"/><circle cx="102" cy="30" r="1.5" fill="white"/></g></svg>` },
-            { id: 'fish_dolphin', name: '蔚藍大海豚', target: 10800, sizeClass: 'size-huge', label: '3 小時', svg: `<svg viewBox="0 0 200 120"><g transform="translate(10,10)"><path d="M20,55 C45,15 110,20 135,40 C115,65 50,70 20,55 Z" fill="#3399ff"/><path d="M75,32 Q90,5 105,22 Z" fill="#0066cc"/><path d="M50,62 C60,75 55,85 40,78 Z" fill="#3399ff"/><circle cx="116" cy="34" r="4.5" fill="black"/><circle cx="118" cy="32" r="1.5" fill="white"/></g></svg>` },
+            { id: 'fish_dolphin', name: '蔚藍大海豚', target: 10800, sizeClass: 'size-huge', label: '3 小時', svg: `<svg viewBox="0 0 220 130"><g transform="translate(12,12)"><path d="M34,70 C17,63 8,50 7,38 C24,47 39,51 52,51 C75,25 124,20 159,39 C174,47 185,57 196,60 C181,69 171,79 151,84 C114,94 75,88 50,75 C43,79 34,86 23,99 C26,84 29,76 34,70 Z" fill="#35a8ff"/><path d="M55,51 C78,25 126,22 158,40 C134,36 93,39 61,61 C58,58 56,55 55,51 Z" fill="#78d8ff" opacity="0.75"/><path d="M92,38 C102,14 122,3 136,4 C129,22 117,35 102,44 Z" fill="#0877d8"/><path d="M91,83 C99,101 91,113 74,120 C75,103 79,91 91,83 Z" fill="#168de8"/><path d="M36,68 C25,73 14,82 5,98 C21,94 35,84 48,74 Z" fill="#0877d8"/><path d="M38,56 C25,52 14,43 7,31 C22,37 37,44 52,51 Z" fill="#168de8"/><path d="M156,48 C171,51 183,57 196,60 C183,63 172,65 158,63 C163,59 163,52 156,48 Z" fill="#1f9fff"/><ellipse cx="145" cy="48" rx="4.5" ry="5" fill="#0f172a"/><circle cx="147" cy="46" r="1.5" fill="#ffffff"/><path d="M155,58 Q168,62 180,58" stroke="#075985" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M66,68 C91,80 126,82 153,72" stroke="#e0f7ff" stroke-width="3" fill="none" opacity="0.65" stroke-linecap="round"/></g></svg>` },
             
             { id: 'fish_jelly', name: '發光小水母', target: 14400, sizeClass: 'size-jelly', label: '4 小時', svg: `<svg viewBox="0 0 120 120">
                 <g transform="translate(10, 10)">
@@ -715,6 +847,8 @@
             </svg>` }
         ];
 
+        const INITIAL_WATER_PERCENT = 12;
+
         const FISH_SPEED_MULTIPLIERS = {
             fish_sail: 0.5 // 旗魚動畫時間減半 = 速度 2 倍
         };
@@ -758,6 +892,7 @@
         const statsToggleBtn = document.getElementById('stats-toggle-btn');
         const startBtn = document.getElementById('start-btn');
         const pauseBtn = document.getElementById('pause-btn');
+        const quickTimeButtons = Array.from(document.querySelectorAll('.quick-time-btn'));
         const timeInputs = [hoursInput, minutesInput, secondsInput];
 
         function formatTime(totalSecs) {
@@ -771,6 +906,15 @@
             let val = parseInt(input.value);
             if (isNaN(val) || val < min) input.value = min;
             else if (val > max) input.value = max;
+            syncPreview();
+        }
+
+
+        function setQuickTime(hours, minutes, seconds) {
+            if (!isPaused || timerTimeout !== null) return;
+            hoursInput.value = hours;
+            minutesInput.value = minutes;
+            secondsInput.value = seconds;
             syncPreview();
         }
 
@@ -893,7 +1037,7 @@
                 if (currentElapsed > totalDurationMs) currentElapsed = totalDurationMs;
 
                 const ratio = currentElapsed / totalDurationMs;
-                const preciseHeight = 5 + (ratio * 95);
+                const preciseHeight = INITIAL_WATER_PERCENT + (ratio * (100 - INITIAL_WATER_PERCENT));
                 waterBg.style.height = `${preciseHeight}%`;
 
                 animationFrameId = requestAnimationFrame(linearWaterRenderLoop);
@@ -907,9 +1051,9 @@
                     currentElapsed += (performance.now() - startTimeStamp);
                 }
                 if (currentElapsed > totalDurationMs) currentElapsed = totalDurationMs;
-                return 5 + ((currentElapsed / totalDurationMs) * 95);
+                return INITIAL_WATER_PERCENT + ((currentElapsed / totalDurationMs) * (100 - INITIAL_WATER_PERCENT));
             }
-            return 5;
+            return INITIAL_WATER_PERCENT;
         }
 
         function assignRandomHeightToFish(fish) {
@@ -925,6 +1069,18 @@
             
             fish.currentBottom = maxSafeBottom > minSafeBottom ? minSafeBottom + (Math.random() * (maxSafeBottom - minSafeBottom)) : minSafeBottom;
             fish.dom.style.bottom = `${fish.currentBottom}%`;
+        }
+
+
+
+        function createBubbleTrail() {
+            const trail = document.createElement('div');
+            trail.className = 'bubble-trail';
+            trail.setAttribute('aria-hidden', 'true');
+            for (let i = 0; i < 3; i++) {
+                trail.appendChild(document.createElement('span'));
+            }
+            return trail;
         }
 
         function checkAndRefreshFishTank() {
@@ -953,6 +1109,7 @@
                         } else {
                             fishContainer.innerHTML = fish.svg;
                         }
+                        fishContainer.appendChild(createBubbleTrail());
                         
                         let baseSpeed = 10;
                         if (fish.sizeClass === 'size-large') baseSpeed = 14;
@@ -1074,6 +1231,7 @@
                 pauseBtn.disabled = false;
                 
                 timeInputs.forEach(input => { input.disabled = true; });
+                quickTimeButtons.forEach(btn => { btn.disabled = true; });
                 
                 updateUI(); 
                 checkAndRefreshFishTank();
@@ -1146,6 +1304,7 @@
             startTimeStamp = 0;
             
             timeInputs.forEach(input => { input.disabled = false; });
+            quickTimeButtons.forEach(btn => { btn.disabled = false; });
             
             startBtn.disabled = false; 
             startBtn.innerText = '開始'; 
@@ -1154,7 +1313,7 @@
             clearAllFishDOM();
             updateUI(); 
             checkAndRefreshFishTank(); 
-            waterBg.style.height = "5%"; 
+            waterBg.style.height = `${INITIAL_WATER_PERCENT}%`; 
             syncPreview();
         }
 
@@ -1162,12 +1321,7 @@
             alarmModal.classList.add('active'); 
             const selectedSound = soundSelect.value;
             
-            let delay = 1500;
-            if (selectedSound === 'urgent' || selectedSound === 'digital') {
-                delay = 700;
-            } else if (selectedSound === 'chime' || selectedSound === 'zen' || selectedSound === 'morse') {
-                delay = 2500;
-            }
+            const delay = 3600;
             
             playAlarmSound(selectedSound); 
             alarmLoopInterval = setInterval(() => playAlarmSound(selectedSound), delay);
@@ -1186,31 +1340,54 @@
             try {
                 if (!audioCtx) initAudioContext();
                 const now = audioCtx.currentTime;
-                
-                const beep = (freq, start, dur, type='sine', g=0.2) => {
-                    const o = audioCtx.createOscillator(); 
-                    const gain = audioCtx.createGain(); 
-                    o.type = type; 
-                    o.frequency.setValueAtTime(freq, start);
-                    gain.gain.setValueAtTime(g, start); 
-                    gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
-                    o.connect(gain); 
-                    gain.connect(audioCtx.destination); 
-                    o.start(start); 
-                    o.stop(start + dur);
+                const master = audioCtx.createGain();
+                master.gain.setValueAtTime(0.58, now);
+                master.gain.exponentialRampToValueAtTime(0.001, now + 3.4);
+                master.connect(audioCtx.destination);
+
+                const note = (freq, startOffset, duration, type = 'sine', volume = 0.16) => {
+                    const t = now + startOffset;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, t);
+                    gain.gain.setValueAtTime(0.001, t);
+                    gain.gain.linearRampToValueAtTime(volume, t + 0.035);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+                    osc.connect(gain);
+                    gain.connect(master);
+                    osc.start(t);
+                    osc.stop(t + duration + 0.05);
                 };
-                
-                switch (soundType) {
-                    case 'classic': beep(880, now, 0.15); beep(880, now + 0.2, 0.15); break;
-                    case 'urgent': for(let i=0; i<4; i++) { beep(1200, now + i*0.12, 0.06, 'square', 0.15); } break;
-                    case 'chime': [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => { beep(f, now + i*0.08, 1.5, 'sine', 0.15); }); break;
-                    case 'scifi': for(let i=0; i<3; i++) { const t = now + i*0.3; const o = audioCtx.createOscillator(); const gain = audioCtx.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(400, t); o.frequency.exponentialRampToValueAtTime(1500, t+0.2); gain.gain.setValueAtTime(0.2, t); gain.gain.exponentialRampToValueAtTime(0.001, t+0.2); o.connect(gain); gain.connect(audioCtx.destination); o.start(t); o.stop(t+0.2); } break;
-                    case 'zen': beep(160, now, 2.2, 'sine', 0.3); break;
-                    case 'retro': beep(300, now, 0.05, 'square'); beep(450, now + 0.05, 0.05, 'square'); break;
-                    case 'morse': const p = (t, d) => beep(900, now + t, d, 'sine', 0.2); p(0, 0.06); p(0.12, 0.06); p(0.24, 0.06); p(0.42, 0.18); break;
-                    case 'sonar': const sO = audioCtx.createOscillator(); const sG = audioCtx.createGain(); sO.type = 'sine'; sO.frequency.setValueAtTime(1400, now); sO.frequency.exponentialRampToValueAtTime(700, now + 0.6); sG.gain.setValueAtTime(0.2, now); sG.gain.exponentialRampToValueAtTime(0.001, now + 1.2); sO.connect(sG); sG.connect(audioCtx.destination); sO.start(now); sO.stop(now + 1.2); break;
-                    case 'digital': beep(2800, now, 0.05, 'sine', 0.2); beep(2800, now + 0.08, 0.05, 'sine', 0.2); break;
-                }
+
+                const chord = (freqs, startOffset, duration, type = 'sine', volume = 0.08) => {
+                    freqs.forEach(freq => note(freq, startOffset, duration, type, volume));
+                };
+
+                const melodies = {
+                    ocean_lullaby: () => {
+                        [523.25, 659.25, 783.99, 659.25, 880.00, 783.99].forEach((f, i) => note(f, i * 0.28, 0.75, 'sine', 0.13));
+                        chord([261.63, 329.63, 392.00], 0, 2.2, 'triangle', 0.045);
+                    },
+                    morning_chime: () => {
+                        [659.25, 783.99, 987.77, 1046.50, 987.77, 783.99].forEach((f, i) => note(f, i * 0.22, 0.55, 'triangle', 0.12));
+                        chord([392.00, 493.88, 587.33], 1.1, 1.8, 'sine', 0.055);
+                    },
+                    coral_music: () => {
+                        [392.00, 493.88, 587.33, 659.25, 587.33, 493.88, 523.25].forEach((f, i) => note(f, i * 0.23, 0.62, 'sine', 0.12));
+                        chord([196.00, 246.94, 329.63], 0.45, 2.3, 'triangle', 0.04);
+                    },
+                    deep_sea: () => {
+                        chord([174.61, 220.00, 261.63], 0, 2.8, 'sine', 0.07);
+                        [349.23, 392.00, 440.00, 392.00].forEach((f, i) => note(f, 0.35 + i * 0.5, 1.0, 'sine', 0.095));
+                    },
+                    star_wave: () => {
+                        [783.99, 987.77, 1174.66, 1318.51, 1174.66, 987.77].forEach((f, i) => note(f, i * 0.24, 0.7, 'triangle', 0.105));
+                        chord([329.63, 415.30, 493.88], 0.25, 2.6, 'sine', 0.05);
+                    }
+                };
+
+                (melodies[soundType] || melodies.ocean_lullaby)();
             } catch (e) { console.error(e); }
         }
 
@@ -1218,6 +1395,7 @@
             el.addEventListener('input', syncPreview);
         });
         
+        waterBg.style.height = `${INITIAL_WATER_PERCENT}%`;
         checkAndRefreshFishTank();
         updateUI();
     </script>
