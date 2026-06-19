@@ -492,7 +492,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.3.5</div>
+    <div class="version-tag">v1.3.6</div>
 
     <svg class="global-svg-defs">
         <defs>
@@ -723,6 +723,7 @@
         let isPaused = true;
         let hasStartedCounting = false; 
         let instantiatedFishList = [];
+        let cachedUnlockedCount = -1;
 
         let animationFrameId = null;
         let startTimeStamp = 0;       
@@ -922,6 +923,8 @@
 
         function checkAndRefreshFishTank() {
             let unlockedCount = FISH_DATABASE.filter(f => accumulatedSeconds >= f.target).length;
+            if (unlockedCount === cachedUnlockedCount && hasStartedCounting) return;
+            cachedUnlockedCount = unlockedCount;
             fishCountDisplay.innerText = `🐠 已解鎖魚種：${unlockedCount} / ${FISH_DATABASE.length}`;
             updateFishGuideUI();
             const currentWaterHeight = getCurrentWaterPercentagePrecise();
