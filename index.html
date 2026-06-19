@@ -257,7 +257,7 @@
             100% { transform: translateX(0); }
         }
 
-        /* 🐟 魚群容器尺寸修復 - 給予翻車魚最完美的寬高比 */
+        /* 🐟 魚群容器尺寸 */
         .fish-container { 
             position: absolute; 
             width: 75px; 
@@ -271,7 +271,7 @@
         .fish-container.size-large { width: 110px; height: 65px; }
         .fish-container.size-huge { width: 140px; height: 85px; }
         .fish-container.size-jelly { width: 85px; height: 85px; } 
-        .fish-container.size-mola { width: 160px; height: 160px; } /* 加大容器寬高，防止上下背鰭被切掉 */
+        .fish-container.size-mola { width: 160px; height: 160px; }
         
         .fish-container.active-swim-right { animation: swim-right linear infinite backwards; }
         .fish-container.active-swim-left { animation: swim-left linear infinite backwards; }
@@ -483,11 +483,59 @@
         .modal-box { background: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-width: 320px; width: 90%; }
         .modal-box h2 { color: #e74c3c; margin-bottom: 10px; font-size: 20px; }
         .modal-btn { background-color: #e74c3c; color: white; padding: 12px 30px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 15px; }
+        
+        /* 隱藏全域定義的 SVG 容器 */
+        .global-svg-defs {
+            position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none;
+        }
     </style>
 </head>
 <body>
 
-    <div class="version-tag">v1.3.4</div>
+    <div class="version-tag">v1.3.5</div>
+
+    <svg class="global-svg-defs">
+        <defs>
+            <linearGradient id="jellyGradWater" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffb3ff" stop-opacity="0.9"/>
+                <stop offset="60%" stop-color="#99ccff" stop-opacity="0.7"/>
+                <stop offset="100%" stop-color="#66b3ff" stop-opacity="0.4"/>
+            </linearGradient>
+            <linearGradient id="tentacleGradWater" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#99ccff" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#ffb3ff" stop-opacity="0.1"/>
+            </linearGradient>
+            
+            <linearGradient id="molaBodyGradWater" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#bcccf8"/>
+                <stop offset="50%" stop-color="#a4b9dd"/>
+                <stop offset="100%" stop-color="#738cb2"/>
+            </linearGradient>
+            <linearGradient id="molaFinGradWater" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#8ba3c7"/>
+                <stop offset="100%" stop-color="#55667d"/>
+            </linearGradient>
+
+            <linearGradient id="jellyGradMenu" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffb3ff" stop-opacity="0.9"/>
+                <stop offset="60%" stop-color="#99ccff" stop-opacity="0.7"/>
+                <stop offset="100%" stop-color="#66b3ff" stop-opacity="0.4"/>
+            </linearGradient>
+            <linearGradient id="tentacleGradMenu" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#99ccff" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#ffb3ff" stop-opacity="0.1"/>
+            </linearGradient>
+            <linearGradient id="molaBodyGradMenu" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#bcccf8"/>
+                <stop offset="50%" stop-color="#a4b9dd"/>
+                <stop offset="100%" stop-color="#738cb2"/>
+            </linearGradient>
+            <linearGradient id="molaFinGradMenu" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#8ba3c7"/>
+                <stop offset="100%" stop-color="#55667d"/>
+            </linearGradient>
+        </defs>
+    </svg>
 
     <button class="stats-toggle-btn" id="stats-toggle-btn" onclick="toggleStatsCard()">📊 統計與圖鑑</button>
 
@@ -557,10 +605,60 @@
     <script>
         let audioCtx = null;
 
-        // 🐟 資料庫完全修正：重製翻車魚的內嵌漸層 ID 命名與實心填色，並將視窗 viewBox 開大至 0 0 160 160，確保在任何網頁瀏覽器中都能完全顯示！
+        // 🐟 水中游動生物的專用代碼 (連結 url(#jellyGradWater) 與 url(#molaBodyGradWater))
+        const WATER_FISH_SVGS = {
+            fish_jelly: `<svg viewBox="0 0 120 120">
+                <g transform="translate(10, 10)">
+                    <path d="M35,45 Q20,70 25,95 Q28,105 22,110" stroke="url(#tentacleGradWater)" stroke-width="1.5" fill="none" opacity="0.75"/>
+                    <path d="M45,48 Q35,75 42,98 Q45,108 40,112" stroke="url(#tentacleGradWater)" stroke-width="1.2" fill="none" opacity="0.6"/>
+                    <path d="M55,48 Q65,75 58,98 Q55,108 60,112" stroke="url(#tentacleGradWater)" stroke-width="1.2" fill="none" opacity="0.6"/>
+                    <path d="M65,45 Q80,70 75,95 Q72,105 78,110" stroke="url(#tentacleGradWater)" stroke-width="1.5" fill="none" opacity="0.75"/>
+                    <path d="M42,46 C35,60 55,75 44,90 C38,100 50,105 46,112" stroke="#ffb3ff" stroke-width="2.5" fill="none" opacity="0.8"/>
+                    <path d="M58,46 C65,60 45,75 56,90 C62,100 50,105 54,112" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.85"/>
+                    <path d="M50,48 C46,65 58,82 50,96 C44,104 52,108 49,114" stroke="#e6b3ff" stroke-width="2" fill="none" opacity="0.7"/>
+                    <path d="M32,45 C32,25 68,25 68,45 C62,47 38,47 32,45 Z" fill="#ffffff" opacity="0.35"/>
+                    <path d="M26,44 C26,12 74,12 74,44 C65,48 58,43 50,46 C42,43 35,48 26,44 Z" fill="url(#jellyGradWater)"/>
+                    <circle cx="43" cy="34" r="2.5" fill="#4d004d" opacity="0.7"/>
+                    <circle cx="44" cy="33" r="0.8" fill="white"/>
+                    <circle cx="57" cy="34" r="2.5" fill="#4d004d" opacity="0.7"/>
+                    <circle cx="58" cy="33" r="0.8" fill="white"/>
+                    <path d="M47,38 Q50,40 53,38" stroke="#4d004d" stroke-width="1.2" fill="none" opacity="0.7"/>
+                </g>
+            </svg>`,
+            fish_mola: `<svg viewBox="0 0 160 160" width="100%" height="100%">
+                <g transform="translate(10, 10)">
+                    <path d="M75,55 Q52,3 74,22 Q86,38 82,58 Z" fill="url(#molaFinGradWater)" stroke="#64748b" stroke-width="0.5"/>
+                    <path d="M68,40 Q58,18 68,26" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.3"/>
+                    <path d="M73,43 Q65,24 71,30" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.3"/>
+                    <path d="M75,85 Q52,137 74,118 Q86,102 82,82 Z" fill="url(#molaFinGradWater)" stroke="#64748b" stroke-width="0.5"/>
+                    <path d="M68,100 Q58,122 68,114" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.3"/>
+                    <path d="M45,52 C35,54 30,62 32,70 C30,78 35,86 45,88 C42,80 42,60 45,52 Z" fill="#8499b8" stroke="#64748b" stroke-width="0.5"/>
+                    <path d="M35,60 Q40,70 35,80" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.2"/>
+                    <path d="M42,70 C42,48 65,44 95,48 C122,52 135,65 132,70 C135,75 122,88 95,92 C65,96 42,92 42,70 Z" fill="url(#molaBodyGradWater)" fill-opacity="1" stroke="#55667d" stroke-width="1"/>
+                    <path d="M65,84 C80,88 105,86 115,78 C100,82 80,82 65,84 Z" fill="#ffffff" opacity="0.5"/>
+                    <path d="M72,70 Q60,63 64,56 Q76,56 76,68 Z" fill="#697c99" stroke="#475569" stroke-width="0.5"/>
+                    <path d="M69,65 Q64,60 67,58" stroke="#ffffff" stroke-width="0.8" fill="none" opacity="0.4"/>
+                    <circle cx="88" cy="58" r="2.5" fill="#ffffff" opacity="0.5"/>
+                    <circle cx="96" cy="60" r="2" fill="#ffffff" opacity="0.5"/>
+                    <circle cx="83" cy="62" r="1.5" fill="#ffffff" opacity="0.5"/>
+                    <circle cx="104" cy="62" r="2" fill="#ffffff" opacity="0.4"/>
+                    <circle cx="92" cy="80" r="2.8" fill="#ffffff" opacity="0.45"/>
+                    <circle cx="100" cy="78" r="2" fill="#ffffff" opacity="0.45"/>
+                    <circle cx="84" cy="77" r="1.5" fill="#ffffff" opacity="0.35"/>
+                    <circle cx="114" cy="61" r="5.5" fill="#334155"/>
+                    <circle cx="114" cy="61" r="4.2" fill="#0f172a"/>
+                    <circle cx="116" cy="59" r="1.5" fill="#ffffff"/>
+                    <circle cx="112" cy="63" r="0.6" fill="#ffffff" opacity="0.8"/>
+                    <path d="M132,69 Q138,67 135,70 Q138,73 131,71 Z" fill="#55667d" stroke="#334155" stroke-width="0.5"/>
+                    <path d="M106,69 Q105,70 105,72" stroke="#334155" stroke-width="1" fill="none" opacity="0.4"/>
+                </g>
+            </svg>`
+        };
+
+        // 📊 選單內部靜態圖鑑顯示專用的代碼 (連結 url(#jellyGradMenu) 與 url(#molaBodyGradMenu))
         const FISH_DATABASE = [
             { id: 'fish1', name: '紅紋金魚', target: 0, sizeClass: '', label: '初始擁有', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="22" fill="#ff4d4d"/><path d="M15,35 Q-5,15 0,35 Q-5,55 15,35" fill="#ff4d4d"/><path d="M45,20 Q30,5 40,5 Q50,5 50,20" fill="#ffa64d"/><path d="M45,50 Q35,65 45,65 Q55,65 52,50" fill="#ffa64d"/><circle cx="70" cy="28" r="4" fill="black"/><circle cx="72" cy="26" r="1.5" fill="white"/><path d="M55,35 Q40,32 35,42" stroke="#ffa64d" stroke-width="2" fill="none"/></g></svg>` },
-            { id: 'fish2', name: '條紋小丑魚', target: 60, sizeClass: '', label: '1 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="20" fill="#ff7300"/><path d="M15,35 Q-5,15 -2,35 Q-5,55 15,35" fill="#ff7300"/><path d="M30,16 Q33,35 30,54 L38,53 Q41,35 38,17 Z" fill="white"/><path d="M50,15 Q53,35 50,55 L58,54 Q61,35 58,16 Z" fill="white"/><circle cx="72" cy="28" r="4" fill="black"/><circle cx="74" cy="26" r="1.5" fill="white"/></g></svg>` },
+            { id: 'fish2', name: '條紋小丑魚', target: 60, sizeClass: '', label: '1 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="20" fill="#ff7300"/><path d="M15,35 Q-5,15 -2,35 Q-5,55 15,35" fill="#ff7300"/><path d="M30,16 Q33,35 30:54 L38,53 Q41,35 38,17 Z" fill="white"/><path d="M50,15 Q53,35 50,55 L58,54 Q61,35 58,16 Z" fill="white"/><circle cx="72" cy="28" r="4" fill="black"/><circle cx="74" cy="26" r="1.5" fill="white"/></g></svg>` },
             { id: 'fish3', name: '霓虹藍倒吊', target: 300, sizeClass: '', label: '5 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="22" fill="#1a75ff"/><path d="M15,35 Q-5,10 -2,35 Q-5,60 15,35" fill="#ffff33"/><path d="M30,25 Q50,15 65,30 Q45,45 30,25" fill="#000066"/><path d="M40,50 Q30,60 42,60 Z" fill="#ffff33"/><circle cx="70" cy="26" r="4" fill="black"/><circle cx="72" cy="24" r="1.5" fill="white"/></g></svg>` },
             { id: 'fish4', name: '螢光綠燈魚', target: 600, sizeClass: '', label: '10 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="32" ry="16" fill="#00cc66"/><path d="M18,35 Q0,20 3,35 Q0,50 18,35" fill="#ff3333"/><path d="M25,35 Q50,28 75,35" stroke="#33ffff" stroke-width="3" fill="none"/><circle cx="68" cy="30" r="3.5" fill="black"/><circle cx="69.5" cy="28.5" r="1.2" fill="white"/></g></svg>` },
             { id: 'fish5', name: '赤鱗獅子魚', target: 1800, sizeClass: '', label: '30 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><path d="M35,18 L20,-2 L40,3 Z M48,15 L40,-5 L53,2 Z M58,16 L60,-5 L65,5 Z M35,52 L20,72 L40,67 Z M48,55 L40,75 L53,68 Z M58,54 L60,75 L65,65 Z" fill="#ff4d4d"/><ellipse cx="50" cy="35" rx="33" ry="20" fill="#cc0000"/><path d="M17,35 Q-5,15 0,35 Q-5,55 17,35" fill="#ff4d4d"/><path d="M30,22 Q50,28 65,22 M30,48 Q50,42 65,48" stroke="white" stroke-width="1.5" fill="none"/><circle cx="68" cy="28" r="4" fill="black"/><circle cx="70" cy="26" r="1.5" fill="white"/></g></svg>` },
@@ -568,29 +666,17 @@
             { id: 'fish_sail', name: '破浪大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 160 100"><g transform="translate(10,10)"><path d="M45,25 Q70,-10 95,15 C75,10 60,15 45,25 Z" fill="#002266"/><path d="M20,40 Q-5,25 0,40 Q-5,55 20,40" fill="#3399ff"/><ellipse cx="65" cy="40" rx="50" ry="22" fill="#0055ff"/><path d="M115,38 L145,36" stroke="#002266" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="32" r="4.5" fill="black"/><circle cx="102" cy="30" r="1.5" fill="white"/></g></svg>` },
             { id: 'fish_dolphin', name: '蔚藍大海豚', target: 10800, sizeClass: 'size-huge', label: '3 小時', svg: `<svg viewBox="0 0 200 120"><g transform="translate(10,10)"><path d="M20,55 C45,15 110,20 135,40 C115,65 50,70 20,55 Z" fill="#3399ff"/><path d="M75,32 Q90,5 105,22 Z" fill="#0066cc"/><path d="M50,62 C60,75 55,85 40,78 Z" fill="#3399ff"/><circle cx="116" cy="34" r="4.5" fill="black"/><circle cx="118" cy="32" r="1.5" fill="white"/></g></svg>` },
             
-            // 🔮 發光小水母
             { id: 'fish_jelly', name: '發光小水母', target: 14400, sizeClass: 'size-jelly', label: '4 小時', svg: `<svg viewBox="0 0 120 120">
-                <defs>
-                    <linearGradient id="jellyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#ffb3ff" stop-opacity="0.9"/>
-                        <stop offset="60%" stop-color="#99ccff" stop-opacity="0.7"/>
-                        <stop offset="100%" stop-color="#66b3ff" stop-opacity="0.4"/>
-                    </linearGradient>
-                    <linearGradient id="tentacleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#99ccff" stop-opacity="0.6"/>
-                        <stop offset="100%" stop-color="#ffb3ff" stop-opacity="0.1"/>
-                    </linearGradient>
-                </defs>
                 <g transform="translate(10, 10)">
-                    <path d="M35,45 Q20,70 25,95 Q28,105 22,110" stroke="url(#tentacleGrad)" stroke-width="1.5" fill="none" opacity="0.75"/>
-                    <path d="M45,48 Q35,75 42,98 Q45,108 40,112" stroke="url(#tentacleGrad)" stroke-width="1.2" fill="none" opacity="0.6"/>
-                    <path d="M55,48 Q65,75 58,98 Q55,108 60,112" stroke="url(#tentacleGrad)" stroke-width="1.2" fill="none" opacity="0.6"/>
-                    <path d="M65,45 Q80,70 75,95 Q72,105 78,110" stroke="url(#tentacleGrad)" stroke-width="1.5" fill="none" opacity="0.75"/>
+                    <path d="M35,45 Q20,70 25,95 Q28,105 22,110" stroke="url(#tentacleGradMenu)" stroke-width="1.5" fill="none" opacity="0.75"/>
+                    <path d="M45,48 Q35,75 42,98 Q45,108 40,112" stroke="url(#tentacleGradMenu)" stroke-width="1.2" fill="none" opacity="0.6"/>
+                    <path d="M55,48 Q65,75 58,98 Q55,108 60,112" stroke="url(#tentacleGradMenu)" stroke-width="1.2" fill="none" opacity="0.6"/>
+                    <path d="M65,45 Q80,70 75,95 Q72,105 78,110" stroke="url(#tentacleGradMenu)" stroke-width="1.5" fill="none" opacity="0.75"/>
                     <path d="M42,46 C35,60 55,75 44,90 C38,100 50,105 46,112" stroke="#ffb3ff" stroke-width="2.5" fill="none" opacity="0.8"/>
                     <path d="M58,46 C65,60 45,75 56,90 C62,100 50,105 54,112" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.85"/>
                     <path d="M50,48 C46,65 58,82 50,96 C44,104 52,108 49,114" stroke="#e6b3ff" stroke-width="2" fill="none" opacity="0.7"/>
                     <path d="M32,45 C32,25 68,25 68,45 C62,47 38,47 32,45 Z" fill="#ffffff" opacity="0.35"/>
-                    <path d="M26,44 C26,12 74,12 74,44 C65,48 58,43 50,46 C42,43 35,48 26,44 Z" fill="url(#jellyGrad)"/>
+                    <path d="M26,44 C26,12 74,12 74,44 C65,48 58,43 50,46 C42,43 35,48 26,44 Z" fill="url(#jellyGradMenu)"/>
                     <circle cx="43" cy="34" r="2.5" fill="#4d004d" opacity="0.7"/>
                     <circle cx="44" cy="33" r="0.8" fill="white"/>
                     <circle cx="57" cy="34" r="2.5" fill="#4d004d" opacity="0.7"/>
@@ -599,37 +685,19 @@
                 </g>
             </svg>` },
             
-            // ☀️ 巨型翻車魚 (完全重繪修正版)：擴大畫布視窗至 160x160，並全實心上色，修正不透明度，保證兩端大鰭完整露出不被吃掉！
             { id: 'fish_mola', name: '巨型翻車魚', target: 18000, sizeClass: 'size-mola', label: '5 小時', svg: `<svg viewBox="0 0 160 160" width="100%" height="100%">
-                <defs>
-                    <linearGradient id="molaBodyGradFix" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#bcccf8"/>
-                        <stop offset="50%" stop-color="#a4b9dd"/>
-                        <stop offset="100%" stop-color="#738cb2"/>
-                    </linearGradient>
-                    <linearGradient id="molaFinGradFix" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#8ba3c7"/>
-                        <stop offset="100%" stop-color="#55667d"/>
-                    </linearGradient>
-                </defs>
                 <g transform="translate(10, 10)">
-                    <path d="M75,55 Q52,3 74,22 Q86,38 82,58 Z" fill="url(#molaFinGradFix)" stroke="#64748b" stroke-width="0.5"/>
+                    <path d="M75,55 Q52,3 74,22 Q86,38 82,58 Z" fill="url(#molaFinGradMenu)" stroke="#64748b" stroke-width="0.5"/>
                     <path d="M68,40 Q58,18 68,26" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.3"/>
                     <path d="M73,43 Q65,24 71,30" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.3"/>
-                    
-                    <path d="M75,85 Q52,137 74,118 Q86,102 82,82 Z" fill="url(#molaFinGradFix)" stroke="#64748b" stroke-width="0.5"/>
+                    <path d="M75,85 Q52,137 74,118 Q86,102 82,82 Z" fill="url(#molaFinGradMenu)" stroke="#64748b" stroke-width="0.5"/>
                     <path d="M68,100 Q58,122 68,114" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.3"/>
-                    
                     <path d="M45,52 C35,54 30,62 32,70 C30,78 35,86 45,88 C42,80 42,60 45,52 Z" fill="#8499b8" stroke="#64748b" stroke-width="0.5"/>
                     <path d="M35,60 Q40,70 35,80" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.2"/>
-                    
-                    <path d="M42,70 C42,48 65,44 95,48 C122,52 135,65 132,70 C135,75 122,88 95,92 C65,96 42,92 42,70 Z" fill="url(#molaBodyGradFix)" fill-opacity="1" stroke="#55667d" stroke-width="1"/>
-                    
+                    <path d="M42,70 C42,48 65,44 95,48 C122,52 135,65 132,70 C135,75 122,88 95,92 C65,96 42,92 42,70 Z" fill="url(#molaBodyGradMenu)" fill-opacity="1" stroke="#55667d" stroke-width="1"/>
                     <path d="M65,84 C80,88 105,86 115,78 C100,82 80,82 65,84 Z" fill="#ffffff" opacity="0.5"/>
-                    
                     <path d="M72,70 Q60,63 64,56 Q76,56 76,68 Z" fill="#697c99" stroke="#475569" stroke-width="0.5"/>
                     <path d="M69,65 Q64,60 67,58" stroke="#ffffff" stroke-width="0.8" fill="none" opacity="0.4"/>
-                    
                     <circle cx="88" cy="58" r="2.5" fill="#ffffff" opacity="0.5"/>
                     <circle cx="96" cy="60" r="2" fill="#ffffff" opacity="0.5"/>
                     <circle cx="83" cy="62" r="1.5" fill="#ffffff" opacity="0.5"/>
@@ -637,12 +705,10 @@
                     <circle cx="92" cy="80" r="2.8" fill="#ffffff" opacity="0.45"/>
                     <circle cx="100" cy="78" r="2" fill="#ffffff" opacity="0.45"/>
                     <circle cx="84" cy="77" r="1.5" fill="#ffffff" opacity="0.35"/>
-                    
                     <circle cx="114" cy="61" r="5.5" fill="#334155"/>
                     <circle cx="114" cy="61" r="4.2" fill="#0f172a"/>
                     <circle cx="116" cy="59" r="1.5" fill="#ffffff"/>
                     <circle cx="112" cy="63" r="0.6" fill="#ffffff" opacity="0.8"/>
-                    
                     <path d="M132,69 Q138,67 135,70 Q138,73 131,71 Z" fill="#55667d" stroke="#334155" stroke-width="0.5"/>
                     <path d="M106,69 Q105,70 105,72" stroke="#334155" stroke-width="1" fill="none" opacity="0.4"/>
                 </g>
@@ -845,7 +911,7 @@
             if (fish.dom.classList.contains('size-large')) safetyBuffer = 10;
             else if (fish.dom.classList.contains('size-huge')) safetyBuffer = 12;
             else if (fish.dom.classList.contains('size-jelly')) safetyBuffer = 12;
-            else if (fish.dom.classList.contains('size-mola')) safetyBuffer = 24; /* 調整翻車魚隨機高度時的安全緩衝 */
+            else if (fish.dom.classList.contains('size-mola')) safetyBuffer = 24;
             
             const maxSafeBottom = currentWaterHeight - safetyBuffer;
             const minSafeBottom = 2;
@@ -869,13 +935,21 @@
                     for (let i = 0; i < spawnCount; i++) {
                         const fishContainer = document.createElement('div');
                         fishContainer.className = `fish-container ${fish.sizeClass}`;
-                        fishContainer.innerHTML = fish.svg;
+                        
+                        // 🌟 核心修正：如果是水母或翻車魚，引入水中游動專用的不滅漸層 SVG 代碼
+                        if (fish.id === 'fish_jelly') {
+                            fishContainer.innerHTML = WATER_FISH_SVGS.fish_jelly;
+                        } else if (fish.id === 'fish_mola') {
+                            fishContainer.innerHTML = WATER_FISH_SVGS.fish_mola;
+                        } else {
+                            fishContainer.innerHTML = fish.svg;
+                        }
                         
                         let baseSpeed = 10;
                         if (fish.sizeClass === 'size-large') baseSpeed = 14;
                         else if (fish.sizeClass === 'size-huge') baseSpeed = 17;
                         else if (fish.sizeClass === 'size-jelly') baseSpeed = 15; 
-                        else if (fish.sizeClass === 'size-mola') baseSpeed = 24; /* 讓體型巨大的翻車魚慢速優雅移動 */
+                        else if (fish.sizeClass === 'size-mola') baseSpeed = 24;
 
                         const randomSpeed = (Math.random() * 5 + baseSpeed).toFixed(1); 
                         const randomDelay = (Math.random() * 5).toFixed(1); 
