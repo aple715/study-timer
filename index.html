@@ -492,7 +492,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.3.7</div>
+    <div class="version-tag">v1.3.8</div>
 
     <svg class="global-svg-defs">
         <defs>
@@ -929,7 +929,7 @@
 
         function checkAndRefreshFishTank() {
             let unlockedCount = FISH_DATABASE.filter(f => accumulatedSeconds >= f.target).length;
-            if (unlockedCount === cachedUnlockedCount && hasStartedCounting) return;
+            if (unlockedCount === cachedUnlockedCount && hasStartedCounting && instantiatedFishList.length > 0) return;
             cachedUnlockedCount = unlockedCount;
             fishCountDisplay.innerText = `🐠 已解鎖魚種：${unlockedCount} / ${FISH_DATABASE.length}`;
             updateFishGuideUI();
@@ -1012,6 +1012,7 @@
         function clearAllFishDOM() {
             fishTankContent.innerHTML = '';
             instantiatedFishList = [];
+            cachedUnlockedCount = -1;
         }
 
         function updateUI() {
