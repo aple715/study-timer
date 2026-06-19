@@ -188,7 +188,7 @@
 
         .select-fish-icon {
             width: 32px;
-            height: 22px;
+            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -206,7 +206,7 @@
             overflow: visible;
         }
 
-        /* 🌊 動態水面與海浪背景：移除 CSS transition，改由 JS 微秒級高頻刷新達到完美絲滑上升 */
+        /* 🌊 動態水面與海浪背景：微秒級高頻刷新達到完美絲滑上升 */
         .water-bg {
             position: absolute;
             bottom: 0;
@@ -270,7 +270,8 @@
         
         .fish-container.size-large { width: 110px; height: 65px; }
         .fish-container.size-huge { width: 140px; height: 85px; }
-        .fish-container.size-mola { width: 150px; height: 130px; }
+        .fish-container.size-jelly { width: 85px; height: 85px; } /* 水母調成正方形更利於維持比例 */
+        .fish-container.size-mola { width: 140px; height: 140px; } /* 翻車魚調成方形讓高聳背鰭完美展現 */
         
         .fish-container.active-swim-right { animation: swim-right linear infinite backwards; }
         .fish-container.active-swim-left { animation: swim-left linear infinite backwards; }
@@ -440,7 +441,7 @@
             background: #ffffff !important; 
             backdrop-filter: none !important; 
             -webkit-backdrop-filter: none !important;
-            touch-action: none; /* 阻止手機原生滾動，提升流暢度 */
+            touch-action: none;
         }
         
         .container.minimized-mode h1,
@@ -490,7 +491,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.3.2</div>
+    <div class="version-tag">v1.3.3</div>
 
     <button class="stats-toggle-btn" id="stats-toggle-btn" onclick="toggleStatsCard()">📊 統計與圖鑑</button>
 
@@ -558,10 +559,9 @@
     </div>
 
     <script>
-        // 全域 AudioContext 宣告，用於 iOS/Chrome 預先啟動
         let audioCtx = null;
 
-        // 🐟 原始魚群資料庫
+        // 🐟 升級優化後的魚群資料庫 (對水母、翻車魚進行了高級 SVG 漸層藝術級重繪)
         const FISH_DATABASE = [
             { id: 'fish1', name: '紅紋金魚', target: 0, sizeClass: '', label: '初始擁有', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="22" fill="#ff4d4d"/><path d="M15,35 Q-5,15 0,35 Q-5,55 15,35" fill="#ff4d4d"/><path d="M45,20 Q30,5 40,5 Q50,5 50,20" fill="#ffa64d"/><path d="M45,50 Q35,65 45,65 Q55,65 52,50" fill="#ffa64d"/><circle cx="70" cy="28" r="4" fill="black"/><circle cx="72" cy="26" r="1.5" fill="white"/><path d="M55,35 Q40,32 35,42" stroke="#ffa64d" stroke-width="2" fill="none"/></g></svg>` },
             { id: 'fish2', name: '條紋小丑魚', target: 60, sizeClass: '', label: '1 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="20" fill="#ff7300"/><path d="M15,35 Q-5,15 -2,35 Q-5,55 15,35" fill="#ff7300"/><path d="M30,16 Q33,35 30,54 L38,53 Q41,35 38,17 Z" fill="white"/><path d="M50,15 Q53,35 50,55 L58,54 Q61,35 58,16 Z" fill="white"/><circle cx="72" cy="28" r="4" fill="black"/><circle cx="74" cy="26" r="1.5" fill="white"/></g></svg>` },
@@ -571,8 +571,90 @@
             { id: 'fish_puff', name: '刺蝟綠河豚', target: 3600, sizeClass: '', label: '1 小時', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><circle cx="50" cy="35" r="24" fill="#ccff33"/><path d="M26,35 Q10,23 15,35 Q10,47 26,35" fill="#99cc00"/><path d="M32,20 L27,15 M42,15 L39,8 M55,14 L55,6 M67,17 L72,11 M30,48 L25,53 M40,54 L37,61 M54,56 L55,64 M68,52 L73,57" stroke="#668000" stroke-width="2"/><circle cx="62" cy="27" r="4.5" fill="black"/><circle cx="64" cy="25" r="1.5" fill="white"/><path d="M50,43 Q56,47 62,42" stroke="#668000" stroke-width="2" fill="none"/></g></svg>` },
             { id: 'fish_sail', name: '破浪大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 160 100"><g transform="translate(10,10)"><path d="M45,25 Q70,-10 95,15 C75,10 60,15 45,25 Z" fill="#002266"/><path d="M20,40 Q-5,25 0,40 Q-5,55 20,40" fill="#3399ff"/><ellipse cx="65" cy="40" rx="50" ry="22" fill="#0055ff"/><path d="M115,38 L145,36" stroke="#002266" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="32" r="4.5" fill="black"/><circle cx="102" cy="30" r="1.5" fill="white"/></g></svg>` },
             { id: 'fish_dolphin', name: '蔚藍大海豚', target: 10800, sizeClass: 'size-huge', label: '3 小時', svg: `<svg viewBox="0 0 200 120"><g transform="translate(10,10)"><path d="M20,55 C45,15 110,20 135,40 C115,65 50,70 20,55 Z" fill="#3399ff"/><path d="M75,32 Q90,5 105,22 Z" fill="#0066cc"/><path d="M50,62 C60,75 55,85 40,78 Z" fill="#3399ff"/><circle cx="116" cy="34" r="4.5" fill="black"/><circle cx="118" cy="32" r="1.5" fill="white"/></g></svg>` },
-            { id: 'fish_jelly', name: '發光小水母', target: 14400, sizeClass: '', label: '4 小時', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><path d="M35,35 Q20,42 30,52 Q20,62 35,67 Q25,74 42,76" stroke="#ff99ff" stroke-width="2.5" fill="none"/><path d="M55,35 C55,10 95,10 95,35 Z" fill="#ff66ff" opacity="0.8"/><circle cx="70" cy="24" r="3" fill="black"/><circle cx="82" cy="24" r="3" fill="black"/><path d="M73,29 Q76,32 79,29" stroke="black" stroke-width="1.5" fill="none"/></g></svg>` },
-            { id: 'fish_mola', name: '巨型翻車魚', target: 18000, sizeClass: 'size-mola', label: '5 小時', svg: `<svg viewBox="0 0 160 140"><g transform="translate(10,10)"><path d="M55,40 Q40,-5 65,15 Z M55,70 Q40,115 65,95 Z" fill="#999999"/><ellipse cx="55" cy="55" rx="35" ry="40" fill="#b3b3b3"/><ellipse cx="25" cy="55" rx="10" ry="12" fill="#999999"/><circle cx="72" cy="40" r="4.5" fill="black"/><circle cx="74" cy="38" r="1.5" fill="white"/></g></svg>` }
+            
+            // 🔮 發光小水母：全新高透光質感重繪 (結合多層次半透明粉紫光與流線口腕觸手)
+            { id: 'fish_jelly', name: '發光小水母', target: 14400, sizeClass: 'size-jelly', label: '4 小時', svg: `<svg viewBox="0 0 120 120">
+                <defs>
+                    <linearGradient id="jellyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#ffb3ff" stop-opacity="0.9"/>
+                        <stop offset="60%" stop-color="#99ccff" stop-opacity="0.7"/>
+                        <stop offset="100%" stop-color="#66b3ff" stop-opacity="0.4"/>
+                    </linearGradient>
+                    <linearGradient id="tentacleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#99ccff" stop-opacity="0.6"/>
+                        <stop offset="100%" stop-color="#ffb3ff" stop-opacity="0.1"/>
+                    </linearGradient>
+                </defs>
+                <g transform="translate(10, 10)">
+                    <path d="M35,45 Q20,70 25,95 Q28,105 22,110" stroke="url(#tentacleGrad)" stroke-width="1.5" fill="none" opacity="0.75"/>
+                    <path d="M45,48 Q35,75 42,98 Q45,108 40,112" stroke="url(#tentacleGrad)" stroke-width="1.2" fill="none" opacity="0.6"/>
+                    <path d="M55,48 Q65,75 58,98 Q55,108 60,112" stroke="url(#tentacleGrad)" stroke-width="1.2" fill="none" opacity="0.6"/>
+                    <path d="M65,45 Q80,70 75,95 Q72,105 78,110" stroke="url(#tentacleGrad)" stroke-width="1.5" fill="none" opacity="0.75"/>
+                    
+                    <path d="M42,46 C35,60 55,75 44,90 C38,100 50,105 46,112" stroke="#ffb3ff" stroke-width="2.5" fill="none" opacity="0.8"/>
+                    <path d="M58,46 C65,60 45,75 56,90 C62,100 50,105 54,112" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.85"/>
+                    <path d="M50,48 C46,65 58,82 50,96 C44,104 52,108 49,114" stroke="#e6b3ff" stroke-width="2" fill="none" opacity="0.7"/>
+                    
+                    <path d="M32,45 C32,25 68,25 68,45 C62,47 38,47 32,45 Z" fill="#ffffff" opacity="0.35"/>
+                    
+                    <path d="M26,44 C26,12 74,12 74,44 C65,48 58,43 50,46 C42,43 35,48 26,44 Z" fill="url(#jellyGrad)"/>
+                    
+                    <circle cx="43" cy="34" r="2.5" fill="#4d004d" opacity="0.7"/>
+                    <circle cx="44" cy="33" r="0.8" fill="white"/>
+                    <circle cx="57" cy="34" r="2.5" fill="#4d004d" opacity="0.7"/>
+                    <circle cx="58" cy="33" r="0.8" fill="white"/>
+                    <path d="M47,38 Q50,40 53,38" stroke="#4d004d" stroke-width="1.2" fill="none" opacity="0.7"/>
+                </g>
+            </svg>` },
+            
+            // ☀️ 巨型翻車魚：全新 3D 高光側斑立體重繪 (改掉原本硬梆梆的橢圓形，重繪高聳背鰭與大頭身)
+            { id: 'fish_mola', name: '巨型翻車魚', target: 18000, sizeClass: 'size-mola', label: '5 小時', svg: `<svg viewBox="0 0 140 140">
+                <defs>
+                    <linearGradient id="molaBodyGrad" x1="30%" y1="0%" x2="70%" y2="100%">
+                        <stop offset="0%" stop-color="#b3c6ff"/>
+                        <stop offset="45%" stop-color="#cbd5e1"/>
+                        <stop offset="100%" stop-color="#8ba3c7"/>
+                    </linearGradient>
+                    <linearGradient id="molaFinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#8ba3c7"/>
+                        <stop offset="100%" stop-color="#64748b"/>
+                    </linearGradient>
+                </defs>
+                <g transform="translate(5, 5)">
+                    <path d="M68,48 Q40,-2 64,16 Q78,35 75,54 Z" fill="url(#molaFinGrad)"/>
+                    <path d="M58,32 Q48,8 60,18" stroke="#f1f5f9" stroke-width="1" fill="none" opacity="0.4"/>
+                    <path d="M65,36 Q55,14 63,22" stroke="#f1f5f9" stroke-width="1" fill="none" opacity="0.4"/>
+                    
+                    <path d="M68,82 Q40,132 64,114 Q78,95 75,76 Z" fill="url(#molaFinGrad)"/>
+                    <path d="M58,98 Q48,122 60,112" stroke="#f1f5f9" stroke-width="1" fill="none" opacity="0.4"/>
+                    
+                    <path d="M38,50 C30,52 26,58 28,65 C26,72 30,78 38,80 C36,74 36,56 38,50 Z" fill="#94a3b8"/>
+                    <path d="M29,56 Q34,65 29,74" stroke="#e2e8f0" stroke-width="1" fill="none" opacity="0.3"/>
+                    
+                    <path d="M34,65 C34,44 55,42 84,46 C110,50 120,62 118,66 C120,70 110,80 84,84 C55,88 34,86 34,65 Z" fill="url(#molaBodyGrad)"/>
+                    
+                    <path d="M55,80 C70,84 95,83 105,74 C90,78 65,78 55,80 Z" fill="#f8fafc" opacity="0.4"/>
+                    
+                    <path d="M64,65 Q52,58 56,52 Q68,52 68,63 Z" fill="#7889a3"/>
+                    <path d="M61,61 Q56,56 59,54" stroke="#ffffff" stroke-width="0.8" fill="none" opacity="0.5"/>
+                    
+                    <circle cx="78" cy="52" r="2.2" fill="#ffffff" opacity="0.45"/>
+                    <circle cx="85" cy="54" r="1.8" fill="#ffffff" opacity="0.45"/>
+                    <circle cx="74" cy="56" r="1.5" fill="#ffffff" opacity="0.45"/>
+                    <circle cx="92" cy="56" r="2" fill="#ffffff" opacity="0.35"/>
+                    <circle cx="82" cy="76" r="2.5" fill="#ffffff" opacity="0.4"/>
+                    <circle cx="89" cy="74" r="1.8" fill="#ffffff" opacity="0.4"/>
+                    <circle cx="75" cy="73" r="1.5" fill="#ffffff" opacity="0.3"/>
+                    
+                    <circle cx="102" cy="57" r="5" fill="#334155"/>
+                    <circle cx="102" cy="57" r="4" fill="#0f172a"/>
+                    <circle cx="104" cy="55" r="1.5" fill="#ffffff"/>
+                    <circle cx="100.5" cy="58.5" r="0.6" fill="#ffffff" opacity="0.7"/>
+                    
+                    <path d="M118,65 Q123,63 121,66 Q123,69 117,67 Z" fill="#64748b"/>
+                    <path d="M96,65 Q95,66 95,68" stroke="#475569" stroke-width="1.5" fill="none" opacity="0.5"/>
+                </g>
+            </svg>` }
         ];
 
         let totalSeconds = 0;
@@ -584,11 +666,10 @@
         let hasStartedCounting = false; 
         let instantiatedFishList = [];
 
-        // 🌊 核心時間戳記變數：用於毫秒級無縫線性水面計算
         let animationFrameId = null;
-        let startTimeStamp = 0;       // 本次計時段的開始時間 (ms)
-        let totalDurationMs = 0;     // 總共需倒數的毫秒數
-        let msElapsedBeforePause = 0; // 暫停前已經渡過的總毫秒數
+        let startTimeStamp = 0;       
+        let totalDurationMs = 0;     
+        let msElapsedBeforePause = 0; 
 
         let dragX = 0, dragY = 0;
         let isDragging = false;
@@ -738,25 +819,18 @@
             });
         }
 
-        // 🌊 核心改動：微秒級高頻率水面絕對線性渲染迴圈
         function linearWaterRenderLoop(timestamp) {
             if (hasStartedCounting && totalDurationMs > 0) {
                 let currentElapsed = msElapsedBeforePause;
-                
                 if (!isPaused) {
                     currentElapsed += (performance.now() - startTimeStamp);
                 }
-                
-                // 確保數值不超過總長度
                 if (currentElapsed > totalDurationMs) currentElapsed = totalDurationMs;
 
-                // 根據毫秒比例，精準換算高度百分比（基礎 5% 到最高 100% 之間毫無間斷地增加）
                 const ratio = currentElapsed / totalDurationMs;
                 const preciseHeight = 5 + (ratio * 95);
-                
                 waterBg.style.height = `${preciseHeight}%`;
 
-                // 只要計時未被徹底重置，就持續每影格刷新渲染
                 animationFrameId = requestAnimationFrame(linearWaterRenderLoop);
             }
         }
@@ -778,7 +852,8 @@
             let safetyBuffer = 6;
             if (fish.dom.classList.contains('size-large')) safetyBuffer = 10;
             else if (fish.dom.classList.contains('size-huge')) safetyBuffer = 12;
-            else if (fish.dom.classList.contains('size-mola')) safetyBuffer = 18; 
+            else if (fish.dom.classList.contains('size-jelly')) safetyBuffer = 12;
+            else if (fish.dom.classList.contains('size-mola')) safetyBuffer = 20; /* 翻車魚上下鰭較長，給予足夠安全緩衝 */
             
             const maxSafeBottom = currentWaterHeight - safetyBuffer;
             const minSafeBottom = 2;
@@ -807,6 +882,7 @@
                         let baseSpeed = 10;
                         if (fish.sizeClass === 'size-large') baseSpeed = 14;
                         else if (fish.sizeClass === 'size-huge') baseSpeed = 17;
+                        else if (fish.sizeClass === 'size-jelly') baseSpeed = 15; /* 水母游速稍微優雅緩慢 */
                         else if (fish.sizeClass === 'size-mola') baseSpeed = 22;
 
                         const randomSpeed = (Math.random() * 5 + baseSpeed).toFixed(1); 
@@ -835,7 +911,8 @@
                         let safetyBuffer = 6;
                         if (f.dom.classList.contains('size-large')) safetyBuffer = 10;
                         else if (f.dom.classList.contains('size-huge')) safetyBuffer = 12;
-                        else if (f.dom.classList.contains('size-mola')) safetyBuffer = 18;
+                        else if (f.dom.classList.contains('size-jelly')) safetyBuffer = 12;
+                        else if (f.dom.classList.contains('size-mola')) safetyBuffer = 20;
 
                         if (f.currentBottom === null || f.currentBottom > (currentWaterHeight - safetyBuffer)) {
                             assignRandomHeightToFish(f);
@@ -875,7 +952,6 @@
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
-            // 播放一個 0.01 秒的超短靜音，破解 iOS/Chrome 的自動播放音訊封鎖
             try {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
@@ -902,7 +978,7 @@
 
         function startTimer() {
             if (isPaused) {
-                initAudioContext(); // 預啟動音訊
+                initAudioContext(); 
 
                 if (timerTimeout === null && remainingSeconds === 0) {
                     totalSeconds = getInputsInSeconds(); 
@@ -911,7 +987,6 @@
                         alert('請設定大於 0 秒的時間喔！'); 
                         return; 
                     }
-                    // 初始化毫秒總時長與控制計數
                     totalDurationMs = totalSeconds * 1000;
                     msElapsedBeforePause = 0;
                 }
@@ -928,13 +1003,9 @@
                 updateUI(); 
                 checkAndRefreshFishTank();
 
-                // 紀錄本次播放段落的起始物理時間戳記
                 startTimeStamp = performance.now();
-
-                // 每秒倒數計時用
                 timerTimeout = setTimeout(step, 1000);
                 
-                // 啟動高頻微秒線性渲染
                 cancelAnimationFrame(animationFrameId);
                 animationFrameId = requestAnimationFrame(linearWaterRenderLoop);
             }
@@ -957,7 +1028,6 @@
                 startBtn.disabled = false;
                 pauseBtn.disabled = true;
                 
-                // 時間到，強制填滿並觸發鬧鐘
                 msElapsedBeforePause = totalDurationMs;
                 waterBg.style.height = "100%";
                 
@@ -972,7 +1042,6 @@
             clearTimeout(timerTimeout); 
             timerTimeout = null;
             
-            // 累加並保存暫停前度過的毫秒數
             msElapsedBeforePause += (performance.now() - startTimeStamp);
             
             startBtn.disabled = false; 
@@ -1012,7 +1081,7 @@
             clearAllFishDOM();
             updateUI(); 
             checkAndRefreshFishTank(); 
-            waterBg.style.height = "5%"; // 恢復預設高度
+            waterBg.style.height = "5%"; 
             syncPreview();
         }
 
@@ -1076,7 +1145,6 @@
             el.addEventListener('input', syncPreview);
         });
         
-        // 首次載入初始化
         checkAndRefreshFishTank();
         updateUI();
     </script>
