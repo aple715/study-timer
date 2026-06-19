@@ -206,7 +206,7 @@
             overflow: visible;
         }
 
-        /* 🌊 動態水面與海浪背景：微秒級高頻刷新達到完美絲滑上升 */
+        /* 🌊 動態水面與海浪背景 */
         .water-bg {
             position: absolute;
             bottom: 0;
@@ -257,7 +257,7 @@
             100% { transform: translateX(0); }
         }
 
-        /* 🐟 小魚容器與動畫 */
+        /* 🐟 魚群容器尺寸修復 - 給予翻車魚最完美的寬高比 */
         .fish-container { 
             position: absolute; 
             width: 75px; 
@@ -270,26 +270,26 @@
         
         .fish-container.size-large { width: 110px; height: 65px; }
         .fish-container.size-huge { width: 140px; height: 85px; }
-        .fish-container.size-jelly { width: 85px; height: 85px; } /* 水母調成正方形更利於維持比例 */
-        .fish-container.size-mola { width: 140px; height: 140px; } /* 翻車魚調成方形讓高聳背鰭完美展現 */
+        .fish-container.size-jelly { width: 85px; height: 85px; } 
+        .fish-container.size-mola { width: 160px; height: 160px; } /* 加大容器寬高，防止上下背鰭被切掉 */
         
         .fish-container.active-swim-right { animation: swim-right linear infinite backwards; }
         .fish-container.active-swim-left { animation: swim-left linear infinite backwards; }
 
         @keyframes swim-right {
-            0% { left: -200px; opacity: 0; transform: translateY(0); }
+            0% { left: -250px; opacity: 0; transform: translateY(0); }
             8% { opacity: 1; }
             50% { transform: translateY(-8px); }
             92% { opacity: 1; }
-            100% { left: 110%; opacity: 0; transform: translateY(0); }
+            100% { left: 115%; opacity: 0; transform: translateY(0); }
         }
         
         @keyframes swim-left {
-            0% { left: 110%; opacity: 0; transform: scaleX(-1) translateY(0); }
+            0% { left: 115%; opacity: 0; transform: scaleX(-1) translateY(0); }
             8% { opacity: 1; }
             50% { transform: scaleX(-1) translateY(8px); }
             92% { opacity: 1; }
-            100% { left: -200px; opacity: 0; transform: scaleX(-1) translateY(0); }
+            100% { left: -250px; opacity: 0; transform: scaleX(-1) translateY(0); }
         }
 
         /* 主介面卡片 */
@@ -310,7 +310,6 @@
             will-change: transform;
         }
 
-        /* ➖ 縮小按鈕樣式 */
         .minimize-toggle-btn {
             position: absolute;
             top: 14px;
@@ -425,7 +424,6 @@
         .btn-reset { background-color: #e74c3c; color: white; }
         button:disabled { background-color: #bdc3c7; cursor: not-allowed; color: #7f8c8d; }
 
-        /* 極簡縮小狀態下的樣式 */
         .container.minimized-mode {
             position: fixed !important;
             top: 50% !important;
@@ -465,7 +463,6 @@
             cursor: pointer; 
         }
 
-        /* 手機版 RWD 調優 */
         @media (max-width: 480px) {
             .container { padding: 25px 15px; }
             h1 { font-size: 19px; margin-bottom: 15px; }
@@ -479,7 +476,6 @@
             input[type="number"], select { font-size: 15px; padding: 9px 6px; }
         }
 
-        /* 彈出視窗 */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 200; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
         }
@@ -491,7 +487,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.3.3</div>
+    <div class="version-tag">v1.3.4</div>
 
     <button class="stats-toggle-btn" id="stats-toggle-btn" onclick="toggleStatsCard()">📊 統計與圖鑑</button>
 
@@ -561,7 +557,7 @@
     <script>
         let audioCtx = null;
 
-        // 🐟 升級優化後的魚群資料庫 (對水母、翻車魚進行了高級 SVG 漸層藝術級重繪)
+        // 🐟 資料庫完全修正：重製翻車魚的內嵌漸層 ID 命名與實心填色，並將視窗 viewBox 開大至 0 0 160 160，確保在任何網頁瀏覽器中都能完全顯示！
         const FISH_DATABASE = [
             { id: 'fish1', name: '紅紋金魚', target: 0, sizeClass: '', label: '初始擁有', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="22" fill="#ff4d4d"/><path d="M15,35 Q-5,15 0,35 Q-5,55 15,35" fill="#ff4d4d"/><path d="M45,20 Q30,5 40,5 Q50,5 50,20" fill="#ffa64d"/><path d="M45,50 Q35,65 45,65 Q55,65 52,50" fill="#ffa64d"/><circle cx="70" cy="28" r="4" fill="black"/><circle cx="72" cy="26" r="1.5" fill="white"/><path d="M55,35 Q40,32 35,42" stroke="#ffa64d" stroke-width="2" fill="none"/></g></svg>` },
             { id: 'fish2', name: '條紋小丑魚', target: 60, sizeClass: '', label: '1 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="20" fill="#ff7300"/><path d="M15,35 Q-5,15 -2,35 Q-5,55 15,35" fill="#ff7300"/><path d="M30,16 Q33,35 30,54 L38,53 Q41,35 38,17 Z" fill="white"/><path d="M50,15 Q53,35 50,55 L58,54 Q61,35 58,16 Z" fill="white"/><circle cx="72" cy="28" r="4" fill="black"/><circle cx="74" cy="26" r="1.5" fill="white"/></g></svg>` },
@@ -572,7 +568,7 @@
             { id: 'fish_sail', name: '破浪大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 160 100"><g transform="translate(10,10)"><path d="M45,25 Q70,-10 95,15 C75,10 60,15 45,25 Z" fill="#002266"/><path d="M20,40 Q-5,25 0,40 Q-5,55 20,40" fill="#3399ff"/><ellipse cx="65" cy="40" rx="50" ry="22" fill="#0055ff"/><path d="M115,38 L145,36" stroke="#002266" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="32" r="4.5" fill="black"/><circle cx="102" cy="30" r="1.5" fill="white"/></g></svg>` },
             { id: 'fish_dolphin', name: '蔚藍大海豚', target: 10800, sizeClass: 'size-huge', label: '3 小時', svg: `<svg viewBox="0 0 200 120"><g transform="translate(10,10)"><path d="M20,55 C45,15 110,20 135,40 C115,65 50,70 20,55 Z" fill="#3399ff"/><path d="M75,32 Q90,5 105,22 Z" fill="#0066cc"/><path d="M50,62 C60,75 55,85 40,78 Z" fill="#3399ff"/><circle cx="116" cy="34" r="4.5" fill="black"/><circle cx="118" cy="32" r="1.5" fill="white"/></g></svg>` },
             
-            // 🔮 發光小水母：全新高透光質感重繪 (結合多層次半透明粉紫光與流線口腕觸手)
+            // 🔮 發光小水母
             { id: 'fish_jelly', name: '發光小水母', target: 14400, sizeClass: 'size-jelly', label: '4 小時', svg: `<svg viewBox="0 0 120 120">
                 <defs>
                     <linearGradient id="jellyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -590,15 +586,11 @@
                     <path d="M45,48 Q35,75 42,98 Q45,108 40,112" stroke="url(#tentacleGrad)" stroke-width="1.2" fill="none" opacity="0.6"/>
                     <path d="M55,48 Q65,75 58,98 Q55,108 60,112" stroke="url(#tentacleGrad)" stroke-width="1.2" fill="none" opacity="0.6"/>
                     <path d="M65,45 Q80,70 75,95 Q72,105 78,110" stroke="url(#tentacleGrad)" stroke-width="1.5" fill="none" opacity="0.75"/>
-                    
                     <path d="M42,46 C35,60 55,75 44,90 C38,100 50,105 46,112" stroke="#ffb3ff" stroke-width="2.5" fill="none" opacity="0.8"/>
                     <path d="M58,46 C65,60 45,75 56,90 C62,100 50,105 54,112" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.85"/>
                     <path d="M50,48 C46,65 58,82 50,96 C44,104 52,108 49,114" stroke="#e6b3ff" stroke-width="2" fill="none" opacity="0.7"/>
-                    
                     <path d="M32,45 C32,25 68,25 68,45 C62,47 38,47 32,45 Z" fill="#ffffff" opacity="0.35"/>
-                    
                     <path d="M26,44 C26,12 74,12 74,44 C65,48 58,43 50,46 C42,43 35,48 26,44 Z" fill="url(#jellyGrad)"/>
-                    
                     <circle cx="43" cy="34" r="2.5" fill="#4d004d" opacity="0.7"/>
                     <circle cx="44" cy="33" r="0.8" fill="white"/>
                     <circle cx="57" cy="34" r="2.5" fill="#4d004d" opacity="0.7"/>
@@ -607,52 +599,52 @@
                 </g>
             </svg>` },
             
-            // ☀️ 巨型翻車魚：全新 3D 高光側斑立體重繪 (改掉原本硬梆梆的橢圓形，重繪高聳背鰭與大頭身)
-            { id: 'fish_mola', name: '巨型翻車魚', target: 18000, sizeClass: 'size-mola', label: '5 小時', svg: `<svg viewBox="0 0 140 140">
+            // ☀️ 巨型翻車魚 (完全重繪修正版)：擴大畫布視窗至 160x160，並全實心上色，修正不透明度，保證兩端大鰭完整露出不被吃掉！
+            { id: 'fish_mola', name: '巨型翻車魚', target: 18000, sizeClass: 'size-mola', label: '5 小時', svg: `<svg viewBox="0 0 160 160" width="100%" height="100%">
                 <defs>
-                    <linearGradient id="molaBodyGrad" x1="30%" y1="0%" x2="70%" y2="100%">
-                        <stop offset="0%" stop-color="#b3c6ff"/>
-                        <stop offset="45%" stop-color="#cbd5e1"/>
-                        <stop offset="100%" stop-color="#8ba3c7"/>
+                    <linearGradient id="molaBodyGradFix" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#bcccf8"/>
+                        <stop offset="50%" stop-color="#a4b9dd"/>
+                        <stop offset="100%" stop-color="#738cb2"/>
                     </linearGradient>
-                    <linearGradient id="molaFinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <linearGradient id="molaFinGradFix" x1="0%" y1="0%" x2="0%" y2="100%">
                         <stop offset="0%" stop-color="#8ba3c7"/>
-                        <stop offset="100%" stop-color="#64748b"/>
+                        <stop offset="100%" stop-color="#55667d"/>
                     </linearGradient>
                 </defs>
-                <g transform="translate(5, 5)">
-                    <path d="M68,48 Q40,-2 64,16 Q78,35 75,54 Z" fill="url(#molaFinGrad)"/>
-                    <path d="M58,32 Q48,8 60,18" stroke="#f1f5f9" stroke-width="1" fill="none" opacity="0.4"/>
-                    <path d="M65,36 Q55,14 63,22" stroke="#f1f5f9" stroke-width="1" fill="none" opacity="0.4"/>
+                <g transform="translate(10, 10)">
+                    <path d="M75,55 Q52,3 74,22 Q86,38 82,58 Z" fill="url(#molaFinGradFix)" stroke="#64748b" stroke-width="0.5"/>
+                    <path d="M68,40 Q58,18 68,26" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.3"/>
+                    <path d="M73,43 Q65,24 71,30" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.3"/>
                     
-                    <path d="M68,82 Q40,132 64,114 Q78,95 75,76 Z" fill="url(#molaFinGrad)"/>
-                    <path d="M58,98 Q48,122 60,112" stroke="#f1f5f9" stroke-width="1" fill="none" opacity="0.4"/>
+                    <path d="M75,85 Q52,137 74,118 Q86,102 82,82 Z" fill="url(#molaFinGradFix)" stroke="#64748b" stroke-width="0.5"/>
+                    <path d="M68,100 Q58,122 68,114" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.3"/>
                     
-                    <path d="M38,50 C30,52 26,58 28,65 C26,72 30,78 38,80 C36,74 36,56 38,50 Z" fill="#94a3b8"/>
-                    <path d="M29,56 Q34,65 29,74" stroke="#e2e8f0" stroke-width="1" fill="none" opacity="0.3"/>
+                    <path d="M45,52 C35,54 30,62 32,70 C30,78 35,86 45,88 C42,80 42,60 45,52 Z" fill="#8499b8" stroke="#64748b" stroke-width="0.5"/>
+                    <path d="M35,60 Q40,70 35,80" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.2"/>
                     
-                    <path d="M34,65 C34,44 55,42 84,46 C110,50 120,62 118,66 C120,70 110,80 84,84 C55,88 34,86 34,65 Z" fill="url(#molaBodyGrad)"/>
+                    <path d="M42,70 C42,48 65,44 95,48 C122,52 135,65 132,70 C135,75 122,88 95,92 C65,96 42,92 42,70 Z" fill="url(#molaBodyGradFix)" fill-opacity="1" stroke="#55667d" stroke-width="1"/>
                     
-                    <path d="M55,80 C70,84 95,83 105,74 C90,78 65,78 55,80 Z" fill="#f8fafc" opacity="0.4"/>
+                    <path d="M65,84 C80,88 105,86 115,78 C100,82 80,82 65,84 Z" fill="#ffffff" opacity="0.5"/>
                     
-                    <path d="M64,65 Q52,58 56,52 Q68,52 68,63 Z" fill="#7889a3"/>
-                    <path d="M61,61 Q56,56 59,54" stroke="#ffffff" stroke-width="0.8" fill="none" opacity="0.5"/>
+                    <path d="M72,70 Q60,63 64,56 Q76,56 76,68 Z" fill="#697c99" stroke="#475569" stroke-width="0.5"/>
+                    <path d="M69,65 Q64,60 67,58" stroke="#ffffff" stroke-width="0.8" fill="none" opacity="0.4"/>
                     
-                    <circle cx="78" cy="52" r="2.2" fill="#ffffff" opacity="0.45"/>
-                    <circle cx="85" cy="54" r="1.8" fill="#ffffff" opacity="0.45"/>
-                    <circle cx="74" cy="56" r="1.5" fill="#ffffff" opacity="0.45"/>
-                    <circle cx="92" cy="56" r="2" fill="#ffffff" opacity="0.35"/>
-                    <circle cx="82" cy="76" r="2.5" fill="#ffffff" opacity="0.4"/>
-                    <circle cx="89" cy="74" r="1.8" fill="#ffffff" opacity="0.4"/>
-                    <circle cx="75" cy="73" r="1.5" fill="#ffffff" opacity="0.3"/>
+                    <circle cx="88" cy="58" r="2.5" fill="#ffffff" opacity="0.5"/>
+                    <circle cx="96" cy="60" r="2" fill="#ffffff" opacity="0.5"/>
+                    <circle cx="83" cy="62" r="1.5" fill="#ffffff" opacity="0.5"/>
+                    <circle cx="104" cy="62" r="2" fill="#ffffff" opacity="0.4"/>
+                    <circle cx="92" cy="80" r="2.8" fill="#ffffff" opacity="0.45"/>
+                    <circle cx="100" cy="78" r="2" fill="#ffffff" opacity="0.45"/>
+                    <circle cx="84" cy="77" r="1.5" fill="#ffffff" opacity="0.35"/>
                     
-                    <circle cx="102" cy="57" r="5" fill="#334155"/>
-                    <circle cx="102" cy="57" r="4" fill="#0f172a"/>
-                    <circle cx="104" cy="55" r="1.5" fill="#ffffff"/>
-                    <circle cx="100.5" cy="58.5" r="0.6" fill="#ffffff" opacity="0.7"/>
+                    <circle cx="114" cy="61" r="5.5" fill="#334155"/>
+                    <circle cx="114" cy="61" r="4.2" fill="#0f172a"/>
+                    <circle cx="116" cy="59" r="1.5" fill="#ffffff"/>
+                    <circle cx="112" cy="63" r="0.6" fill="#ffffff" opacity="0.8"/>
                     
-                    <path d="M118,65 Q123,63 121,66 Q123,69 117,67 Z" fill="#64748b"/>
-                    <path d="M96,65 Q95,66 95,68" stroke="#475569" stroke-width="1.5" fill="none" opacity="0.5"/>
+                    <path d="M132,69 Q138,67 135,70 Q138,73 131,71 Z" fill="#55667d" stroke="#334155" stroke-width="0.5"/>
+                    <path d="M106,69 Q105,70 105,72" stroke="#334155" stroke-width="1" fill="none" opacity="0.4"/>
                 </g>
             </svg>` }
         ];
@@ -853,7 +845,7 @@
             if (fish.dom.classList.contains('size-large')) safetyBuffer = 10;
             else if (fish.dom.classList.contains('size-huge')) safetyBuffer = 12;
             else if (fish.dom.classList.contains('size-jelly')) safetyBuffer = 12;
-            else if (fish.dom.classList.contains('size-mola')) safetyBuffer = 20; /* 翻車魚上下鰭較長，給予足夠安全緩衝 */
+            else if (fish.dom.classList.contains('size-mola')) safetyBuffer = 24; /* 調整翻車魚隨機高度時的安全緩衝 */
             
             const maxSafeBottom = currentWaterHeight - safetyBuffer;
             const minSafeBottom = 2;
@@ -882,8 +874,8 @@
                         let baseSpeed = 10;
                         if (fish.sizeClass === 'size-large') baseSpeed = 14;
                         else if (fish.sizeClass === 'size-huge') baseSpeed = 17;
-                        else if (fish.sizeClass === 'size-jelly') baseSpeed = 15; /* 水母游速稍微優雅緩慢 */
-                        else if (fish.sizeClass === 'size-mola') baseSpeed = 22;
+                        else if (fish.sizeClass === 'size-jelly') baseSpeed = 15; 
+                        else if (fish.sizeClass === 'size-mola') baseSpeed = 24; /* 讓體型巨大的翻車魚慢速優雅移動 */
 
                         const randomSpeed = (Math.random() * 5 + baseSpeed).toFixed(1); 
                         const randomDelay = (Math.random() * 5).toFixed(1); 
@@ -912,7 +904,7 @@
                         if (f.dom.classList.contains('size-large')) safetyBuffer = 10;
                         else if (f.dom.classList.contains('size-huge')) safetyBuffer = 12;
                         else if (f.dom.classList.contains('size-jelly')) safetyBuffer = 12;
-                        else if (f.dom.classList.contains('size-mola')) safetyBuffer = 20;
+                        else if (f.dom.classList.contains('size-mola')) safetyBuffer = 24;
 
                         if (f.currentBottom === null || f.currentBottom > (currentWaterHeight - safetyBuffer)) {
                             assignRandomHeightToFish(f);
