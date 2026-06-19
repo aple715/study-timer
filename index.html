@@ -320,7 +320,7 @@
             pointer-events: none; 
             left: -200px; 
             will-change: left, transform, bottom;
-            transition: bottom 6.5s ease-in-out, width 0.9s ease, height 0.9s ease;
+            transition: bottom 4.2s ease-in-out, width 0.9s ease, height 0.9s ease;
         }
         
         .fish-container.size-large { width: 110px; height: 65px; }
@@ -619,7 +619,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.4.5</div>
+    <div class="version-tag">v1.4.6</div>
 
     <svg class="global-svg-defs">
         <defs>
@@ -791,22 +791,11 @@
                     <path d="M132,69 Q138,67 135,70 Q138,73 131,71 Z" fill="#55667d" stroke="#334155" stroke-width="0.5"/>
                     <path d="M106,69 Q105,70 105,72" stroke="#334155" stroke-width="1" fill="none" opacity="0.4"/>
                 </g>
-            </svg>`
-        };
-
-        // 📊 選單內部靜態圖鑑顯示專用的代碼 (連結 url(#jellyGradMenu) 與 url(#molaBodyGradMenu))
-        const FISH_DATABASE = [
-            { id: 'fish1', name: '紅紋金魚', target: 0, sizeClass: '', label: '初始擁有', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="22" fill="#ff4d4d"/><path d="M15,35 Q-5,15 0,35 Q-5,55 15,35" fill="#ff4d4d"/><path d="M45,20 Q30,5 40,5 Q50,5 50,20" fill="#ffa64d"/><path d="M45,50 Q35,65 45,65 Q55,65 52,50" fill="#ffa64d"/><circle cx="70" cy="28" r="4" fill="black"/><circle cx="72" cy="26" r="1.5" fill="white"/><path d="M55,35 Q40,32 35,42" stroke="#ffa64d" stroke-width="2" fill="none"/></g></svg>` },
-            { id: 'fish2', name: '條紋小丑魚', target: 60, sizeClass: '', label: '1 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="20" fill="#ff7300"/><path d="M15,35 Q-5,15 -2,35 Q-5,55 15,35" fill="#ff7300"/><path d="M30,16 Q33,35 30:54 L38,53 Q41,35 38,17 Z" fill="white"/><path d="M50,15 Q53,35 50,55 L58,54 Q61,35 58,16 Z" fill="white"/><circle cx="72" cy="28" r="4" fill="black"/><circle cx="74" cy="26" r="1.5" fill="white"/></g></svg>` },
-            { id: 'fish3', name: '霓虹藍倒吊', target: 300, sizeClass: '', label: '5 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="22" fill="#1a75ff"/><path d="M15,35 Q-5,10 -2,35 Q-5,60 15,35" fill="#ffff33"/><path d="M30,25 Q50,15 65,30 Q45,45 30,25" fill="#000066"/><path d="M40,50 Q30,60 42,60 Z" fill="#ffff33"/><circle cx="70" cy="26" r="4" fill="black"/><circle cx="72" cy="24" r="1.5" fill="white"/></g></svg>` },
-            { id: 'fish4', name: '螢光綠燈魚', target: 600, sizeClass: '', label: '10 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="32" ry="16" fill="#00cc66"/><path d="M18,35 Q0,20 3,35 Q0,50 18,35" fill="#ff3333"/><path d="M25,35 Q50,28 75,35" stroke="#33ffff" stroke-width="3" fill="none"/><circle cx="68" cy="30" r="3.5" fill="black"/><circle cx="69.5" cy="28.5" r="1.2" fill="white"/></g></svg>` },
-            { id: 'fish5', name: '赤鱗獅子魚', target: 1800, sizeClass: '', label: '30 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><path d="M35,18 L20,-2 L40,3 Z M48,15 L40,-5 L53,2 Z M58,16 L60,-5 L65,5 Z M35,52 L20,72 L40,67 Z M48,55 L40,75 L53,68 Z M58,54 L60,75 L65,65 Z" fill="#ff4d4d"/><ellipse cx="50" cy="35" rx="33" ry="20" fill="#cc0000"/><path d="M17,35 Q-5,15 0,35 Q-5,55 17,35" fill="#ff4d4d"/><path d="M30,22 Q50,28 65,22 M30,48 Q50,42 65,48" stroke="white" stroke-width="1.5" fill="none"/><circle cx="68" cy="28" r="4" fill="black"/><circle cx="70" cy="26" r="1.5" fill="white"/></g></svg>` },
-            { id: 'fish_puff', name: '刺蝟綠河豚', target: 3600, sizeClass: '', label: '1 小時', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><circle cx="50" cy="35" r="24" fill="#ccff33"/><path d="M26,35 Q10,23 15,35 Q10,47 26,35" fill="#99cc00"/><path d="M32,20 L27,15 M42,15 L39,8 M55,14 L55,6 M67,17 L72,11 M30,48 L25,53 M40,54 L37,61 M54,56 L55,64 M68,52 L73,57" stroke="#668000" stroke-width="2"/><circle cx="62" cy="27" r="4.5" fill="black"/><circle cx="64" cy="25" r="1.5" fill="white"/><path d="M50,43 Q56,47 62,42" stroke="#668000" stroke-width="2" fill="none"/></g></svg>` },
-            { id: 'fish_sail', name: '破浪大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 160 100"><g transform="translate(10,10)"><path d="M45,25 Q70,-10 95,15 C75,10 60,15 45,25 Z" fill="#002266"/><path d="M20,40 Q-5,25 0,40 Q-5,55 20,40" fill="#3399ff"/><ellipse cx="65" cy="40" rx="50" ry="22" fill="#0055ff"/><path d="M115,38 L145,36" stroke="#002266" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="32" r="4.5" fill="black"/><circle cx="102" cy="30" r="1.5" fill="white"/></g></svg>` },
-            { id: 'fish_dolphin', name: '蔚藍大海豚', target: 10800, sizeClass: 'size-dolphin', label: '3 小時', svg: `<svg viewBox="0 0 300 130" width="100%" height="100%" aria-label="瓶鼻海豚">
+            </svg>`,
+            fish_dolphin: `<svg viewBox="0 0 300 130" width="100%" height="100%" aria-label="瓶鼻海豚">
                 <g transform="translate(4,6)">
                     <defs>
-                        <linearGradient id="dolphinBodyGrad" x1="18%" y1="12%" x2="82%" y2="88%">
+                        <linearGradient id="dolphinBodyGradWater" x1="18%" y1="12%" x2="82%" y2="88%">
                             <stop offset="0%" stop-color="#8fd3ff"/>
                             <stop offset="45%" stop-color="#3f8fca"/>
                             <stop offset="100%" stop-color="#1d5f9f"/>
@@ -823,7 +812,58 @@
                              C211,24 236,43 250,59
                              C232,77 198,91 154,91
                              C112,91 86,80 73,64 Z"
-                          fill="url(#dolphinBodyGrad)"/>
+                          fill="url(#dolphinBodyGradWater)"/>
+                    <!-- 白色腹線 -->
+                    <path d="M83,72 C116,89 172,88 220,68 C197,94 124,104 82,76 Z" fill="#e9fbff" opacity="0.95"/>
+                    <path d="M91,58 C121,37 161,31 204,40 C159,42 120,51 88,69 C86,65 87,61 91,58 Z" fill="#a7ddff" opacity="0.45"/>
+
+                    <!-- 背鰭放在中央偏後，形狀改成海豚鰭 -->
+                    <path d="M151,28 C163,4 187,-2 204,12 C187,32 169,43 149,43 Z" fill="#1f609b"/>
+                    <!-- 胸鰭 -->
+                    <path d="M138,82 C144,104 129,119 105,124 C114,101 122,88 138,82 Z" fill="#1f609b"/>
+
+                    <!-- 長吻部 rostrum：海豚最重要辨識點 -->
+                    <path d="M238,55 C257,51 276,55 292,62 C273,66 256,67 240,62 Z" fill="#3f8fca"/>
+                    <path d="M240,63 C257,67 273,66 292,62 C275,73 257,74 240,68 Z" fill="#e9fbff" opacity="0.9"/>
+
+                    <circle cx="222" cy="48" r="4" fill="#102033"/>
+                    <circle cx="224" cy="46" r="1.4" fill="#ffffff"/>
+                    <path d="M231,65 Q247,73 269,65" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.95"/>
+                    <path d="M99,72 C132,83 179,80 219,63" stroke="#ffffff" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.72"/>
+                </g>
+            </svg>`
+        };
+
+        // 📊 選單內部靜態圖鑑顯示專用的代碼 (連結 url(#jellyGradMenu) 與 url(#molaBodyGradMenu))
+        const FISH_DATABASE = [
+            { id: 'fish1', name: '紅紋金魚', target: 0, sizeClass: '', label: '初始擁有', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="22" fill="#ff4d4d"/><path d="M15,35 Q-5,15 0,35 Q-5,55 15,35" fill="#ff4d4d"/><path d="M45,20 Q30,5 40,5 Q50,5 50,20" fill="#ffa64d"/><path d="M45,50 Q35,65 45,65 Q55,65 52,50" fill="#ffa64d"/><circle cx="70" cy="28" r="4" fill="black"/><circle cx="72" cy="26" r="1.5" fill="white"/><path d="M55,35 Q40,32 35,42" stroke="#ffa64d" stroke-width="2" fill="none"/></g></svg>` },
+            { id: 'fish2', name: '條紋小丑魚', target: 60, sizeClass: '', label: '1 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="20" fill="#ff7300"/><path d="M15,35 Q-5,15 -2,35 Q-5,55 15,35" fill="#ff7300"/><path d="M30,16 Q33,35 30:54 L38,53 Q41,35 38,17 Z" fill="white"/><path d="M50,15 Q53,35 50,55 L58,54 Q61,35 58,16 Z" fill="white"/><circle cx="72" cy="28" r="4" fill="black"/><circle cx="74" cy="26" r="1.5" fill="white"/></g></svg>` },
+            { id: 'fish3', name: '霓虹藍倒吊', target: 300, sizeClass: '', label: '5 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="22" fill="#1a75ff"/><path d="M15,35 Q-5,10 -2,35 Q-5,60 15,35" fill="#ffff33"/><path d="M30,25 Q50,15 65,30 Q45,45 30,25" fill="#000066"/><path d="M40,50 Q30,60 42,60 Z" fill="#ffff33"/><circle cx="70" cy="26" r="4" fill="black"/><circle cx="72" cy="24" r="1.5" fill="white"/></g></svg>` },
+            { id: 'fish4', name: '螢光綠燈魚', target: 600, sizeClass: '', label: '10 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="32" ry="16" fill="#00cc66"/><path d="M18,35 Q0,20 3,35 Q0,50 18,35" fill="#ff3333"/><path d="M25,35 Q50,28 75,35" stroke="#33ffff" stroke-width="3" fill="none"/><circle cx="68" cy="30" r="3.5" fill="black"/><circle cx="69.5" cy="28.5" r="1.2" fill="white"/></g></svg>` },
+            { id: 'fish5', name: '赤鱗獅子魚', target: 1800, sizeClass: '', label: '30 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><path d="M35,18 L20,-2 L40,3 Z M48,15 L40,-5 L53,2 Z M58,16 L60,-5 L65,5 Z M35,52 L20,72 L40,67 Z M48,55 L40,75 L53,68 Z M58,54 L60,75 L65,65 Z" fill="#ff4d4d"/><ellipse cx="50" cy="35" rx="33" ry="20" fill="#cc0000"/><path d="M17,35 Q-5,15 0,35 Q-5,55 17,35" fill="#ff4d4d"/><path d="M30,22 Q50,28 65,22 M30,48 Q50,42 65,48" stroke="white" stroke-width="1.5" fill="none"/><circle cx="68" cy="28" r="4" fill="black"/><circle cx="70" cy="26" r="1.5" fill="white"/></g></svg>` },
+            { id: 'fish_puff', name: '刺蝟綠河豚', target: 3600, sizeClass: '', label: '1 小時', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><circle cx="50" cy="35" r="24" fill="#ccff33"/><path d="M26,35 Q10,23 15,35 Q10,47 26,35" fill="#99cc00"/><path d="M32,20 L27,15 M42,15 L39,8 M55,14 L55,6 M67,17 L72,11 M30,48 L25,53 M40,54 L37,61 M54,56 L55,64 M68,52 L73,57" stroke="#668000" stroke-width="2"/><circle cx="62" cy="27" r="4.5" fill="black"/><circle cx="64" cy="25" r="1.5" fill="white"/><path d="M50,43 Q56,47 62,42" stroke="#668000" stroke-width="2" fill="none"/></g></svg>` },
+            { id: 'fish_sail', name: '破浪大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 160 100"><g transform="translate(10,10)"><path d="M45,25 Q70,-10 95,15 C75,10 60,15 45,25 Z" fill="#002266"/><path d="M20,40 Q-5,25 0,40 Q-5,55 20,40" fill="#3399ff"/><ellipse cx="65" cy="40" rx="50" ry="22" fill="#0055ff"/><path d="M115,38 L145,36" stroke="#002266" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="32" r="4.5" fill="black"/><circle cx="102" cy="30" r="1.5" fill="white"/></g></svg>` },
+            { id: 'fish_dolphin', name: '蔚藍大海豚', target: 10800, sizeClass: 'size-dolphin', label: '3 小時', svg: `<svg viewBox="0 0 300 130" width="100%" height="100%" aria-label="瓶鼻海豚">
+                <g transform="translate(4,6)">
+                    <defs>
+                        <linearGradient id="dolphinBodyGradMenu" x1="18%" y1="12%" x2="82%" y2="88%">
+                            <stop offset="0%" stop-color="#8fd3ff"/>
+                            <stop offset="45%" stop-color="#3f8fca"/>
+                            <stop offset="100%" stop-color="#1d5f9f"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- 水平尾鰭：用上下兩片月牙，避免看起來像魚尾 -->
+                    <path d="M32,59 C14,45 5,31 0,16 C22,23 41,36 55,51 Z" fill="#2568a7"/>
+                    <path d="M32,64 C13,80 5,96 0,114 C23,107 42,91 56,72 Z" fill="#1e5e98"/>
+                    <path d="M48,58 C62,55 76,55 91,59 L88,72 C73,73 61,72 48,68 Z" fill="#2c74b8"/>
+
+                    <!-- 海豚流線身體 -->
+                    <path d="M73,64
+                             C88,35 128,20 174,22
+                             C211,24 236,43 250,59
+                             C232,77 198,91 154,91
+                             C112,91 86,80 73,64 Z"
+                          fill="url(#dolphinBodyGradMenu)"/>
                     <!-- 白色腹線 -->
                     <path d="M83,72 C116,89 172,88 220,68 C197,94 124,104 82,76 Z" fill="#e9fbff" opacity="0.95"/>
                     <path d="M91,58 C121,37 161,31 204,40 C159,42 120,51 88,69 C86,65 87,61 91,58 Z" fill="#a7ddff" opacity="0.45"/>
@@ -1169,6 +1209,7 @@
             if (fish.id === 'fish_mola' && allowSurface && Math.random() < 0.35) {
                 return max;
             }
+            // 使用均勻分布，避免同魚種長時間集中在固定高度或底部。
             return min + Math.random() * span;
         }
 
@@ -1182,11 +1223,11 @@
             }
 
             const current = typeof fish.currentBottom === 'number' ? fish.currentBottom : getRandomBottomForFish(fish);
-            const minJump = Math.min(span * 0.28, 14);
+            const minJump = Math.min(span * 0.45, 22);
             let target = min + Math.random() * span;
 
-            // 避免只微小變化，看起來仍像固定高度；但也透過 CSS transition 慢慢移動，不瞬移。
-            for (let i = 0; i < 5 && Math.abs(target - current) < minJump; i++) {
+            // 讓每次換深度有足夠位移，但仍透過 CSS transition 慢慢移動，不瞬移。
+            for (let i = 0; i < 8 && Math.abs(target - current) < minJump; i++) {
                 target = min + Math.random() * span;
             }
             return target;
@@ -1194,7 +1235,8 @@
 
         function scheduleNextDepthChange(fish, initial = false) {
             const now = performance.now();
-            fish.nextDepthChangeAt = now + (initial ? 4000 : 6500) + Math.random() * 6500;
+            // 更頻繁且每隻魚不同步地換深度，避免旗魚、海豚等大型魚永遠沿同一條線巡航。
+            fish.nextDepthChangeAt = now + (initial ? 1800 : 3000) + Math.random() * 4200;
         }
 
         function assignRandomHeightToFish(fish, force = false) {
@@ -1266,6 +1308,8 @@
                             fishContainer.innerHTML = WATER_FISH_SVGS.fish_jelly;
                         } else if (fish.id === 'fish_mola') {
                             fishContainer.innerHTML = WATER_FISH_SVGS.fish_mola;
+                        } else if (fish.id === 'fish_dolphin') {
+                            fishContainer.innerHTML = WATER_FISH_SVGS.fish_dolphin;
                         } else {
                             fishContainer.innerHTML = fish.svg;
                         }
@@ -1293,7 +1337,13 @@
                             nextDepthChangeAt: 0 
                         };
                         
-                        // 不在每次游完後重新抽高度，避免魚群上下跳動；只在生成或水位安全區不足時調整。
+                        // 每次重新進場時換一個目標深度，但用 transition 漂過去，避免瞬移跳動。
+                        fishContainer.addEventListener('animationiteration', () => {
+                            if (!hasStartedCounting || !fishData) return;
+                            fishData.currentBottom = getNextBottomForFish(fishData);
+                            fishContainer.style.bottom = `${fishData.currentBottom}%`;
+                            scheduleNextDepthChange(fishData, false);
+                        });
                         fishTankContent.appendChild(fishContainer);
                         instantiatedFishList.push(fishData);
                     }
