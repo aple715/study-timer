@@ -206,7 +206,7 @@
             overflow: visible;
         }
 
-        /* 動態水面與海浪背景設定 */
+        /* 🌊 動態水面與海浪背景：移除 CSS transition，改由 JS 微秒級高頻刷新達到完美絲滑上升 */
         .water-bg {
             position: absolute;
             bottom: 0;
@@ -215,8 +215,8 @@
             height: 5%; 
             background: linear-gradient(180deg, #1fa2ff 0%, #12d6df 50%, #006699 100%);
             opacity: 0.85;
-            transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 2;
+            will-change: height;
         }
 
         .waves-container {
@@ -424,7 +424,7 @@
         .btn-reset { background-color: #e74c3c; color: white; }
         button:disabled { background-color: #bdc3c7; cursor: not-allowed; color: #7f8c8d; }
 
-        /* 極簡縮小狀態下的樣式 - 優化行動端拖曳流暢度 */
+        /* 極簡縮小狀態下的樣式 */
         .container.minimized-mode {
             position: fixed !important;
             top: 50% !important;
@@ -440,7 +440,7 @@
             background: #ffffff !important; 
             backdrop-filter: none !important; 
             -webkit-backdrop-filter: none !important;
-            touch-action: none; /* 防止手機拖曳時畫面一起滾動 */
+            touch-action: none; /* 阻止手機原生滾動，提升流暢度 */
         }
         
         .container.minimized-mode h1,
@@ -490,7 +490,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.3.1</div>
+    <div class="version-tag">v1.3.2</div>
 
     <button class="stats-toggle-btn" id="stats-toggle-btn" onclick="toggleStatsCard()">📊 統計與圖鑑</button>
 
@@ -558,6 +558,9 @@
     </div>
 
     <script>
+        // 全域 AudioContext 宣告，用於 iOS/Chrome 預先啟動
+        let audioCtx = null;
+
         // 🐟 原始魚群資料庫
         const FISH_DATABASE = [
             { id: 'fish1', name: '紅紋金魚', target: 0, sizeClass: '', label: '初始擁有', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="35" ry="22" fill="#ff4d4d"/><path d="M15,35 Q-5,15 0,35 Q-5,55 15,35" fill="#ff4d4d"/><path d="M45,20 Q30,5 40,5 Q50,5 50,20" fill="#ffa64d"/><path d="M45,50 Q35,65 45,65 Q55,65 52,50" fill="#ffa64d"/><circle cx="70" cy="28" r="4" fill="black"/><circle cx="72" cy="26" r="1.5" fill="white"/><path d="M55,35 Q40,32 35,42" stroke="#ffa64d" stroke-width="2" fill="none"/></g></svg>` },
@@ -572,25 +575,24 @@
             { id: 'fish_mola', name: '巨型翻車魚', target: 18000, sizeClass: 'size-mola', label: '5 小時', svg: `<svg viewBox="0 0 160 140"><g transform="translate(10,10)"><path d="M55,40 Q40,-5 65,15 Z M55,70 Q40,115 65,95 Z" fill="#999999"/><ellipse cx="55" cy="55" rx="35" ry="40" fill="#b3b3b3"/><ellipse cx="25" cy="55" rx="10" ry="12" fill="#999999"/><circle cx="72" cy="40" r="4.5" fill="black"/><circle cx="74" cy="38" r="1.5" fill="white"/></g></svg>` }
         ];
 
-        // 全域變數
         let totalSeconds = 0;
         let remainingSeconds = 0;
         let accumulatedSeconds = parseInt(localStorage.getItem('accumulatedSeconds')) || 0; 
         
         let timerTimeout = null;
-        let expectedTime = 0;
-        let alarmLoopInterval = null; 
         let isPaused = true;
         let hasStartedCounting = false; 
         let instantiatedFishList = [];
 
-        // 拖曳狀態變數
+        // 🌊 核心時間戳記變數：用於毫秒級無縫線性水面計算
+        let animationFrameId = null;
+        let startTimeStamp = 0;       // 本次計時段的開始時間 (ms)
+        let totalDurationMs = 0;     // 總共需倒數的毫秒數
+        let msElapsedBeforePause = 0; // 暫停前已經渡過的總毫秒數
+
         let dragX = 0, dragY = 0;
         let isDragging = false;
         let startX = 0, startY = 0;
-
-        // 全域音訊上下文 (防禦性預解鎖機制)
-        let audioCtx = null;
 
         const defaultTitle = "深呼吸！海洋專注計時器";
         const hoursInput = document.getElementById('hours-input');
@@ -611,23 +613,6 @@
         const statsToggleBtn = document.getElementById('stats-toggle-btn');
         const startBtn = document.getElementById('start-btn');
         const pauseBtn = document.getElementById('pause-btn');
-
-        // 初始化音訊與事件監聽
-        function initAudioContext() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                // 播放一個極短的靜音來騙過瀏覽器的安全機制
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.01);
-            } else if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }
 
         function formatTime(totalSecs) {
             const hrs = Math.floor(totalSecs / 3600);
@@ -668,7 +653,6 @@
             }
         }
 
-        // --- 📥 拖曳邊界防禦與限制機制 ---
         mainContainer.addEventListener('mousedown', startDrag);
         mainContainer.addEventListener('touchstart', startDrag, { passive: false });
 
@@ -698,17 +682,21 @@
             const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
             const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
 
-            let tentativeX = clientX - startX;
-            let tentativeY = clientY - startY;
+            dragX = clientX - startX;
+            dragY = clientY - startY;
 
-            // 邊界防禦：限制小卡片絕對不會飛出可視螢幕之外
-            const halfWidth = 90;  // 縮小模式寬度 180px 的一半
-            const halfHeight = 35; // 縮小模式估計高度 70px 的一半
-            const screenW = window.innerWidth / 2;
-            const screenH = window.innerHeight / 2;
+            const cardWidth = mainContainer.offsetWidth;
+            const cardHeight = mainContainer.offsetHeight;
+            const halfW = cardWidth / 2;
+            const halfH = cardHeight / 2;
 
-            dragX = Math.max(-screenW + halfWidth, Math.min(screenW - halfWidth, tentativeX));
-            dragY = Math.max(-screenH + halfHeight, Math.min(screenH - halfHeight, tentativeY));
+            const minX = -window.innerWidth / 2 + halfW;
+            const maxX = window.innerWidth / 2 - halfW;
+            const minY = -window.innerHeight / 2 + halfH;
+            const maxY = window.innerHeight / 2 - halfH;
+
+            dragX = Math.max(minX, Math.min(maxX, dragX));
+            dragY = Math.max(minY, Math.min(maxY, dragY));
 
             if (mainContainer.classList.contains('minimized-mode')) {
                 mainContainer.style.transform = `translate(calc(-50% + ${dragX}px), calc(-50% + ${dragY}px))`;
@@ -750,15 +738,43 @@
             });
         }
 
-        function getCurrentWaterPercentage() {
-            if (totalSeconds > 0 && hasStartedCounting) {
-                return 5 + (((totalSeconds - remainingSeconds) / totalSeconds) * 95);
+        // 🌊 核心改動：微秒級高頻率水面絕對線性渲染迴圈
+        function linearWaterRenderLoop(timestamp) {
+            if (hasStartedCounting && totalDurationMs > 0) {
+                let currentElapsed = msElapsedBeforePause;
+                
+                if (!isPaused) {
+                    currentElapsed += (performance.now() - startTimeStamp);
+                }
+                
+                // 確保數值不超過總長度
+                if (currentElapsed > totalDurationMs) currentElapsed = totalDurationMs;
+
+                // 根據毫秒比例，精準換算高度百分比（基礎 5% 到最高 100% 之間毫無間斷地增加）
+                const ratio = currentElapsed / totalDurationMs;
+                const preciseHeight = 5 + (ratio * 95);
+                
+                waterBg.style.height = `${preciseHeight}%`;
+
+                // 只要計時未被徹底重置，就持續每影格刷新渲染
+                animationFrameId = requestAnimationFrame(linearWaterRenderLoop);
+            }
+        }
+
+        function getCurrentWaterPercentagePrecise() {
+            if (hasStartedCounting && totalDurationMs > 0) {
+                let currentElapsed = msElapsedBeforePause;
+                if (!isPaused) {
+                    currentElapsed += (performance.now() - startTimeStamp);
+                }
+                if (currentElapsed > totalDurationMs) currentElapsed = totalDurationMs;
+                return 5 + ((currentElapsed / totalDurationMs) * 95);
             }
             return 5;
         }
 
         function assignRandomHeightToFish(fish) {
-            const currentWaterHeight = getCurrentWaterPercentage();
+            const currentWaterHeight = getCurrentWaterPercentagePrecise();
             let safetyBuffer = 6;
             if (fish.dom.classList.contains('size-large')) safetyBuffer = 10;
             else if (fish.dom.classList.contains('size-huge')) safetyBuffer = 12;
@@ -775,7 +791,7 @@
             let unlockedCount = FISH_DATABASE.filter(f => accumulatedSeconds >= f.target).length;
             fishCountDisplay.innerText = `🐠 已解鎖魚種：${unlockedCount} / ${FISH_DATABASE.length}`;
             updateFishGuideUI();
-            const currentWaterHeight = getCurrentWaterPercentage();
+            const currentWaterHeight = getCurrentWaterPercentagePrecise();
 
             FISH_DATABASE.forEach((fish) => {
                 const isUnlocked = accumulatedSeconds >= fish.target;
@@ -850,7 +866,25 @@
             timeLeftDisplay.innerText = formattedRemaining;
             accumulatedDisplay.innerText = `⏱️ 累積專注：${formatTime(accumulatedSeconds)}`;
             document.title = (!isPaused && remainingSeconds > 0) ? `(${formattedRemaining}) 讀書中...` : defaultTitle;
-            waterBg.style.height = `${getCurrentWaterPercentage()}%`;
+        }
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            // 播放一個 0.01 秒的超短靜音，破解 iOS/Chrome 的自動播放音訊封鎖
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(0);
+                osc.stop(0.01);
+            } catch(e){}
         }
 
         function getInputsInSeconds() {
@@ -862,14 +896,14 @@
         function syncPreview() { 
             if (isPaused && timerTimeout === null) {
                 timeLeftDisplay.innerText = formatTime(getInputsInSeconds()); 
+                waterBg.style.height = `${getCurrentWaterPercentagePrecise()}%`;
             }
         }
 
         function startTimer() {
-            // 在使用者點擊交互的第一時間，解鎖並啟用音訊上下文
-            initAudioContext();
-
             if (isPaused) {
+                initAudioContext(); // 預啟動音訊
+
                 if (timerTimeout === null && remainingSeconds === 0) {
                     totalSeconds = getInputsInSeconds(); 
                     remainingSeconds = totalSeconds;
@@ -877,7 +911,11 @@
                         alert('請設定大於 0 秒的時間喔！'); 
                         return; 
                     }
+                    // 初始化毫秒總時長與控制計數
+                    totalDurationMs = totalSeconds * 1000;
+                    msElapsedBeforePause = 0;
                 }
+                
                 isPaused = false; 
                 hasStartedCounting = true;
                 startBtn.disabled = true; 
@@ -890,41 +928,42 @@
                 updateUI(); 
                 checkAndRefreshFishTank();
 
-                expectedTime = performance.now() + 1000;
+                // 紀錄本次播放段落的起始物理時間戳記
+                startTimeStamp = performance.now();
+
+                // 每秒倒數計時用
                 timerTimeout = setTimeout(step, 1000);
+                
+                // 啟動高頻微秒線性渲染
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = requestAnimationFrame(linearWaterRenderLoop);
             }
         }
 
         function step() {
             if (isPaused) return;
 
-            let drift = performance.now() - expectedTime;
-            if (drift > 1000) {
-                let passedSecs = Math.floor(drift / 1000);
-                remainingSeconds = Math.max(0, remainingSeconds - passedSecs);
-                accumulatedSeconds += passedSecs;
-                expectedTime += passedSecs * 1000;
-            } else {
-                if (remainingSeconds > 0) {
-                    remainingSeconds--; 
-                    accumulatedSeconds++;
-                }
-                expectedTime += 1000;
+            if (remainingSeconds > 0) {
+                remainingSeconds--; 
+                accumulatedSeconds++;
+                localStorage.setItem('accumulatedSeconds', accumulatedSeconds); 
+                updateUI(); 
+                checkAndRefreshFishTank(); 
             }
-
-            localStorage.setItem('accumulatedSeconds', accumulatedSeconds); 
-            updateUI(); 
-            checkAndRefreshFishTank(); 
 
             if (remainingSeconds <= 0) {
                 timerTimeout = null; 
                 isPaused = true;
                 startBtn.disabled = false;
                 pauseBtn.disabled = true;
+                
+                // 時間到，強制填滿並觸發鬧鐘
+                msElapsedBeforePause = totalDurationMs;
+                waterBg.style.height = "100%";
+                
                 triggerAlarm(); 
             } else {
-                let nextDelay = Math.max(0, 1000 - drift);
-                timerTimeout = setTimeout(step, nextDelay);
+                timerTimeout = setTimeout(step, 1000);
             }
         }
 
@@ -932,6 +971,10 @@
             isPaused = true; 
             clearTimeout(timerTimeout); 
             timerTimeout = null;
+            
+            // 累加並保存暫停前度過的毫秒數
+            msElapsedBeforePause += (performance.now() - startTimeStamp);
+            
             startBtn.disabled = false; 
             pauseBtn.disabled = true; 
             startBtn.innerText = '繼續'; 
@@ -947,10 +990,16 @@
 
             clearTimeout(timerTimeout); 
             timerTimeout = null;
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+
             isPaused = true; 
             hasStartedCounting = false; 
             totalSeconds = 0; 
             remainingSeconds = 0;
+            totalDurationMs = 0;
+            msElapsedBeforePause = 0;
+            startTimeStamp = 0;
             
             ['hours-input', 'minutes-input', 'seconds-input'].forEach(id => {
                 document.getElementById(id).disabled = false;
@@ -963,6 +1012,7 @@
             clearAllFishDOM();
             updateUI(); 
             checkAndRefreshFishTank(); 
+            waterBg.style.height = "5%"; // 恢復預設高度
             syncPreview();
         }
 
@@ -990,22 +1040,20 @@
             resetTimer(); 
         }
 
-        // --- 🎵 音訊產生器模組 ---
         function playAlarmSound(soundType) {
             try {
-                initAudioContext();
-                const ctx = audioCtx;
-                const now = ctx.currentTime;
+                if (!audioCtx) initAudioContext();
+                const now = audioCtx.currentTime;
                 
                 const beep = (freq, start, dur, type='sine', g=0.2) => {
-                    const o = ctx.createOscillator(); 
-                    const gain = ctx.createGain(); 
+                    const o = audioCtx.createOscillator(); 
+                    const gain = audioCtx.createGain(); 
                     o.type = type; 
                     o.frequency.setValueAtTime(freq, start);
                     gain.gain.setValueAtTime(g, start); 
                     gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
                     o.connect(gain); 
-                    gain.connect(ctx.destination); 
+                    gain.connect(audioCtx.destination); 
                     o.start(start); 
                     o.stop(start + dur);
                 };
@@ -1014,11 +1062,11 @@
                     case 'classic': beep(880, now, 0.15); beep(880, now + 0.2, 0.15); break;
                     case 'urgent': for(let i=0; i<4; i++) { beep(1200, now + i*0.12, 0.06, 'square', 0.15); } break;
                     case 'chime': [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => { beep(f, now + i*0.08, 1.5, 'sine', 0.15); }); break;
-                    case 'scifi': for(let i=0; i<3; i++) { const t = now + i*0.3; const o = ctx.createOscillator(); const gain = ctx.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(400, t); o.frequency.exponentialRampToValueAtTime(1500, t+0.2); gain.gain.setValueAtTime(0.2, t); gain.gain.exponentialRampToValueAtTime(0.001, t+0.2); o.connect(gain); gain.connect(ctx.destination); o.start(t); o.stop(t+0.2); } break;
+                    case 'scifi': for(let i=0; i<3; i++) { const t = now + i*0.3; const o = audioCtx.createOscillator(); const gain = audioCtx.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(400, t); o.frequency.exponentialRampToValueAtTime(1500, t+0.2); gain.gain.setValueAtTime(0.2, t); gain.gain.exponentialRampToValueAtTime(0.001, t+0.2); o.connect(gain); gain.connect(audioCtx.destination); o.start(t); o.stop(t+0.2); } break;
                     case 'zen': beep(160, now, 2.2, 'sine', 0.3); break;
                     case 'retro': beep(300, now, 0.05, 'square'); beep(450, now + 0.05, 0.05, 'square'); break;
                     case 'morse': const p = (t, d) => beep(900, now + t, d, 'sine', 0.2); p(0, 0.06); p(0.12, 0.06); p(0.24, 0.06); p(0.42, 0.18); break;
-                    case 'sonar': const sO = ctx.createOscillator(); const sG = ctx.createGain(); sO.type = 'sine'; sO.frequency.setValueAtTime(1400, now); sO.frequency.exponentialRampToValueAtTime(700, now + 0.6); sG.gain.setValueAtTime(0.2, now); sG.gain.exponentialRampToValueAtTime(0.001, now + 1.2); sO.connect(sG); sG.connect(ctx.destination); sO.start(now); sO.stop(now + 1.2); break;
+                    case 'sonar': const sO = audioCtx.createOscillator(); const sG = audioCtx.createGain(); sO.type = 'sine'; sO.frequency.setValueAtTime(1400, now); sO.frequency.exponentialRampToValueAtTime(700, now + 0.6); sG.gain.setValueAtTime(0.2, now); sG.gain.exponentialRampToValueAtTime(0.001, now + 1.2); sO.connect(sG); sG.connect(audioCtx.destination); sO.start(now); sO.stop(now + 1.2); break;
                     case 'digital': beep(2800, now, 0.05, 'sine', 0.2); beep(2800, now + 0.08, 0.05, 'sine', 0.2); break;
                 }
             } catch (e) { console.error(e); }
@@ -1028,8 +1076,9 @@
             el.addEventListener('input', syncPreview);
         });
         
-        updateUI(); 
+        // 首次載入初始化
         checkAndRefreshFishTank();
+        updateUI();
     </script>
 </body>
 </html>
