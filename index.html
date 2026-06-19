@@ -320,11 +320,12 @@
             pointer-events: none; 
             left: -200px; 
             will-change: left, transform, bottom;
-            transition: bottom 4.8s ease-in-out;
+            transition: bottom 8.5s ease-in-out, width 0.9s ease, height 0.9s ease;
         }
         
         .fish-container.size-large { width: 110px; height: 65px; }
         .fish-container.size-huge { width: 140px; height: 85px; }
+        .fish-container.size-dolphin { width: 175px; height: 90px; }
         .fish-container.size-jelly { width: 85px; height: 85px; } 
         .fish-container.size-mola { width: 160px; height: 160px; transition: width 0.8s ease, height 0.8s ease, bottom 5s ease-in-out; }
         .fish-container.size-mola.mola-mid { width: 135px; height: 135px; }
@@ -618,7 +619,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.4.3</div>
+    <div class="version-tag">v1.4.4</div>
 
     <svg class="global-svg-defs">
         <defs>
@@ -685,11 +686,13 @@
             <span class="seaweed" style="left: 13%; --h: 140px; --d: 5.8s; --delay: -1.2s;"></span>
             <span class="seaweed" style="left: 25%; --h: 105px; --d: 4.9s; --delay: -2.1s;"></span>
             <span class="seaweed" style="left: 39%; --h: 155px; --d: 6.2s; --delay: -0.8s;"></span>
+            <span class="seaweed" style="left: 52%; --h: 86px; --d: 4.2s; --delay: -3.1s; opacity:0.5;"></span>
             <span class="seaweed" style="left: 58%; --h: 120px; --d: 5.2s; --delay: -1.7s;"></span>
             <span class="seaweed" style="left: 73%; --h: 165px; --d: 6.5s; --delay: -2.5s;"></span>
+            <span class="seaweed" style="left: 81%; --h: 96px; --d: 4.4s; --delay: -0.9s; opacity:0.55;"></span>
             <span class="seaweed" style="left: 88%; --h: 110px; --d: 4.8s; --delay: -1.1s;"></span>
         </div>
-        <div id="fish-tank-content" style="position: absolute; width:100%; height:100%; top:0; left:0; z-index:2; overflow:hidden;"></div>
+        <div id="fish-tank-content" style="position: absolute; width:100%; height:100%; top:0; left:0; z-index:2; overflow:visible;"></div>
     </div>
 
     <div class="container" id="main-container">
@@ -800,7 +803,24 @@
             { id: 'fish5', name: '赤鱗獅子魚', target: 1800, sizeClass: '', label: '30 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><path d="M35,18 L20,-2 L40,3 Z M48,15 L40,-5 L53,2 Z M58,16 L60,-5 L65,5 Z M35,52 L20,72 L40,67 Z M48,55 L40,75 L53,68 Z M58,54 L60,75 L65,65 Z" fill="#ff4d4d"/><ellipse cx="50" cy="35" rx="33" ry="20" fill="#cc0000"/><path d="M17,35 Q-5,15 0,35 Q-5,55 17,35" fill="#ff4d4d"/><path d="M30,22 Q50,28 65,22 M30,48 Q50,42 65,48" stroke="white" stroke-width="1.5" fill="none"/><circle cx="68" cy="28" r="4" fill="black"/><circle cx="70" cy="26" r="1.5" fill="white"/></g></svg>` },
             { id: 'fish_puff', name: '刺蝟綠河豚', target: 3600, sizeClass: '', label: '1 小時', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><circle cx="50" cy="35" r="24" fill="#ccff33"/><path d="M26,35 Q10,23 15,35 Q10,47 26,35" fill="#99cc00"/><path d="M32,20 L27,15 M42,15 L39,8 M55,14 L55,6 M67,17 L72,11 M30,48 L25,53 M40,54 L37,61 M54,56 L55,64 M68,52 L73,57" stroke="#668000" stroke-width="2"/><circle cx="62" cy="27" r="4.5" fill="black"/><circle cx="64" cy="25" r="1.5" fill="white"/><path d="M50,43 Q56,47 62,42" stroke="#668000" stroke-width="2" fill="none"/></g></svg>` },
             { id: 'fish_sail', name: '破浪大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 160 100"><g transform="translate(10,10)"><path d="M45,25 Q70,-10 95,15 C75,10 60,15 45,25 Z" fill="#002266"/><path d="M20,40 Q-5,25 0,40 Q-5,55 20,40" fill="#3399ff"/><ellipse cx="65" cy="40" rx="50" ry="22" fill="#0055ff"/><path d="M115,38 L145,36" stroke="#002266" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="32" r="4.5" fill="black"/><circle cx="102" cy="30" r="1.5" fill="white"/></g></svg>` },
-            { id: 'fish_dolphin', name: '蔚藍大海豚', target: 10800, sizeClass: 'size-huge', label: '3 小時', svg: `<svg viewBox="0 0 260 130" width="100%" height="100%"><g transform="translate(8,10)"><path d="M40,67 C64,28 131,16 177,34 C190,39 202,47 217,52 C203,55 190,56 176,53 C151,78 92,92 47,75 C37,72 27,70 16,69 C25,67 33,67 40,67 Z" fill="#4b9ed8"/><path d="M50,72 C85,85 138,79 176,53 C148,85 91,95 47,75 Z" fill="#d9f7ff" opacity="0.95"/><path d="M62,55 C95,28 139,25 176,35 C132,33 93,43 58,64 C57,60 59,57 62,55 Z" fill="#85d8ff" opacity="0.68"/><path d="M116,32 C130,4 154,-2 173,9 C158,31 142,43 121,47 Z" fill="#1f6fb8"/><path d="M105,80 C113,102 99,116 73,124 C82,101 91,88 105,80 Z" fill="#1f6fb8"/><path d="M40,67 C27,79 18,93 13,110 C34,103 53,89 66,73 Z" fill="#2b7fc5"/><path d="M40,67 C29,56 20,44 12,27 C32,35 51,45 67,55 Z" fill="#52aeee"/><path d="M176,43 C190,43 206,47 238,52 C208,59 190,59 176,54 C182,51 182,46 176,43 Z" fill="#4b9ed8"/><path d="M229,52 C239,44 249,39 256,34 C253,45 251,50 247,53 C251,58 253,64 256,76 C247,70 238,63 229,55 Z" fill="#1f6fb8"/><path d="M176,43 C185,41 191,42 198,45" stroke="#1a5f9e" stroke-width="2" fill="none" opacity="0.35" stroke-linecap="round"/><circle cx="166" cy="41" r="4.8" fill="#0f172a"/><circle cx="168" cy="39" r="1.6" fill="#ffffff"/><path d="M181,54 Q193,59 207,54" stroke="#075985" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M78,70 C109,83 145,78 174,57" stroke="#ffffff" stroke-width="4.2" fill="none" opacity="0.9" stroke-linecap="round"/><path d="M171,34 Q176,30 181,33" stroke="#075985" stroke-width="1.5" fill="none" opacity="0.35" stroke-linecap="round"/></g></svg>` },
+            { id: 'fish_dolphin', name: '蔚藍大海豚', target: 10800, sizeClass: 'size-dolphin', label: '3 小時', svg: `<svg viewBox="0 0 260 120" width="100%" height="100%" aria-label="海豚">
+                <g transform="translate(6,6)">
+                    <path d="M48,62 C73,29 130,19 171,31 C194,38 207,52 226,57 C205,63 190,62 173,55 C143,83 87,88 50,72 C38,67 27,66 13,68 C25,61 36,60 48,62 Z" fill="#3f86c5"/>
+                    <path d="M60,70 C93,82 139,77 173,55 C145,89 89,92 50,72 C54,72 57,71 60,70 Z" fill="#e8fbff" opacity="0.96"/>
+                    <path d="M66,55 C98,31 136,27 171,32 C130,34 95,43 60,64 C60,60 62,57 66,55 Z" fill="#7fc8f2" opacity="0.72"/>
+                    <path d="M118,32 C132,8 156,2 176,12 C159,34 141,44 120,46 Z" fill="#2368a8"/>
+                    <path d="M104,79 C111,99 95,111 72,116 C80,96 90,84 104,79 Z" fill="#2368a8"/>
+                    <path d="M49,62 C39,52 30,39 19,20 C41,29 58,43 70,55 Z" fill="#3f86c5"/>
+                    <path d="M49,63 C36,75 27,88 20,105 C42,99 58,85 69,72 Z" fill="#2f76b8"/>
+                    <path d="M171,42 C190,40 207,47 229,56 C206,63 190,64 172,55 C180,51 180,45 171,42 Z" fill="#3f86c5"/>
+                    <path d="M226,56 C239,44 250,39 258,34 C254,48 248,55 239,58 C248,62 254,70 258,84 C247,78 237,69 226,59 Z" fill="#2368a8"/>
+                    <circle cx="164" cy="41" r="4.2" fill="#102033"/>
+                    <circle cx="166" cy="39" r="1.5" fill="#ffffff"/>
+                    <path d="M177,55 Q194,62 211,56" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.95"/>
+                    <path d="M80,69 C109,78 142,73 169,56" stroke="#ffffff" stroke-width="3.8" fill="none" stroke-linecap="round" opacity="0.85"/>
+                    <path d="M171,34 Q178,30 185,34" stroke="#0f4f85" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.45"/>
+                </g>
+            </svg>` },
             
             { id: 'fish_jelly', name: '發光小水母', target: 14400, sizeClass: 'size-jelly', label: '4 小時', svg: `<svg viewBox="0 0 120 120">
                 <g transform="translate(10, 10)">
@@ -851,7 +871,7 @@
             </svg>` }
         ];
 
-        const INITIAL_WATER_PERCENT = 14;
+        const INITIAL_WATER_PERCENT = 16;
 
         const FISH_SPEED_MULTIPLIERS = {
             fish_sail: 0.5 // 旗魚動畫時間減半 = 速度 2 倍
@@ -1060,50 +1080,79 @@
             return INITIAL_WATER_PERCENT;
         }
 
-        function getFishSafetyConfig(fish) {
-            const isMola = fish.id === 'fish_mola' || fish.dom.classList.contains('size-mola');
-            const waterHeight = getCurrentWaterPercentagePrecise();
+        function clampNumber(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
 
-            if (isMola) {
-                const isSurface = waterHeight < 22;
-                const isMid = waterHeight >= 22 && waterHeight < 42;
-                fish.dom.classList.toggle('mola-surface', isSurface);
-                fish.dom.classList.toggle('mola-shallow', isSurface);
-                fish.dom.classList.toggle('mola-mid', isMid);
-                return {
-                    minBottom: isSurface ? 3 : 5,
-                    safetyBuffer: isSurface ? -2 : (isMid ? 9 : 18),
-                    allowSurface: isSurface
-                };
+        function getFishPixelHeight(fish) {
+            const h = fish.dom.getBoundingClientRect().height || fish.dom.offsetHeight || 60;
+            return h;
+        }
+
+        function updateMolaVisualState(fish) {
+            if (fish.id !== 'fish_mola') return false;
+            const waterHeight = getCurrentWaterPercentagePrecise();
+            const isSurface = waterHeight < 26;
+            const isMid = waterHeight >= 26 && waterHeight < 55;
+            fish.dom.classList.toggle('mola-surface', isSurface);
+            fish.dom.classList.toggle('mola-shallow', isSurface);
+            fish.dom.classList.toggle('mola-mid', isMid);
+            return isSurface;
+        }
+
+        function getFishDepthRange(fish) {
+            const tankHeight = Math.max(1, waterBg.clientHeight || window.innerHeight * (getCurrentWaterPercentagePrecise() / 100));
+            const fishHeight = getFishPixelHeight(fish);
+            const isMola = fish.id === 'fish_mola' || fish.dom.classList.contains('size-mola');
+            const isJelly = fish.id === 'fish_jelly' || fish.dom.classList.contains('size-jelly');
+            const isDolphin = fish.id === 'fish_dolphin' || fish.dom.classList.contains('size-dolphin');
+            const allowSurface = updateMolaVisualState(fish);
+
+            // bottom 是相對於「水域容器」的百分比，不是整個畫面百分比。
+            // 用魚本身高度換算安全上限，水滿時就能自然分布到中上層。
+            const topMarginPx = isMola ? 10 : (isDolphin ? 8 : 6);
+            const surfaceAllowancePx = allowSurface ? fishHeight * 0.45 : 0;
+            let maxBySize = ((tankHeight - fishHeight - topMarginPx + surfaceAllowancePx) / tankHeight) * 100;
+
+            let min = isJelly ? 12 : 6;
+            let max = clampNumber(maxBySize, min, 90);
+
+            if (isDolphin) {
+                min = Math.max(min, 18);
+                max = Math.max(min + 8, Math.min(max, 82));
             }
 
-            let safetyBuffer = 6;
-            if (fish.dom.classList.contains('size-large')) safetyBuffer = 10;
-            else if (fish.dom.classList.contains('size-huge')) safetyBuffer = 12;
-            else if (fish.dom.classList.contains('size-jelly')) safetyBuffer = 12;
-            return { minBottom: 2, safetyBuffer, allowSurface: false };
+            if (isMola) {
+                if (allowSurface) {
+                    min = 2;
+                    max = Math.max(8, Math.min(max, 35));
+                } else {
+                    min = 8;
+                    max = Math.max(min + 8, Math.min(max, 78));
+                }
+            }
+
+            return { min, max, allowSurface };
         }
 
         function getRandomBottomForFish(fish) {
-            const currentWaterHeight = getCurrentWaterPercentagePrecise();
-            const { minBottom, safetyBuffer } = getFishSafetyConfig(fish);
-            const maxSafeBottom = currentWaterHeight - safetyBuffer;
-            return maxSafeBottom > minBottom
-                ? minBottom + (Math.random() * (maxSafeBottom - minBottom))
-                : minBottom;
+            const { min, max, allowSurface } = getFishDepthRange(fish);
+            if (fish.id === 'fish_mola' && allowSurface && Math.random() < 0.35) {
+                return max; // 低水位時偶爾貼近水面，形成部分露出水面的效果。
+            }
+            return min + Math.random() * Math.max(0, max - min);
         }
 
         function assignRandomHeightToFish(fish, force = false) {
-            const currentWaterHeight = getCurrentWaterPercentagePrecise();
-            const { safetyBuffer } = getFishSafetyConfig(fish);
-            const maxSafeBottom = currentWaterHeight - safetyBuffer;
+            const { min, max } = getFishDepthRange(fish);
             const now = performance.now();
+            const current = fish.currentBottom;
+            const outOfRange = current === null || current < min || current > max;
 
-            const mustMoveForSafety = fish.currentBottom === null || fish.currentBottom > maxSafeBottom;
-            if (force || mustMoveForSafety) {
+            if (force || outOfRange) {
                 fish.currentBottom = getRandomBottomForFish(fish);
                 fish.dom.style.bottom = `${fish.currentBottom}%`;
-                fish.nextDepthChangeAt = now + 7000 + Math.random() * 8000;
+                fish.nextDepthChangeAt = now + 12000 + Math.random() * 14000;
             }
         }
 
@@ -1111,16 +1160,15 @@
             if (!hasStartedCounting || instantiatedFishList.length === 0) return;
             const now = performance.now();
             instantiatedFishList.forEach(fish => {
-                const currentWaterHeight = getCurrentWaterPercentagePrecise();
-                const { safetyBuffer } = getFishSafetyConfig(fish);
-                const maxSafeBottom = currentWaterHeight - safetyBuffer;
-                const isUnsafe = fish.currentBottom === null || fish.currentBottom > maxSafeBottom;
-                const shouldDrift = !isUnsafe && now >= (fish.nextDepthChangeAt || 0);
+                const { min, max } = getFishDepthRange(fish);
+                const current = fish.currentBottom;
+                const outOfRange = current === null || current < min || current > max;
+                const shouldDrift = !outOfRange && now >= (fish.nextDepthChangeAt || 0);
 
-                if (isUnsafe || shouldDrift) {
+                if (outOfRange || shouldDrift) {
                     fish.currentBottom = getRandomBottomForFish(fish);
                     fish.dom.style.bottom = `${fish.currentBottom}%`;
-                    fish.nextDepthChangeAt = now + 9000 + Math.random() * 11000;
+                    fish.nextDepthChangeAt = now + 16000 + Math.random() * 22000;
                 }
             });
         }
@@ -1151,7 +1199,7 @@
                 let existingFish = instantiatedFishList.filter(f => f.id === fish.id);
 
                 if (isUnlocked && hasStartedCounting && existingFish.length === 0) {
-                    const spawnCount = (fish.id === 'fish1') ? 3 : ((fish.sizeClass === 'size-mola' || fish.sizeClass === 'size-huge') ? 1 : 2); 
+                    const spawnCount = (fish.id === 'fish1') ? 3 : ((fish.sizeClass === 'size-mola' || fish.sizeClass === 'size-huge' || fish.sizeClass === 'size-dolphin') ? 1 : 2); 
                     for (let i = 0; i < spawnCount; i++) {
                         const fishContainer = document.createElement('div');
                         fishContainer.className = `fish-container ${fish.sizeClass}`;
@@ -1168,7 +1216,7 @@
                         
                         let baseSpeed = 10;
                         if (fish.sizeClass === 'size-large') baseSpeed = 14;
-                        else if (fish.sizeClass === 'size-huge') baseSpeed = 17;
+                        else if (fish.sizeClass === 'size-huge' || fish.sizeClass === 'size-dolphin') baseSpeed = 17;
                         else if (fish.sizeClass === 'size-jelly') baseSpeed = 15; 
                         else if (fish.sizeClass === 'size-mola') baseSpeed = 24;
 
