@@ -492,7 +492,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.3.6</div>
+    <div class="version-tag">v1.3.7</div>
 
     <svg class="global-svg-defs">
         <defs>
@@ -715,11 +715,16 @@
             </svg>` }
         ];
 
+        const FISH_SPEED_MULTIPLIERS = {
+            fish_sail: 0.5 // 旗魚動畫時間減半 = 速度 2 倍
+        };
+
         let totalSeconds = 0;
         let remainingSeconds = 0;
         let accumulatedSeconds = parseInt(localStorage.getItem('accumulatedSeconds')) || 0; 
         
         let timerTimeout = null;
+        let alarmLoopInterval = null;
         let isPaused = true;
         let hasStartedCounting = false; 
         let instantiatedFishList = [];
@@ -753,6 +758,7 @@
         const statsToggleBtn = document.getElementById('stats-toggle-btn');
         const startBtn = document.getElementById('start-btn');
         const pauseBtn = document.getElementById('pause-btn');
+        const timeInputs = [hoursInput, minutesInput, secondsInput];
 
         function formatTime(totalSecs) {
             const hrs = Math.floor(totalSecs / 3600);
@@ -954,7 +960,8 @@
                         else if (fish.sizeClass === 'size-jelly') baseSpeed = 15; 
                         else if (fish.sizeClass === 'size-mola') baseSpeed = 24;
 
-                        const randomSpeed = (Math.random() * 5 + baseSpeed).toFixed(1); 
+                        const speedMultiplier = FISH_SPEED_MULTIPLIERS[fish.id] || 1;
+                        const randomSpeed = ((Math.random() * 5 + baseSpeed) * speedMultiplier).toFixed(1); 
                         const randomDelay = (Math.random() * 5).toFixed(1); 
                         const direction = Math.random() > 0.5 ? 'right' : 'left';
 
@@ -1065,9 +1072,7 @@
                 startBtn.disabled = true; 
                 pauseBtn.disabled = false;
                 
-                ['hours-input', 'minutes-input', 'seconds-input'].forEach(id => {
-                    document.getElementById(id).disabled = true;
-                });
+                timeInputs.forEach(input => { input.disabled = true; });
                 
                 updateUI(); 
                 checkAndRefreshFishTank();
@@ -1139,9 +1144,7 @@
             msElapsedBeforePause = 0;
             startTimeStamp = 0;
             
-            ['hours-input', 'minutes-input', 'seconds-input'].forEach(id => {
-                document.getElementById(id).disabled = false;
-            });
+            timeInputs.forEach(input => { input.disabled = false; });
             
             startBtn.disabled = false; 
             startBtn.innerText = '開始'; 
@@ -1210,7 +1213,7 @@
             } catch (e) { console.error(e); }
         }
 
-        [hoursInput, minutesInput, secondsInput].forEach(el => {
+        timeInputs.forEach(el => {
             el.addEventListener('input', syncPreview);
         });
         
