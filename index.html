@@ -625,7 +625,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.5.2</div>
+    <div class="version-tag">v1.5.3</div>
 
     <svg class="global-svg-defs">
         <defs>
@@ -1316,12 +1316,14 @@
             }
 
             if (isMola) {
+                // 翻車魚體型大，但不應該長期卡在海草附近。
+                // 水位低時仍允許少量露出水面；水位足夠時放寬到中上層活動。
                 if (allowSurface) {
                     min = 1;
-                    max = Math.max(10, Math.min(max, 38));
+                    max = Math.max(14, Math.min(max, 45));
                 } else {
-                    min = 7;
-                    max = Math.max(min + 12, Math.min(max, 80));
+                    min = 10;
+                    max = Math.max(min + 18, Math.min(max, 88));
                 }
             }
 
@@ -1331,7 +1333,7 @@
         function getRandomBottomForFish(fish) {
             const { min, max, allowSurface } = getFishDepthRange(fish);
             const span = Math.max(0, max - min);
-            if (fish.id === 'fish_mola' && allowSurface && Math.random() < 0.35) {
+            if (fish.id === 'fish_mola' && allowSurface && Math.random() < 0.45) {
                 return max;
             }
             // 使用均勻分布，避免同魚種長時間集中在固定高度或底部。
@@ -1343,7 +1345,7 @@
             const span = Math.max(0, max - min);
             if (span <= 1) return min;
 
-            if (fish.id === 'fish_mola' && allowSurface && Math.random() < 0.3) {
+            if (fish.id === 'fish_mola' && allowSurface && Math.random() < 0.4) {
                 return max;
             }
 
@@ -1361,7 +1363,10 @@
         function scheduleNextDepthChange(fish, initial = false) {
             const now = performance.now();
             // 更頻繁且每隻魚不同步地換深度，避免旗魚、海豚等大型魚永遠沿同一條線巡航。
-            fish.nextDepthChangeAt = now + (initial ? 1800 : 3000) + Math.random() * 4200;
+            const baseDelay = fish.id === 'fish_mola' ? 7000 : 3000;
+            const initialDelay = fish.id === 'fish_mola' ? 2600 : 1800;
+            const randomDelay = fish.id === 'fish_mola' ? 8500 : 4200;
+            fish.nextDepthChangeAt = now + (initial ? initialDelay : baseDelay) + Math.random() * randomDelay;
         }
 
         function assignRandomHeightToFish(fish, force = false) {
@@ -1443,7 +1448,7 @@
                 fish.currentBottom = clampNumber(fish.currentBottom ?? fish.targetBottom, min, max);
 
                 // 慢慢游向新深度，不再靠 CSS animation 固定在同一條水平線。
-                const depthEase = fish.id === 'fish_sail' ? 0.45 : 0.32;
+                const depthEase = fish.id === 'fish_sail' ? 0.45 : (fish.id === 'fish_mola' ? 0.22 : 0.32);
                 fish.currentBottom += (fish.targetBottom - fish.currentBottom) * depthEase * dt;
 
                 const dir = fish.direction === 'right' ? 1 : -1;
@@ -1465,10 +1470,6 @@
             });
         }
 
-        function gentlyRefreshFishDepths() {
-            // v1.5.0 起由 requestAnimationFrame 的 updateFishMotion 統一控制深度。
-            updateFishMotion(performance.now());
-        }
 
         function createBubbleTrail() {
             const trail = document.createElement('div');
@@ -1483,14 +1484,11 @@
         function checkAndRefreshFishTank() {
             let unlockedCount = FISH_DATABASE.filter(f => accumulatedSeconds >= f.target).length;
             if (unlockedCount === cachedUnlockedCount && hasStartedCounting && instantiatedFishList.length > 0) {
-                gentlyRefreshFishDepths();
                 return;
             }
             cachedUnlockedCount = unlockedCount;
             fishCountDisplay.innerText = `🐠 已解鎖魚種：${unlockedCount} / ${FISH_DATABASE.length}`;
             updateFishGuideUI();
-            const currentWaterHeight = getCurrentWaterPercentagePrecise();
-
             FISH_DATABASE.forEach((fish) => {
                 const isUnlocked = accumulatedSeconds >= fish.target;
                 let existingFish = instantiatedFishList.filter(f => f.id === fish.id);
@@ -1523,7 +1521,6 @@
 
                         const speedMultiplier = FISH_SPEED_MULTIPLIERS[fish.id] || 1;
                         const randomSpeed = ((Math.random() * 5 + baseSpeed) * speedMultiplier).toFixed(1); 
-                        const randomDelay = (Math.random() * 5).toFixed(1); 
                         const direction = Math.random() > 0.5 ? 'right' : 'left';
 
                         const fishData = { 
@@ -1532,7 +1529,6 @@
                             targetThreshold: fish.target, 
                             direction: direction, 
                             speed: randomSpeed, 
-                            delay: randomDelay, 
                             currentBottom: null,
                             nextDepthChangeAt: 0 
                         };
@@ -1547,7 +1543,6 @@
                 existingFish.forEach(f => {
                     if (isUnlocked && hasStartedCounting) {
                         prepareFishForJsMotion(f);
-                        updateFishMotion(performance.now());
                     } else {
                         f.dom.classList.remove('active-swim-right', 'active-swim-left', 'js-swim');
                         f.dom.style.animation = ''; 
