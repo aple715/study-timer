@@ -625,7 +625,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.5.0</div>
+    <div class="version-tag">v1.5.1</div>
 
     <svg class="global-svg-defs">
         <defs>
@@ -848,7 +848,70 @@
             { id: 'fish4', name: '螢光綠燈魚', target: 600, sizeClass: '', label: '10 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><ellipse cx="50" cy="35" rx="32" ry="16" fill="#00cc66"/><path d="M18,35 Q0,20 3,35 Q0,50 18,35" fill="#ff3333"/><path d="M25,35 Q50,28 75,35" stroke="#33ffff" stroke-width="3" fill="none"/><circle cx="68" cy="30" r="3.5" fill="black"/><circle cx="69.5" cy="28.5" r="1.2" fill="white"/></g></svg>` },
             { id: 'fish5', name: '赤鱗獅子魚', target: 1800, sizeClass: '', label: '30 分鐘', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><path d="M35,18 L20,-2 L40,3 Z M48,15 L40,-5 L53,2 Z M58,16 L60,-5 L65,5 Z M35,52 L20,72 L40,67 Z M48,55 L40,75 L53,68 Z M58,54 L60,75 L65,65 Z" fill="#ff4d4d"/><ellipse cx="50" cy="35" rx="33" ry="20" fill="#cc0000"/><path d="M17,35 Q-5,15 0,35 Q-5,55 17,35" fill="#ff4d4d"/><path d="M30,22 Q50,28 65,22 M30,48 Q50,42 65,48" stroke="white" stroke-width="1.5" fill="none"/><circle cx="68" cy="28" r="4" fill="black"/><circle cx="70" cy="26" r="1.5" fill="white"/></g></svg>` },
             { id: 'fish_puff', name: '刺蝟綠河豚', target: 3600, sizeClass: '', label: '1 小時', svg: `<svg viewBox="0 0 120 80"><g transform="translate(10,5)"><circle cx="50" cy="35" r="24" fill="#ccff33"/><path d="M26,35 Q10,23 15,35 Q10,47 26,35" fill="#99cc00"/><path d="M32,20 L27,15 M42,15 L39,8 M55,14 L55,6 M67,17 L72,11 M30,48 L25,53 M40,54 L37,61 M54,56 L55,64 M68,52 L73,57" stroke="#668000" stroke-width="2"/><circle cx="62" cy="27" r="4.5" fill="black"/><circle cx="64" cy="25" r="1.5" fill="white"/><path d="M50,43 Q56,47 62,42" stroke="#668000" stroke-width="2" fill="none"/></g></svg>` },
-            { id: 'fish_sail', name: '破浪大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 160 100"><g transform="translate(10,10)"><path d="M45,25 Q70,-10 95,15 C75,10 60,15 45,25 Z" fill="#002266"/><path d="M20,40 Q-5,25 0,40 Q-5,55 20,40" fill="#3399ff"/><ellipse cx="65" cy="40" rx="50" ry="22" fill="#0055ff"/><path d="M115,38 L145,36" stroke="#002266" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="32" r="4.5" fill="black"/><circle cx="102" cy="30" r="1.5" fill="white"/></g></svg>` },
+            { id: 'fish_sail', name: '破浪大旗魚', target: 7200, sizeClass: 'size-large', label: '2 小時', svg: `<svg viewBox="0 0 205 105" width="100%" height="100%">
+                <g transform="translate(4, 6)">
+                    <defs>
+                        <linearGradient id="sailBodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#083f91"/>
+                            <stop offset="42%" stop-color="#0b69c7"/>
+                            <stop offset="72%" stop-color="#dff5ff"/>
+                            <stop offset="100%" stop-color="#ffffff"/>
+                        </linearGradient>
+                        <linearGradient id="sailFinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#052e73"/>
+                            <stop offset="100%" stop-color="#0c6ed0"/>
+                        </linearGradient>
+                        <linearGradient id="sailGoldLine" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#fff0a6" stop-opacity="0"/>
+                            <stop offset="22%" stop-color="#ffd66b" stop-opacity="0.9"/>
+                            <stop offset="72%" stop-color="#ffc547" stop-opacity="0.85"/>
+                            <stop offset="100%" stop-color="#fff0a6" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+
+                    <!-- 長吻：旗魚最明顯特徵 -->
+                    <path d="M4,50 C28,48 45,47 64,47" stroke="#062d68" stroke-width="2.4" stroke-linecap="round"/>
+                    <path d="M6,51 C28,51 45,50 64,49" stroke="#9fd8ff" stroke-width="0.9" stroke-linecap="round" opacity="0.75"/>
+
+                    <!-- 高張背帆 -->
+                    <path d="M57,43 C66,8 88,2 119,18 C111,20 112,27 119,29 C105,30 107,37 116,39 C96,36 78,37 57,43 Z" fill="url(#sailFinGrad)" stroke="#04285f" stroke-width="1.2"/>
+                    <path d="M65,39 C72,19 82,11 96,10 M75,37 C82,18 93,12 107,17 M86,36 C92,22 101,18 112,22" stroke="#6bb7ff" stroke-width="1" opacity="0.45" fill="none"/>
+
+                    <!-- 流線身體 -->
+                    <path d="M53,50 C66,32 107,28 148,39 C163,43 171,48 176,51 C165,56 151,61 126,65 C92,70 64,64 53,50 Z" fill="url(#sailBodyGrad)" stroke="#08346f" stroke-width="1.3"/>
+                    <path d="M58,52 C84,50 121,50 164,51" stroke="#f6fbff" stroke-width="3.2" opacity="0.78" fill="none" stroke-linecap="round"/>
+                    <path d="M69,45 C96,41 126,42 158,48" stroke="#0a377c" stroke-width="2.3" opacity="0.35" fill="none" stroke-linecap="round"/>
+                    <path d="M72,55 C101,61 132,59 159,53" stroke="#bfeaff" stroke-width="1.5" opacity="0.65" fill="none" stroke-linecap="round"/>
+
+                    <!-- 金色速度側線與垂直斑紋 -->
+                    <path d="M70,53 C98,51 130,51 162,52" stroke="url(#sailGoldLine)" stroke-width="2.2" opacity="0.95" fill="none" stroke-linecap="round"/>
+                    <g stroke="#ffffff" stroke-width="1.4" opacity="0.45" stroke-linecap="round">
+                        <path d="M78,43 L76,61"/><path d="M88,41 L87,63"/><path d="M99,40 L99,64"/>
+                        <path d="M110,40 L111,64"/><path d="M121,41 L123,62"/><path d="M132,43 L135,60"/>
+                        <path d="M143,45 L147,57"/>
+                    </g>
+
+                    <!-- 頭部、眼睛、鰓線 -->
+                    <path d="M53,50 C60,41 68,38 76,39 C71,45 71,56 76,63 C66,62 59,58 53,50 Z" fill="#dff4ff" opacity="0.92" stroke="#7ba8c8" stroke-width="0.8"/>
+                    <path d="M67,41 C62,47 62,55 68,61" stroke="#7aa4c1" stroke-width="1.1" fill="none" opacity="0.75"/>
+                    <circle cx="70" cy="45" r="4.9" fill="#f8fbff" stroke="#06316b" stroke-width="1"/>
+                    <circle cx="71" cy="45" r="2.8" fill="#061b36"/>
+                    <circle cx="72.2" cy="43.8" r="1" fill="#ffffff"/>
+                    <path d="M56,55 C63,54 68,54 72,56" stroke="#4f718a" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+
+                    <!-- 腹鰭與小副鰭 -->
+                    <path d="M86,64 C80,74 74,79 68,77 C73,68 78,64 86,64 Z" fill="#0758b6" stroke="#06316b" stroke-width="0.8"/>
+                    <path d="M126,64 C122,72 116,76 111,73 C115,67 120,64 126,64 Z" fill="#0758b6" stroke="#06316b" stroke-width="0.8"/>
+                    <path d="M144,62 C141,68 136,70 133,67 C136,64 140,62 144,62 Z" fill="#063b86" opacity="0.9"/>
+                    <path d="M147,40 C144,35 139,33 135,35 C139,39 143,40 147,40 Z" fill="#063b86" opacity="0.9"/>
+
+                    <!-- 尾柄與月牙尾 -->
+                    <path d="M163,49 C172,45 179,43 184,40 C179,47 179,55 184,63 C177,58 171,55 163,53 Z" fill="#0a55ad" stroke="#052c66" stroke-width="1"/>
+                    <path d="M181,40 C186,27 192,20 198,17 C196,34 191,45 184,51 Z" fill="#084b9d" stroke="#052c66" stroke-width="1"/>
+                    <path d="M184,52 C191,59 195,70 197,85 C189,78 184,70 181,63 Z" fill="#084b9d" stroke="#052c66" stroke-width="1"/>
+                    <path d="M169,51 C176,51 180,51 184,52" stroke="#75bdff" stroke-width="1" opacity="0.55"/>
+                </g>
+            </svg>` },
             { id: 'fish_dolphin', name: '蔚藍大海豚', target: 10800, sizeClass: 'size-dolphin', label: '3 小時', svg: `<svg viewBox="0 0 300 130" width="100%" height="100%" aria-label="瓶鼻海豚">
                 <g transform="translate(4,6)">
                     <defs>
