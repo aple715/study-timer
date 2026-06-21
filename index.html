@@ -11,7 +11,16 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>深呼吸！海洋專注計時器</title>
+    <title>Ocean Focus｜海洋專注計時器</title>
+    <meta name="description" content="透過專注學習解鎖魚類與海洋生物，打造屬於你的海洋生態系。">
+    <meta name="keywords" content="Ocean Focus, 海洋專注計時器, 番茄鐘, 專注, 讀書計時器, 養魚, 學習工具">
+    <meta name="author" content="Ocean Focus">
+    <meta property="og:title" content="Ocean Focus｜海洋專注計時器">
+    <meta property="og:description" content="專注學習，解鎖海洋生物，打造你的海洋生態系。">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Ocean Focus">
+    <meta name="twitter:card" content="summary">
+    <meta name="theme-color" content="#12d6df">
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐟</text></svg>">
     <link class="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐟</text></svg>">
@@ -576,6 +585,7 @@
         }
         
         .container.minimized-mode h1,
+        .container.minimized-mode .value-proposition,
         .container.minimized-mode .setting-group,
         .container.minimized-mode .btn-group { 
             display: none !important; 
@@ -606,8 +616,80 @@
             .stats-display { top: 50px; right: 10px; left: 10px; width: auto; text-align: center; align-items: center; }
             .custom-select-container { width: 100%; }
             .time-inputs-container { gap: 4px; }
+            .value-proposition { font-size: 13px; margin: -4px 0 14px; }
+            .welcome-box { padding: 24px 18px; }
             input[type="number"], select { font-size: 15px; padding: 9px 6px; }
         }
+
+
+
+        .value-proposition {
+            margin: -10px 0 18px;
+            color: #0f6f8f;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.45;
+            letter-spacing: 0.3px;
+            user-select: none;
+        }
+
+        .welcome-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(6, 38, 64, 0.45);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 22px;
+        }
+
+        .welcome-overlay.active { display: flex; }
+
+        .welcome-box {
+            width: min(92vw, 420px);
+            padding: 28px 24px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 18px 50px rgba(0, 40, 80, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            text-align: center;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        .welcome-box h2 {
+            color: #0b4f7a;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .welcome-box p {
+            color: #345;
+            font-size: 15px;
+            line-height: 1.75;
+            margin-bottom: 16px;
+        }
+
+        .welcome-feature-list {
+            text-align: left;
+            display: grid;
+            gap: 8px;
+            margin: 16px 0 22px;
+            color: #234;
+            font-size: 14px;
+            font-weight: 650;
+        }
+
+        .welcome-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #1fa2ff, #12d6df);
+            color: white;
+            box-shadow: 0 8px 20px rgba(18, 150, 210, 0.28);
+        }
+
+        .welcome-btn:hover { transform: translateY(-1px); }
 
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 200; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
@@ -625,7 +707,7 @@
 </head>
 <body>
 
-    <div class="version-tag">v1.5.3</div>
+    <div class="version-tag">v1.5.4</div>
 
     <svg class="global-svg-defs">
         <defs>
@@ -704,6 +786,7 @@
     <div class="container" id="main-container">
         <button class="minimize-toggle-btn" id="minimize-btn" onclick="toggleMinimizeMode()" title="縮小計時器">縮小</button>
         <h1>書海無涯，水快淹來啦！</h1>
+        <div class="value-proposition">🌊 專注學習，打造你的海洋生態系</div>
         
         <div class="setting-group">
             <label>設定專注時間</label>
@@ -746,6 +829,20 @@
             <button class="modal-btn" onclick="dismissAlarm()">確定 (關閉鬧鐘)</button>
         </div>
     </div>
+
+    <div class="welcome-overlay" id="welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+        <div class="welcome-box">
+            <h2 id="welcome-title">🌊 歡迎來到 Ocean Focus</h2>
+            <p>專注學習，打造你的海洋生態系。每累積專注時間，都能解鎖新的魚類與海洋生物。</p>
+            <div class="welcome-feature-list">
+                <div>🐟 目前共有 10 種生物等待發現</div>
+                <div>⏱️ 專注時間會累積保存</div>
+                <div>📚 打開圖鑑可以查看解鎖條件</div>
+            </div>
+            <button class="welcome-btn" onclick="dismissWelcome()">開始探索</button>
+        </div>
+    </div>
+
 
     <script>
         let audioCtx = null;
@@ -1083,7 +1180,7 @@
         let isDragging = false;
         let startX = 0, startY = 0;
 
-        const defaultTitle = "深呼吸！海洋專注計時器";
+        const defaultTitle = "Ocean Focus｜海洋專注計時器";
         const hoursInput = document.getElementById('hours-input');
         const minutesInput = document.getElementById('minutes-input');
         const secondsInput = document.getElementById('seconds-input');
@@ -1096,6 +1193,7 @@
         const waterBg = document.getElementById('water');
         const fishTankContent = document.getElementById('fish-tank-content');
         const alarmModal = document.getElementById('alarm-modal');
+        const welcomeModal = document.getElementById('welcome-modal');
         const mainContainer = document.getElementById('main-container');
         const minimizeBtn = document.getElementById('minimize-btn');
         const statsCard = document.getElementById('stats-card');
@@ -1232,7 +1330,7 @@
                 if (accumulatedSeconds >= fish.target) {
                     optionDiv.innerHTML = `<div class="select-fish-icon">${fish.svg}</div><span>${fish.name} (${fish.label})</span>`;
                 } else {
-                    optionDiv.innerHTML = `<div class="select-fish-icon">🔒</div><span style="color: #94a3b8;">未解鎖（累積 ${fish.label}）</span>`;
+                    optionDiv.innerHTML = `<div class="select-fish-icon">🔒</div><span style="color: #64748b;"><strong>???</strong><br><small>需累積 ${fish.label} 專注時間</small></span>`;
                 }
                 customOptionsBox.appendChild(optionDiv);
             });
@@ -1725,6 +1823,12 @@
             resetTimer(); 
         }
 
+
+        function dismissWelcome() {
+            localStorage.setItem('oceanFocusWelcomeSeen', 'true');
+            welcomeModal.classList.remove('active');
+        }
+
         function playAlarmSound(soundType) {
             try {
                 if (!audioCtx) initAudioContext();
@@ -1783,6 +1887,10 @@
         timeInputs.forEach(el => {
             el.addEventListener('input', syncPreview);
         });
+        
+        if (localStorage.getItem('oceanFocusWelcomeSeen') !== 'true') {
+            welcomeModal.classList.add('active');
+        }
         
         waterBg.style.height = `${INITIAL_WATER_PERCENT}%`;
         checkAndRefreshFishTank();
